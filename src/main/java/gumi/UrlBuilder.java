@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -37,8 +38,8 @@ public class UrlBuilder implements Cloneable {
 
     private volatile String path;
 
-    private volatile ConcurrentMap<String, ArrayList<String>> queryParameters =
-            new ConcurrentHashMap<String, ArrayList<String>>();
+    private volatile ConcurrentMap<String, List<String>> queryParameters =
+            new ConcurrentHashMap<String, List<String>>();
 
     private volatile String anchor;
 
@@ -54,7 +55,10 @@ public class UrlBuilder implements Cloneable {
         ret.hostName = this.hostName;
         ret.port = this.port;
         ret.path = this.path;
-        ret.queryParameters = new ConcurrentHashMap<String, ArrayList<String>>(this.queryParameters);
+        ret.queryParameters = new ConcurrentHashMap<String, List<String>>();
+        for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
+            ret.queryParameters.put(e.getKey(), new ArrayList<String>(e.getValue()));
+        }
         ret.anchor = this.anchor;
         return ret;
     }
@@ -111,8 +115,8 @@ public class UrlBuilder implements Cloneable {
         return ret;
     }
 
-    private ConcurrentMap<String, ArrayList<String>> decodeQueryParameters(final String query) {
-        final ConcurrentMap<String, ArrayList<String>> ret = new ConcurrentHashMap<String, ArrayList<String>>();
+    private ConcurrentMap<String, List<String>> decodeQueryParameters(final String query) {
+        final ConcurrentMap<String, List<String>> ret = new ConcurrentHashMap<String, List<String>>();
         if (query == null || query.isEmpty()) {
             return ret;
         }
@@ -133,7 +137,7 @@ public class UrlBuilder implements Cloneable {
             } else {
                 value = null;
             }
-            final ArrayList<String> valueList;
+            final List<String> valueList;
             if (ret.containsKey(key)) {
                 valueList = ret.get(key);
             } else {
@@ -147,7 +151,7 @@ public class UrlBuilder implements Cloneable {
 
     private String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, ArrayList<String>> e : this.queryParameters.entrySet()) {
+        for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
             for (final String value : e.getValue()) {
                 try {
                     sb.append(URLEncoder.encode(e.getKey(), this.outputEncodingName));
@@ -276,7 +280,7 @@ public class UrlBuilder implements Cloneable {
 
     public UrlBuilder addQueryParameter(final String key, final String value) {
         final UrlBuilder ret = clone();
-        final ArrayList<String> valueList;
+        final List<String> valueList;
         if (ret.queryParameters.containsKey(key)) {
             valueList = ret.queryParameters.get(key);
         } else {
