@@ -21,7 +21,7 @@ public class UrlBuilder implements Cloneable {
             Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
     private static final Pattern AUTHORITY_PATTERN =
-            Pattern.compile("(.*)(?:([0-9]*))");
+            Pattern.compile("([^:]*)(:([0-9]*))?");
 
     public static final String DEFAULT_SCHEME = "http";
 
@@ -42,11 +42,10 @@ public class UrlBuilder implements Cloneable {
 
     private volatile String anchor;
 
-
     private UrlBuilder() {
     }
 
-
+    @Override
     public UrlBuilder clone() {
         final UrlBuilder ret = new UrlBuilder();
         ret.inputEncodingName = this.inputEncodingName;
@@ -64,17 +63,26 @@ public class UrlBuilder implements Cloneable {
         return fromString(url, "UTF-8");
     }
 
+    public static UrlBuilder fromEmpty() {
+        return new UrlBuilder();
+    }
+
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
         final UrlBuilder ret = new UrlBuilder();
         ret.inputEncodingName = inputEncoding;
+        if (url.isEmpty()) {
+            return ret;
+        }
         final Matcher m = URI_PATTERN.matcher(url);
         if (m.find()) {
             ret.protocol = m.group(2);
-            final Matcher n = AUTHORITY_PATTERN.matcher(m.group(4));
-            if (n.find()) {
-                ret.hostName = n.group(1);
-                if (n.groupCount() > 1) {
-                    ret.port = Integer.parseInt(n.group(3));
+            if (m.group(4) != null) {
+                final Matcher n = AUTHORITY_PATTERN.matcher(m.group(4));
+                if (n.find()) {
+                    ret.hostName = n.group(1);
+                    if (n.group(3) != null) {
+                        ret.port = Integer.parseInt(n.group(3));
+                    }
                 }
             }
             ret.path = m.group(5);
@@ -105,6 +113,9 @@ public class UrlBuilder implements Cloneable {
 
     private ConcurrentMap<String, ArrayList<String>> decodeQueryParameters(final String query) {
         final ConcurrentMap<String, ArrayList<String>> ret = new ConcurrentHashMap<String, ArrayList<String>>();
+        if (query == null || query.isEmpty()) {
+            return ret;
+        }
         for (final String part : query.split("&")) {
             final String[] kvp = part.split("=", 2);
             String key, value;
@@ -154,7 +165,7 @@ public class UrlBuilder implements Cloneable {
                 sb.append('&');
             }
         }
-        sb.deleteCharAt(sb.length());
+        sb.deleteCharAt(sb.length()-1);
         return sb.toString();
     }
 
