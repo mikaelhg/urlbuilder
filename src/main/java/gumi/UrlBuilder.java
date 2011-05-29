@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,8 +41,6 @@ import java.util.regex.Pattern;
  */
 public class UrlBuilder implements Cloneable {
 
-    private static final Logger log = Logger.getLogger(UrlBuilder.class.getName());
-
     private static final String DEFAULT_ENCODING_NAME = "UTF-8";
 
     private static final Pattern URI_PATTERN =
@@ -54,9 +51,9 @@ public class UrlBuilder implements Cloneable {
 
     public static final String DEFAULT_SCHEME = "http";
 
-    private volatile Charset inputEncodingName = Charset.forName(DEFAULT_ENCODING_NAME);
+    private volatile Charset inputEncoding = Charset.forName(DEFAULT_ENCODING_NAME);
 
-    private volatile Charset outputEncodingName = Charset.forName(DEFAULT_ENCODING_NAME);
+    private volatile Charset outputEncoding = Charset.forName(DEFAULT_ENCODING_NAME);
 
     private volatile String protocol = DEFAULT_SCHEME;
 
@@ -81,8 +78,8 @@ public class UrlBuilder implements Cloneable {
     @Override
     public UrlBuilder clone() {
         final UrlBuilder ret = new UrlBuilder();
-        ret.inputEncodingName = this.inputEncodingName;
-        ret.outputEncodingName = this.outputEncodingName;
+        ret.inputEncoding = this.inputEncoding;
+        ret.outputEncoding = this.outputEncoding;
         ret.protocol = this.protocol;
         ret.hostName = this.hostName;
         ret.port = this.port;
@@ -105,7 +102,7 @@ public class UrlBuilder implements Cloneable {
 
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
         final UrlBuilder ret = new UrlBuilder();
-        ret.inputEncodingName = Charset.forName(inputEncoding);
+        ret.inputEncoding = Charset.forName(inputEncoding);
         if (url.isEmpty()) {
             return ret;
         }
@@ -155,9 +152,9 @@ public class UrlBuilder implements Cloneable {
         for (final String part : query.split("&")) {
             final String[] kvp = part.split("=", 2);
             String key, value;
-            key = urlDecode(kvp[0], this.inputEncodingName);
+            key = urlDecode(kvp[0], this.inputEncoding);
             if (kvp.length == 2) {
-                value = urlDecode(kvp[1], this.inputEncodingName);
+                value = urlDecode(kvp[1], this.inputEncoding);
             } else {
                 value = null;
             }
@@ -242,10 +239,10 @@ public class UrlBuilder implements Cloneable {
         final StringBuilder sb = new StringBuilder();
         for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
             for (final String value : e.getValue()) {
-                sb.append(urlEncode(e.getKey(), this.outputEncodingName));
+                sb.append(urlEncode(e.getKey(), this.outputEncoding));
                 if (value != null) {
                     sb.append('=');
-                    sb.append(urlEncode(value, this.outputEncodingName));
+                    sb.append(urlEncode(value, this.outputEncoding));
                 }
                 sb.append('&');
             }
@@ -265,7 +262,7 @@ public class UrlBuilder implements Cloneable {
             if ("/".equals(element)) {
                 sb.append(element);
             } else if (element != null && !element.isEmpty()) {
-                sb.append(urlEncode(element, this.outputEncodingName));
+                sb.append(urlEncode(element, this.outputEncoding));
             }
         }
         return sb.toString();
@@ -328,13 +325,13 @@ public class UrlBuilder implements Cloneable {
 
     public UrlBuilder encodeAs(final Charset charset) {
         final UrlBuilder ret = clone();
-        ret.outputEncodingName = charset;
+        ret.outputEncoding = charset;
         return ret;
     }
 
     public UrlBuilder encodeAs(final String charsetName) {
         final UrlBuilder ret = clone();
-        ret.outputEncodingName = Charset.forName(charsetName);
+        ret.outputEncoding = Charset.forName(charsetName);
         return ret;
     }
 
