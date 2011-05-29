@@ -1,22 +1,50 @@
+/*
+Copyright 2011 Mikael Gueck
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package gumi;
 
-import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Build and manipulate URLs easily.
+ *
  * URL: http://www.ietf.org/rfc/rfc1738.txt
  * URI: http://tools.ietf.org/html/rfc3986
  * @author Mikael Gueck gumi@iki.fi
  */
 public class UrlBuilder implements Cloneable {
+
+    private static final Logger log = Logger.getLogger(UrlBuilder.class.getName());
+
+    private static final String DEFAULT_ENCODING_NAME = "UTF-8";
 
     private static final Pattern URI_PATTERN =
             Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
@@ -26,9 +54,9 @@ public class UrlBuilder implements Cloneable {
 
     public static final String DEFAULT_SCHEME = "http";
 
-    private volatile String inputEncodingName = "UTF-8";
+    private volatile Charset inputEncodingName = Charset.forName(DEFAULT_ENCODING_NAME);
 
-    private volatile String outputEncodingName = "UTF-8";
+    private volatile Charset outputEncodingName = Charset.forName(DEFAULT_ENCODING_NAME);
 
     private volatile String protocol = DEFAULT_SCHEME;
 
@@ -43,7 +71,11 @@ public class UrlBuilder implements Cloneable {
 
     private volatile String anchor;
 
-    private UrlBuilder() {
+    /**
+     * The builder public constructor isn't meant to be used,
+     * but it's there if you need it.
+     */
+    public UrlBuilder() {
     }
 
     @Override
@@ -64,7 +96,7 @@ public class UrlBuilder implements Cloneable {
     }
 
     public static UrlBuilder fromString(final String url) {
-        return fromString(url, "UTF-8");
+        return fromString(url, DEFAULT_ENCODING_NAME);
     }
 
     public static UrlBuilder fromEmpty() {
@@ -73,7 +105,7 @@ public class UrlBuilder implements Cloneable {
 
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
         final UrlBuilder ret = new UrlBuilder();
-        ret.inputEncodingName = inputEncoding;
+        ret.inputEncodingName = Charset.forName(inputEncoding);
         if (url.isEmpty()) {
             return ret;
         }
@@ -123,17 +155,9 @@ public class UrlBuilder implements Cloneable {
         for (final String part : query.split("&")) {
             final String[] kvp = part.split("=", 2);
             String key, value;
-            try {
-                key = URLDecoder.decode(kvp[0], this.inputEncodingName);
-            } catch (final UnsupportedEncodingException e) {
-                key = kvp[0];
-            }
+            key = urlDecode(kvp[0], this.inputEncodingName);
             if (kvp.length == 2) {
-                try {
-                    value = URLDecoder.decode(kvp[1], this.inputEncodingName);
-                } catch (final UnsupportedEncodingException e) {
-                    value = kvp[1];
-                }
+                value = urlDecode(kvp[1], this.inputEncodingName);
             } else {
                 value = null;
             }
@@ -149,27 +173,101 @@ public class UrlBuilder implements Cloneable {
         return ret;
     }
 
-    private String encodeQueryParameters() {
+    protected boolean isUrlSafe(final char c) {
+        return ('a' <= c && 'z' >= c) ||
+                ('A' <= c && 'Z' >= c) ||
+                ('0' <= c && '9' >= c) ||
+                (c == '-' || c == '_' || c == '.' || c == '~' || c == ' ');
+    }
+
+    protected String urlEncode(final String input, final Charset charset) {
+        final StringBuilder sb = new StringBuilder();
+        final CharBuffer cb = CharBuffer.allocate(1);
+        for (final char c : input.toCharArray()) {
+            if (c == ' ') {
+                sb.append('+');
+            } else if (isUrlSafe(c)) {
+                sb.append(c);
+            } else {
+                cb.put(0, c);
+                cb.rewind();
+                for (final byte b : charset.encode(cb).array()) {
+                    sb.append('%');
+                    sb.append(String.format("%1$02X", b));
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    protected byte[] nextDecodeableSequence(final String input, final int position) {
+        final int len = input.length();
+        final byte[] data = new byte[len];
+        int j = 0;
+        for (int i = position; i < len; i++) {
+            final char c0 = input.charAt(i);
+            if (c0 != '%' || (len < i + 2)) {
+                return Arrays.copyOfRange(data, 0, j);
+            } else {
+                data[j++] = (byte) Integer.parseInt(input.substring(i + 1, i + 3), 16);
+                i += 2;
+            }
+        }
+        return Arrays.copyOfRange(data, 0, j);
+    }
+
+    protected String urlDecode(final String input, final Charset charset) {
+        final StringBuilder sb = new StringBuilder();
+        final int len = input.length();
+        int j = 0, i = 0;
+        for (i = 0; i < len; i++) {
+            final char c0 = input.charAt(i);
+            if (c0 == '+') {
+                sb.append(' ');
+            } else if (c0 != '%') {
+                sb.append(c0);
+            } else if (len < i + 2) {
+                // the string will end before we will be able to read a sequence
+                i += 2;
+            } else {
+                final byte[] bytes = nextDecodeableSequence(input, i);
+                sb.append(charset.decode(ByteBuffer.wrap(bytes)));
+                i += bytes.length * 3 - 1;
+            }
+        }
+        return sb.toString();
+    }
+
+    protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
         for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
             for (final String value : e.getValue()) {
-                try {
-                    sb.append(URLEncoder.encode(e.getKey(), this.outputEncodingName));
-                } catch (final UnsupportedEncodingException ex) {
-                    sb.append(e.getKey());
-                }
+                sb.append(urlEncode(e.getKey(), this.outputEncodingName));
                 if (value != null) {
                     sb.append('=');
-                    try {
-                        sb.append(URLEncoder.encode(value, this.outputEncodingName));
-                    } catch (final UnsupportedEncodingException ex) {
-                        sb.append(value);
-                    }
+                    sb.append(urlEncode(value, this.outputEncodingName));
                 }
                 sb.append('&');
             }
         }
-        sb.deleteCharAt(sb.length()-1);
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    protected String getEncodedPath() {
+        final StringBuilder sb = new StringBuilder();
+        if (this.path == null || this.path.isEmpty()) {
+            return sb.toString();
+        }
+        final StringTokenizer st = new StringTokenizer(this.path, "/", true);
+        while (st.hasMoreElements()) {
+            final String element = st.nextToken();
+            if ("/".equals(element)) {
+                sb.append(element);
+            } else if (element != null && !element.isEmpty()) {
+                sb.append(urlEncode(element, this.outputEncodingName));
+            }
+        }
         return sb.toString();
     }
 
@@ -190,7 +288,7 @@ public class UrlBuilder implements Cloneable {
             sb.append(this.port);
         }
         if (this.path != null) {
-            sb.append(this.path);
+            sb.append(getEncodedPath());
         }
         if (!this.queryParameters.isEmpty()) {
             sb.append('?');
@@ -230,13 +328,13 @@ public class UrlBuilder implements Cloneable {
 
     public UrlBuilder encodeAs(final Charset charset) {
         final UrlBuilder ret = clone();
-        ret.outputEncodingName = charset.name();
+        ret.outputEncodingName = charset;
         return ret;
     }
 
     public UrlBuilder encodeAs(final String charsetName) {
         final UrlBuilder ret = clone();
-        ret.outputEncodingName = charsetName;
+        ret.outputEncodingName = Charset.forName(charsetName);
         return ret;
     }
 
@@ -276,7 +374,6 @@ public class UrlBuilder implements Cloneable {
         ret.anchor = anchor;
         return ret;
     }
-
 
     public UrlBuilder addQueryParameter(final String key, final String value) {
         final UrlBuilder ret = clone();

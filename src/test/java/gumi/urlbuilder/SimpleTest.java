@@ -1,6 +1,8 @@
 package gumi.urlbuilder;
 
 import gumi.UrlBuilder;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -34,11 +36,34 @@ public class SimpleTest {
         assertRoundtrip("https://www");
         assertRoundtrip("https://www:1234");
         assertRoundtrip("https://www:1234/");
+        assertRoundtrip("https://www:1234/foo");
+        assertRoundtrip("https://www:1234/foo/bar");
+        assertRoundtrip("https://www:1234/foo/bar/");
+        assertRoundtrip("https://www:1234/foo/bar//");
+        assertRoundtrip("https://www:1234/foo//bar//");
     }
 
     @Test
     public void urlExceptionTest() throws Exception {
         UrlBuilder.fromString("https://www:1234/").toUriWithException();
+
+        final String charset = "ISO-8859-1";
+        final String foo = URLEncoder.encode("ööäöäöäö", charset);
+        final String bar = URLDecoder.decode(foo, charset);
+        final String url1 = "https://www:1234/foo?foo=" + foo;
+
+        Assert.assertEquals(UrlBuilder.fromEmpty().encodeAs("ISO-8859-1")
+                .withHost("test").withPath("/foo")
+                .addQueryParameter("foo", "öäöäöä")
+                .toString(),
+                "http://test/foo?foo=%F6%E4%F6%E4%F6%E4");
+
+        Assert.assertEquals(UrlBuilder.fromString(url1, charset).encodeAs(charset).toString(), url1);
+
+        System.out.println(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").toString());
+
+        System.out.println(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").encodeAs("ISO-8859-1").toString());
+
     }
 
     private static void assertRoundtrip(final String url) throws Exception {
