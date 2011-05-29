@@ -118,7 +118,7 @@ public class UrlBuilder implements Cloneable {
                     }
                 }
             }
-            ret.path = m.group(5);
+            ret.path = decodePath(m.group(5), ret.inputEncoding);
             ret.queryParameters = ret.decodeQueryParameters(m.group(7));
             ret.anchor = m.group(9);
         }
@@ -170,14 +170,14 @@ public class UrlBuilder implements Cloneable {
         return ret;
     }
 
-    protected boolean isUrlSafe(final char c) {
+    private static boolean isUrlSafe(final char c) {
         return ('a' <= c && 'z' >= c) ||
                 ('A' <= c && 'Z' >= c) ||
                 ('0' <= c && '9' >= c) ||
                 (c == '-' || c == '_' || c == '.' || c == '~' || c == ' ');
     }
 
-    protected String urlEncode(final String input, final Charset charset) {
+    private static String urlEncode(final String input, final Charset charset) {
         final StringBuilder sb = new StringBuilder();
         final CharBuffer cb = CharBuffer.allocate(1);
         for (final char c : input.toCharArray()) {
@@ -188,16 +188,17 @@ public class UrlBuilder implements Cloneable {
             } else {
                 cb.put(0, c);
                 cb.rewind();
-                for (final byte b : charset.encode(cb).array()) {
+                final ByteBuffer bb = charset.encode(cb);
+                for (int i = 0; i < bb.limit(); i++) {
                     sb.append('%');
-                    sb.append(String.format("%1$02X", b));
+                    sb.append(String.format("%1$02X", bb.get(i)));
                 }
             }
         }
         return sb.toString();
     }
 
-    protected byte[] nextDecodeableSequence(final String input, final int position) {
+    private static byte[] nextDecodeableSequence(final String input, final int position) {
         final int len = input.length();
         final byte[] data = new byte[len];
         int j = 0;
@@ -213,7 +214,7 @@ public class UrlBuilder implements Cloneable {
         return Arrays.copyOfRange(data, 0, j);
     }
 
-    protected String urlDecode(final String input, final Charset charset) {
+    private static String urlDecode(final String input, final Charset charset) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
         int j = 0, i = 0;
@@ -251,18 +252,35 @@ public class UrlBuilder implements Cloneable {
         return sb.toString();
     }
 
-    protected String getEncodedPath() {
+    private static String encodePath(final String input, final Charset encoding) {
         final StringBuilder sb = new StringBuilder();
-        if (this.path == null || this.path.isEmpty()) {
+        if (input == null || input.isEmpty()) {
             return sb.toString();
         }
-        final StringTokenizer st = new StringTokenizer(this.path, "/", true);
+        final StringTokenizer st = new StringTokenizer(input, "/", true);
         while (st.hasMoreElements()) {
             final String element = st.nextToken();
             if ("/".equals(element)) {
                 sb.append(element);
             } else if (element != null && !element.isEmpty()) {
-                sb.append(urlEncode(element, this.outputEncoding));
+                sb.append(urlEncode(element, encoding));
+            }
+        }
+        return sb.toString();
+    }
+
+    private static String decodePath(final String input, final Charset encoding) {
+        final StringBuilder sb = new StringBuilder();
+        if (input == null || input.isEmpty()) {
+            return sb.toString();
+        }
+        final StringTokenizer st = new StringTokenizer(input, "/", true);
+        while (st.hasMoreElements()) {
+            final String element = st.nextToken();
+            if ("/".equals(element)) {
+                sb.append(element);
+            } else if (element != null && !element.isEmpty()) {
+                sb.append(urlDecode(element, encoding));
             }
         }
         return sb.toString();
@@ -285,7 +303,7 @@ public class UrlBuilder implements Cloneable {
             sb.append(this.port);
         }
         if (this.path != null) {
-            sb.append(getEncodedPath());
+            sb.append(encodePath(this.path, this.outputEncoding));
         }
         if (!this.queryParameters.isEmpty()) {
             sb.append('?');
@@ -356,7 +374,7 @@ public class UrlBuilder implements Cloneable {
 
     public UrlBuilder withPath(final String path) {
         final UrlBuilder ret = clone();
-        ret.path = path;
+        ret.path = decodePath(path, ret.inputEncoding);
         return ret;
     }
 

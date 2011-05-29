@@ -12,6 +12,15 @@ import org.junit.Test;
 public class SimpleTest {
 
     @Test
+    public void utf8Test() throws Exception {
+        // höplä
+        Assert.assertEquals(UrlBuilder
+                .fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
+                .encodeAs("UTF-8").toString(),
+                "http://foo/h%C3%B6pl%C3%A4");
+    }
+
+    @Test
     public void simpleTest() throws Exception {
         final UrlBuilder ub1 = UrlBuilder.fromEmpty()
                 .withProtocol("http")
@@ -63,6 +72,11 @@ public class SimpleTest {
         System.out.println(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").toString());
 
         System.out.println(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").encodeAs("ISO-8859-1").toString());
+
+        UrlBuilder.fromString("http://foo/bar?baz=1&xyzzy=2&qwerty=3").setQueryParameter("xyzzy", "trööt").toString();
+
+        System.out.println(UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString());
+
 
     }
 
