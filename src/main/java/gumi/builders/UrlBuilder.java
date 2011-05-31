@@ -373,9 +373,17 @@ public class UrlBuilder implements Cloneable {
     }
 
     public UrlBuilder withPath(final String path) {
+        return withPath(path, this.inputEncoding);
+    }
+
+    public UrlBuilder withPath(final String path, final Charset encoding) {
         final UrlBuilder ret = clone();
-        ret.path = decodePath(path, ret.inputEncoding);
+        ret.path = decodePath(path, encoding);
         return ret;
+    }
+
+    public UrlBuilder withPath(final String path, final String encoding) {
+        return withPath(path, Charset.forName(encoding));
     }
 
     public UrlBuilder withQuery(final String query) {
@@ -390,7 +398,7 @@ public class UrlBuilder implements Cloneable {
         return ret;
     }
 
-    public UrlBuilder addQueryParameter(final String key, final String value) {
+    public UrlBuilder addParameter(final String key, final String value) {
         final UrlBuilder ret = clone();
         final List<String> valueList;
         if (ret.queryParameters.containsKey(key)) {
@@ -403,7 +411,7 @@ public class UrlBuilder implements Cloneable {
         return ret;
     }
 
-    public UrlBuilder setQueryParameter(final String key, final String value) {
+    public UrlBuilder setParameter(final String key, final String value) {
         final UrlBuilder ret = clone();
         final ArrayList<String> valueList = new ArrayList<String>();
         valueList.add(value);
@@ -411,7 +419,7 @@ public class UrlBuilder implements Cloneable {
         return ret;
     }
 
-    public UrlBuilder removeQueryParameter(final String key, final String value) {
+    public UrlBuilder removeParameter(final String key, final String value) {
         final UrlBuilder ret = clone();
         if (ret.queryParameters.containsKey(key)) {
             ret.queryParameters.get(key).remove(value);
@@ -419,7 +427,7 @@ public class UrlBuilder implements Cloneable {
         return ret;
     }
 
-    public UrlBuilder removeQueryParameters(final String key) {
+    public UrlBuilder removeParameters(final String key) {
         final UrlBuilder ret = clone();
         if (ret.queryParameters.containsKey(key)) {
             ret.queryParameters.remove(key);

@@ -26,7 +26,7 @@ public class SimpleUrlTest {
                 .withProtocol("http")
                 .withHost("www.example.com")
                 .withPath("/")
-                .addQueryParameter("foo", "bar");
+                .addParameter("foo", "bar");
         final String urlString1 = ub1.toString();
 
         final UrlBuilder ub2 = UrlBuilder.fromString("http://www.example.com/?foo=bar");
@@ -63,7 +63,7 @@ public class SimpleUrlTest {
 
         Assert.assertEquals(UrlBuilder.fromEmpty().encodeAs("ISO-8859-1")
                 .withHost("test").withPath("/foo")
-                .addQueryParameter("foo", "öäöäöä")
+                .addParameter("foo", "öäöäöä")
                 .toString(),
                 "http://test/foo?foo=%F6%E4%F6%E4%F6%E4");
 
@@ -73,7 +73,7 @@ public class SimpleUrlTest {
 
         System.out.println(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").encodeAs("ISO-8859-1").toString());
 
-        UrlBuilder.fromString("http://foo/bar?baz=1&xyzzy=2&qwerty=3").setQueryParameter("xyzzy", "trööt").toString();
+        UrlBuilder.fromString("http://foo/bar?baz=1&xyzzy=2&qwerty=3").setParameter("xyzzy", "trööt").toString();
 
         System.out.println(UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString());
 
