@@ -1,6 +1,6 @@
-package gumi.urlbuilder;
+package gumi.builders;
 
-import gumi.UrlBuilder;
+import gumi.builders.UrlBuilder;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import junit.framework.Assert;
@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * A few simple, handwritten, non-datadriven tests to get started.
  */
-public class SimpleTest {
+public class SimpleUrlTest {
 
     @Test
     public void utf8Test() throws Exception {

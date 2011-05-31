@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package gumi;
+package gumi.builders;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -49,7 +49,7 @@ public class UrlBuilder implements Cloneable {
     private static final Pattern AUTHORITY_PATTERN =
             Pattern.compile("([^:]*)(:([0-9]*))?");
 
-    public static final String DEFAULT_SCHEME = "http";
+    private static final String DEFAULT_SCHEME = "http";
 
     private volatile Charset inputEncoding = Charset.forName(DEFAULT_ENCODING_NAME);
 
