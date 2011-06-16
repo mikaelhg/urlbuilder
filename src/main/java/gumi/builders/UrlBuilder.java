@@ -15,6 +15,7 @@ limitations under the License.
 */
 package gumi.builders;
 
+import java.net.IDN;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -112,7 +113,7 @@ public class UrlBuilder implements Cloneable {
             if (m.group(4) != null) {
                 final Matcher n = AUTHORITY_PATTERN.matcher(m.group(4));
                 if (n.find()) {
-                    ret.hostName = n.group(1);
+                    ret.hostName = IDN.toUnicode(n.group(1));
                     if (n.group(3) != null) {
                         ret.port = Integer.parseInt(n.group(3));
                     }
@@ -296,7 +297,7 @@ public class UrlBuilder implements Cloneable {
         }
         sb.append("://");
         if (this.hostName != null) {
-            sb.append(this.hostName);
+            sb.append(IDN.toASCII(this.hostName));
         }
         if (this.port != null) {
             sb.append(':');
@@ -362,7 +363,7 @@ public class UrlBuilder implements Cloneable {
 
     public UrlBuilder withHost(final String hostName) {
         final UrlBuilder ret = clone();
-        ret.hostName = hostName;
+        ret.hostName = IDN.toUnicode(hostName);
         return ret;
     }
 

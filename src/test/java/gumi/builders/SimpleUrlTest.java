@@ -1,6 +1,5 @@
 package gumi.builders;
 
-import gumi.builders.UrlBuilder;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import junit.framework.Assert;
@@ -50,6 +49,7 @@ public class SimpleUrlTest {
         assertRoundtrip("https://www:1234/foo/bar/");
         assertRoundtrip("https://www:1234/foo/bar//");
         assertRoundtrip("https://www:1234/foo//bar//");
+        assertRoundtrip("https://höplä/");
     }
 
     @Test
