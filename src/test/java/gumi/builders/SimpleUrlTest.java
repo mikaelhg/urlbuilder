@@ -49,7 +49,6 @@ public class SimpleUrlTest {
         assertRoundtrip("https://www:1234/foo/bar/");
         assertRoundtrip("https://www:1234/foo/bar//");
         assertRoundtrip("https://www:1234/foo//bar//");
-        assertRoundtrip("https://höplä/");
     }
 
     @Test
