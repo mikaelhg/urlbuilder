@@ -47,6 +47,7 @@ public class UrlBuilder implements Cloneable {
     private static final Pattern URI_PATTERN =
             Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
+    /** Possible username and password, or only username. */
     private static final Pattern AUTHORITY_PATTERN =
             Pattern.compile("([^:]*)(:([0-9]*))?");
 

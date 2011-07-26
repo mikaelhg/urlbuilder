@@ -75,8 +75,6 @@ public class SimpleUrlTest {
         UrlBuilder.fromString("http://foo/bar?baz=1&xyzzy=2&qwerty=3").setParameter("xyzzy", "trööt").toString();
 
         System.out.println(UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString());
-
-
     }
 
     private static void assertRoundtrip(final String url) throws Exception {
