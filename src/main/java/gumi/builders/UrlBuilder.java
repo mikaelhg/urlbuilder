@@ -103,8 +103,12 @@ public class UrlBuilder implements Cloneable {
     }
 
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
+        return fromString(url, Charset.forName(inputEncoding));
+    }
+    
+    public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
         final UrlBuilder ret = new UrlBuilder();
-        ret.inputEncoding = Charset.forName(inputEncoding);
+        ret.inputEncoding = inputEncoding;
         if (url.isEmpty()) {
             return ret;
         }
@@ -341,7 +345,6 @@ public class UrlBuilder implements Cloneable {
             throw new RuntimeException(e);
         }
     }
-
 
     public UrlBuilder encodeAs(final Charset charset) {
         final UrlBuilder ret = clone();
