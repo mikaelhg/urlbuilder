@@ -32,3 +32,9 @@ Create and modify URLs and URL parameters easily, with a builder class.
     } catch (java.net.MalformedURLException ex) {
         // handle the exception
     }
+
+Todo:
+-----
+
+* More unit tests for corner cases
+* Preserve URL property order
