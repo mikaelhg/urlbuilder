@@ -15,6 +15,8 @@ limitations under the License.
 */
 package gumi.builders;
 
+import gumi.builders.url.RuntimeMalformedURLException;
+import gumi.builders.url.RuntimeURISyntaxException;
 import java.net.IDN;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -325,11 +327,11 @@ public class UrlBuilder implements Cloneable {
         return new URI(this.toString());
     }
 
-    public URI toUri() {
+    public URI toUri() throws RuntimeURISyntaxException {
         try {
             return toUriWithException();
         } catch (final URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeURISyntaxException(e);
         }
     }
 
@@ -337,11 +339,11 @@ public class UrlBuilder implements Cloneable {
         return new URL(this.toString());
     }
 
-    public URL toUrl() {
+    public URL toUrl() throws RuntimeMalformedURLException {
         try {
             return toUrlWithException();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException(e);
+        } catch (final MalformedURLException e) {
+            throw new RuntimeMalformedURLException(e);
         }
     }
 
