@@ -65,8 +65,7 @@ public class UrlBuilder implements Cloneable {
 
     private volatile String path;
 
-    private volatile ConcurrentMap<String, List<String>> queryParameters =
-            new ConcurrentHashMap<String, List<String>>();
+    private volatile ConcurrentMap<String, List<String>> queryParameters = new ConcurrentHashMap<>();
 
     private volatile String anchor;
 
@@ -86,9 +85,9 @@ public class UrlBuilder implements Cloneable {
         ret.hostName = this.hostName;
         ret.port = this.port;
         ret.path = this.path;
-        ret.queryParameters = new ConcurrentHashMap<String, List<String>>();
+        ret.queryParameters = new ConcurrentHashMap<>();
         for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
-            ret.queryParameters.put(e.getKey(), new ArrayList<String>(e.getValue()));
+            ret.queryParameters.put(e.getKey(), new ArrayList<>(e.getValue()));
         }
         ret.anchor = this.anchor;
         return ret;
@@ -151,7 +150,7 @@ public class UrlBuilder implements Cloneable {
     }
 
     private ConcurrentMap<String, List<String>> decodeQueryParameters(final String query) {
-        final ConcurrentMap<String, List<String>> ret = new ConcurrentHashMap<String, List<String>>();
+        final ConcurrentMap<String, List<String>> ret = new ConcurrentHashMap<>();
         if (query == null || query.isEmpty()) {
             return ret;
         }
@@ -168,7 +167,7 @@ public class UrlBuilder implements Cloneable {
             if (ret.containsKey(key)) {
                 valueList = ret.get(key);
             } else {
-                valueList = new ArrayList<String>();
+                valueList = new ArrayList<>();
                 ret.put(key, valueList);
             }
             valueList.add(value);
@@ -409,7 +408,7 @@ public class UrlBuilder implements Cloneable {
         if (ret.queryParameters.containsKey(key)) {
             valueList = ret.queryParameters.get(key);
         } else {
-            valueList = new ArrayList<String>();
+            valueList = new ArrayList<>();
             ret.queryParameters.put(key, valueList);
         }
         valueList.add(value);
@@ -418,7 +417,7 @@ public class UrlBuilder implements Cloneable {
 
     public UrlBuilder setParameter(final String key, final String value) {
         final UrlBuilder ret = clone();
-        final ArrayList<String> valueList = new ArrayList<String>();
+        final ArrayList<String> valueList = new ArrayList<>();
         valueList.add(value);
         ret.queryParameters.put(key, valueList);
         return ret;
