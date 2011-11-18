@@ -32,9 +32,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>10.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>[4.7,)</version>
+            <version>4.10</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

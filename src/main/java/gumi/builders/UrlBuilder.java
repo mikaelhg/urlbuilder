@@ -15,6 +15,10 @@ limitations under the License.
 */
 package gumi.builders;
 
+import com.google.common.base.Charsets;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
+import com.google.common.collect.Multimap;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import java.net.IDN;
@@ -25,13 +29,9 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,9 +42,9 @@ import java.util.regex.Pattern;
  * URI: http://tools.ietf.org/html/rfc3986
  * @author Mikael Gueck gumi@iki.fi
  */
-public class UrlBuilder implements Cloneable {
+public class UrlBuilder {
 
-    private static final String DEFAULT_ENCODING_NAME = "UTF-8";
+    private static final Charset DEFAULT_ENCODING = Charsets.UTF_8;
 
     private static final Pattern URI_PATTERN =
             Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
@@ -55,48 +55,72 @@ public class UrlBuilder implements Cloneable {
 
     private static final String DEFAULT_SCHEME = "http";
 
-    private volatile Charset inputEncoding = Charset.forName(DEFAULT_ENCODING_NAME);
+    private final Charset inputEncoding;
 
-    private volatile Charset outputEncoding = Charset.forName(DEFAULT_ENCODING_NAME);
+    private final Charset outputEncoding;
 
-    private volatile String protocol = DEFAULT_SCHEME;
+    private final String protocol;
 
-    private volatile String hostName;
+    private final String hostName;
 
-    private volatile Integer port;
+    private final Integer port;
 
-    private volatile String path;
+    private final String path;
 
-    private volatile ConcurrentMap<String, List<String>> queryParameters = new ConcurrentHashMap<>();
+    private final Multimap<String, String> queryParameters;
 
-    private volatile String anchor;
+    private final String anchor;
 
     /**
      * The builder public constructor isn't meant to be used,
      * but it's there if you need it.
      */
     public UrlBuilder() {
+        this.inputEncoding = DEFAULT_ENCODING;
+        this.outputEncoding = DEFAULT_ENCODING;
+        this.protocol = DEFAULT_SCHEME;
+        this.hostName = null;
+        this.port = null;
+        this.path = null;
+        this.queryParameters = ImmutableMultimap.of();
+        this.anchor = null;
     }
 
-    @Override
-    public UrlBuilder clone() {
-        final UrlBuilder ret = new UrlBuilder();
-        ret.inputEncoding = this.inputEncoding;
-        ret.outputEncoding = this.outputEncoding;
-        ret.protocol = this.protocol;
-        ret.hostName = this.hostName;
-        ret.port = this.port;
-        ret.path = this.path;
-        ret.queryParameters = new ConcurrentHashMap<>();
-        for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
-            ret.queryParameters.put(e.getKey(), new ArrayList<>(e.getValue()));
-        }
-        ret.anchor = this.anchor;
-        return ret;
+    private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
+            final String protocol, final String hostName, final Integer port,
+            final String path, final Multimap<String, String> queryParameters,
+            final String anchor)
+    {
+        this.inputEncoding = inputEncoding;
+        this.outputEncoding = outputEncoding;
+        this.protocol = protocol;
+        this.hostName = hostName;
+        this.port = port;
+        this.path = path;
+        this.queryParameters = ImmutableMultimap.copyOf(queryParameters);
+        this.anchor = anchor;
+    }
+    
+    public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
+            final String protocol, final String hostName, final Integer port,
+            final String path, final Multimap<String, String> queryParameters,
+            final String anchor) {
+        return new UrlBuilder(inputEncoding, outputEncoding, protocol, hostName, port, path, queryParameters, anchor);
+    }
+
+    public UrlBuilder(final UrlBuilder parent) {
+        this.inputEncoding = parent.inputEncoding;
+        this.outputEncoding = parent.outputEncoding;
+        this.protocol = parent.protocol;
+        this.hostName = parent.hostName;
+        this.port = parent.port;
+        this.path = parent.path;
+        this.queryParameters = ImmutableMultimap.copyOf(parent.queryParameters);
+        this.anchor = parent.anchor;
     }
 
     public static UrlBuilder fromString(final String url) {
-        return fromString(url, DEFAULT_ENCODING_NAME);
+        return fromString(url, DEFAULT_ENCODING);
     }
 
     public static UrlBuilder fromEmpty() {
@@ -108,28 +132,29 @@ public class UrlBuilder implements Cloneable {
     }
     
     public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
-        final UrlBuilder ret = new UrlBuilder();
-        ret.inputEncoding = inputEncoding;
         if (url.isEmpty()) {
-            return ret;
+            return new UrlBuilder();
         }
         final Matcher m = URI_PATTERN.matcher(url);
+        String protocol = null, hostName = null, path = null, anchor = null;
+        Integer port = null;
+        Multimap<String, String> queryParameters = null;
         if (m.find()) {
-            ret.protocol = m.group(2);
+            protocol = m.group(2);
             if (m.group(4) != null) {
                 final Matcher n = AUTHORITY_PATTERN.matcher(m.group(4));
                 if (n.find()) {
-                    ret.hostName = IDN.toUnicode(n.group(1));
+                    hostName = IDN.toUnicode(n.group(1));
                     if (n.group(3) != null) {
-                        ret.port = Integer.parseInt(n.group(3));
+                        port = Integer.parseInt(n.group(3));
                     }
                 }
             }
-            ret.path = decodePath(m.group(5), ret.inputEncoding);
-            ret.queryParameters = ret.decodeQueryParameters(m.group(7));
-            ret.anchor = m.group(9);
+            path = decodePath(m.group(5), inputEncoding);
+            queryParameters = decodeQueryParameters(m.group(7), inputEncoding);
+            anchor = m.group(9);
         }
-        return ret;
+        return new UrlBuilder(inputEncoding, DEFAULT_ENCODING, protocol, hostName, port, path, queryParameters, anchor);
     }
 
     public static UrlBuilder fromUri(final URI uri) {
@@ -141,38 +166,26 @@ public class UrlBuilder implements Cloneable {
     }
 
     public static UrlBuilder fromUrl(final URL url) {
-        final UrlBuilder ret = new UrlBuilder();
-        ret.protocol = url.getProtocol();
-        ret.hostName = url.getHost();
-        ret.port = url.getPort();
-        ret.path = url.getPath();
-        ret.queryParameters = ret.decodeQueryParameters(url.getQuery());
-        ret.anchor = url.getRef();
-        return ret;
+        return new UrlBuilder(DEFAULT_ENCODING, DEFAULT_ENCODING,
+                url.getProtocol(), url.getHost(), url.getPort(), url.getPath(),
+                decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
     }
 
-    private ConcurrentMap<String, List<String>> decodeQueryParameters(final String query) {
-        final ConcurrentMap<String, List<String>> ret = new ConcurrentHashMap<>();
+    private static Multimap<String, String> decodeQueryParameters(final String query, final Charset inputEncoding) {
+        final Multimap<String, String> ret = HashMultimap.create();
         if (query == null || query.isEmpty()) {
             return ret;
         }
         for (final String part : query.split("&")) {
             final String[] kvp = part.split("=", 2);
-            String key, value;
-            key = urlDecode(kvp[0], this.inputEncoding);
+            final String key, value;
+            key = urlDecode(kvp[0], inputEncoding);
             if (kvp.length == 2) {
-                value = urlDecode(kvp[1], this.inputEncoding);
+                value = urlDecode(kvp[1], inputEncoding);
             } else {
                 value = null;
             }
-            final List<String> valueList;
-            if (ret.containsKey(key)) {
-                valueList = ret.get(key);
-            } else {
-                valueList = new ArrayList<>();
-                ret.put(key, valueList);
-            }
-            valueList.add(value);
+            ret.put(key, value);
         }
         return ret;
     }
@@ -245,15 +258,13 @@ public class UrlBuilder implements Cloneable {
 
     protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
-            for (final String value : e.getValue()) {
-                sb.append(urlEncode(e.getKey(), this.outputEncoding));
-                if (value != null) {
-                    sb.append('=');
-                    sb.append(urlEncode(value, this.outputEncoding));
-                }
-                sb.append('&');
+        for (final Map.Entry<String, String> e : this.queryParameters.entries()) {
+            sb.append(urlEncode(e.getKey(), this.outputEncoding));
+            if (e.getValue() != null) {
+                sb.append('=');
+                sb.append(urlEncode(e.getValue(), this.outputEncoding));
             }
+            sb.append('&');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
@@ -348,34 +359,24 @@ public class UrlBuilder implements Cloneable {
     }
 
     public UrlBuilder encodeAs(final Charset charset) {
-        final UrlBuilder ret = clone();
-        ret.outputEncoding = charset;
-        return ret;
+        return of(inputEncoding, charset, protocol, hostName, port, path, queryParameters, anchor);
     }
 
     public UrlBuilder encodeAs(final String charsetName) {
-        final UrlBuilder ret = clone();
-        ret.outputEncoding = Charset.forName(charsetName);
-        return ret;
+        return of(inputEncoding, Charset.forName(charsetName), protocol, hostName, port, path, queryParameters, anchor);
     }
 
 
     public UrlBuilder withProtocol(final String protocol) {
-        final UrlBuilder ret = clone();
-        ret.protocol = protocol;
-        return ret;
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, queryParameters, anchor);
     }
 
     public UrlBuilder withHost(final String hostName) {
-        final UrlBuilder ret = clone();
-        ret.hostName = IDN.toUnicode(hostName);
-        return ret;
+        return of(inputEncoding, outputEncoding, protocol, IDN.toUnicode(hostName), port, path, queryParameters, anchor);
     }
 
     public UrlBuilder withPort(final int port) {
-        final UrlBuilder ret = clone();
-        ret.port = port;
-        return ret;
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, queryParameters, anchor);
     }
 
     public UrlBuilder withPath(final String path) {
@@ -383,9 +384,7 @@ public class UrlBuilder implements Cloneable {
     }
 
     public UrlBuilder withPath(final String path, final Charset encoding) {
-        final UrlBuilder ret = clone();
-        ret.path = decodePath(path, encoding);
-        return ret;
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, decodePath(path, encoding), queryParameters, anchor);
     }
 
     public UrlBuilder withPath(final String path, final String encoding) {
@@ -393,52 +392,36 @@ public class UrlBuilder implements Cloneable {
     }
 
     public UrlBuilder withQuery(final String query) {
-        final UrlBuilder ret = clone();
-        ret.queryParameters = ret.decodeQueryParameters(query);
-        return ret;
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, decodeQueryParameters(query, inputEncoding), anchor);
     }
 
     public UrlBuilder withAnchor(final String anchor) {
-        final UrlBuilder ret = clone();
-        ret.anchor = anchor;
-        return ret;
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, queryParameters, anchor);
     }
 
     public UrlBuilder addParameter(final String key, final String value) {
-        final UrlBuilder ret = clone();
-        final List<String> valueList;
-        if (ret.queryParameters.containsKey(key)) {
-            valueList = ret.queryParameters.get(key);
-        } else {
-            valueList = new ArrayList<>();
-            ret.queryParameters.put(key, valueList);
-        }
-        valueList.add(value);
-        return ret;
+        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
+        qp.put(key, value);
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
     public UrlBuilder setParameter(final String key, final String value) {
-        final UrlBuilder ret = clone();
-        final ArrayList<String> valueList = new ArrayList<>();
-        valueList.add(value);
-        ret.queryParameters.put(key, valueList);
-        return ret;
+        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
+        qp.removeAll(key);
+        qp.put(key, value);
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
     public UrlBuilder removeParameter(final String key, final String value) {
-        final UrlBuilder ret = clone();
-        if (ret.queryParameters.containsKey(key)) {
-            ret.queryParameters.get(key).remove(value);
-        }
-        return ret;
+        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
+        qp.remove(key, value);
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
     public UrlBuilder removeParameters(final String key) {
-        final UrlBuilder ret = clone();
-        if (ret.queryParameters.containsKey(key)) {
-            ret.queryParameters.remove(key);
-        }
-        return ret;
+        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
+        qp.removeAll(key);
+        return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
 }
