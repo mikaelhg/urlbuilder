@@ -21,7 +21,7 @@ public class SimpleUrlTest {
 
     @Test
     public void simpleTest() throws Exception {
-        final UrlBuilder ub1 = UrlBuilder.fromEmpty()
+        final UrlBuilder ub1 = UrlBuilder.empty()
                 .withProtocol("http")
                 .withHost("www.example.com")
                 .withPath("/")
@@ -60,7 +60,7 @@ public class SimpleUrlTest {
         final String bar = URLDecoder.decode(foo, charset);
         final String url1 = "https://www:1234/foo?foo=" + foo;
 
-        Assert.assertEquals(UrlBuilder.fromEmpty().encodeAs("ISO-8859-1")
+        Assert.assertEquals(UrlBuilder.empty().encodeAs("ISO-8859-1")
                 .withHost("test").withPath("/foo")
                 .addParameter("foo", "öäöäöä")
                 .toString(),

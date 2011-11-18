@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Build and manipulate URLs easily.
@@ -42,6 +43,7 @@ import java.util.regex.Pattern;
  * URI: http://tools.ietf.org/html/rfc3986
  * @author Mikael Gueck gumi@iki.fi
  */
+@Immutable
 public class UrlBuilder {
 
     private static final Charset DEFAULT_ENCODING = Charsets.UTF_8;
@@ -75,7 +77,7 @@ public class UrlBuilder {
      * The builder public constructor isn't meant to be used,
      * but it's there if you need it.
      */
-    public UrlBuilder() {
+    private UrlBuilder() {
         this.inputEncoding = DEFAULT_ENCODING;
         this.outputEncoding = DEFAULT_ENCODING;
         this.protocol = DEFAULT_SCHEME;
@@ -85,7 +87,7 @@ public class UrlBuilder {
         this.queryParameters = ImmutableMultimap.of();
         this.anchor = null;
     }
-
+    
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
             final String protocol, final String hostName, final Integer port,
             final String path, final Multimap<String, String> queryParameters,
@@ -101,6 +103,10 @@ public class UrlBuilder {
         this.anchor = anchor;
     }
     
+    public static UrlBuilder empty() {
+        return new UrlBuilder();
+    }
+
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
             final String protocol, final String hostName, final Integer port,
             final String path, final Multimap<String, String> queryParameters,
@@ -108,23 +114,8 @@ public class UrlBuilder {
         return new UrlBuilder(inputEncoding, outputEncoding, protocol, hostName, port, path, queryParameters, anchor);
     }
 
-    public UrlBuilder(final UrlBuilder parent) {
-        this.inputEncoding = parent.inputEncoding;
-        this.outputEncoding = parent.outputEncoding;
-        this.protocol = parent.protocol;
-        this.hostName = parent.hostName;
-        this.port = parent.port;
-        this.path = parent.path;
-        this.queryParameters = ImmutableMultimap.copyOf(parent.queryParameters);
-        this.anchor = parent.anchor;
-    }
-
     public static UrlBuilder fromString(final String url) {
         return fromString(url, DEFAULT_ENCODING);
-    }
-
-    public static UrlBuilder fromEmpty() {
-        return new UrlBuilder();
     }
 
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
