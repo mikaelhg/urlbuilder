@@ -61,17 +61,17 @@ public class UrlBuilder {
 
     private final Charset outputEncoding;
 
-    private final String protocol;
+    public final String protocol;
 
-    private final String hostName;
+    public final String hostName;
 
-    private final Integer port;
+    public final Integer port;
 
-    private final String path;
+    public final String path;
 
-    private final Multimap<String, String> queryParameters;
+    public final ImmutableMultimap<String, String> queryParameters;
 
-    private final String anchor;
+    public final String anchor;
 
     /**
      * The builder public constructor isn't meant to be used,
