@@ -45,9 +45,6 @@
                                     <pattern>com.google.common.**</pattern>
                                     <result>gumi.builders.internal.guava.@1</result>
                                 </rule>
-                                <keep>
-                                    <pattern>gumi.builders.**</pattern>
-                                </keep>
                             </rules>
                         </configuration>
                     </execution>
