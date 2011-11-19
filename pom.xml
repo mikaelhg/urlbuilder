@@ -26,7 +26,33 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.5.1</version>
-            </plugin>        
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>jarjar-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jarjar</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>com.google.guava:guava</include>
+                            </includes>
+                            <rules>
+                                <rule>
+                                    <pattern>com.google.common.**</pattern>
+                                    <result>gumi.builders.internal.guava.@1</result>
+                                </rule>
+                                <keep>
+                                    <pattern>gumi.builders.**</pattern>
+                                </keep>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
