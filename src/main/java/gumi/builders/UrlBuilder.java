@@ -145,7 +145,7 @@ public class UrlBuilder {
             queryParameters = decodeQueryParameters(m.group(7), inputEncoding);
             anchor = m.group(9);
         }
-        return new UrlBuilder(inputEncoding, DEFAULT_ENCODING, protocol, hostName, port, path, queryParameters, anchor);
+        return of(inputEncoding, DEFAULT_ENCODING, protocol, hostName, port, path, queryParameters, anchor);
     }
 
     public static UrlBuilder fromUri(final URI uri) {
@@ -157,12 +157,14 @@ public class UrlBuilder {
     }
 
     public static UrlBuilder fromUrl(final URL url) {
-        return new UrlBuilder(DEFAULT_ENCODING, DEFAULT_ENCODING,
+        return of(DEFAULT_ENCODING, DEFAULT_ENCODING,
                 url.getProtocol(), url.getHost(), url.getPort(), url.getPath(),
                 decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
     }
 
-    private static Multimap<String, String> decodeQueryParameters(final String query, final Charset inputEncoding) {
+    private static Multimap<String, String> decodeQueryParameters(
+            final String query, final Charset inputEncoding)
+    {
         final Multimap<String, String> ret = HashMultimap.create();
         if (query == null || query.isEmpty()) {
             return ret;
@@ -228,7 +230,7 @@ public class UrlBuilder {
     private static String urlDecode(final String input, final Charset charset) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
-        int j = 0, i = 0;
+        int i = 0;
         for (i = 0; i < len; i++) {
             final char c0 = input.charAt(i);
             if (c0 == '+') {
