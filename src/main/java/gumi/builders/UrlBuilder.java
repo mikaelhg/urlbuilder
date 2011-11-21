@@ -15,10 +15,7 @@ limitations under the License.
 */
 package gumi.builders;
 
-import com.google.common.base.Charsets;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
+import static java.util.Collections.*;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import java.net.IDN;
@@ -29,24 +26,26 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.annotation.concurrent.Immutable;
 
 /**
- * Build and manipulate URLs easily.
+ * Build and manipulate URLs easily. Instances of this class are immutable
+ * after their constructor returns.
  *
  * URL: http://www.ietf.org/rfc/rfc1738.txt
  * URI: http://tools.ietf.org/html/rfc3986
  * @author Mikael Gueck gumi@iki.fi
  */
-@Immutable
-public class UrlBuilder {
+public final class UrlBuilder {
 
-    private static final Charset DEFAULT_ENCODING = Charsets.UTF_8;
+    private static final Charset DEFAULT_ENCODING = Charset.forName("UTF-8");
 
     private static final Pattern URI_PATTERN =
             Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
@@ -69,14 +68,10 @@ public class UrlBuilder {
 
     public final String path;
 
-    public final ImmutableMultimap<String, String> queryParameters;
+    public final Map<String, List<String>> queryParameters;
 
     public final String anchor;
 
-    /**
-     * The builder public constructor isn't meant to be used,
-     * but it's there if you need it.
-     */
     private UrlBuilder() {
         this.inputEncoding = DEFAULT_ENCODING;
         this.outputEncoding = DEFAULT_ENCODING;
@@ -84,13 +79,13 @@ public class UrlBuilder {
         this.hostName = null;
         this.port = null;
         this.path = null;
-        this.queryParameters = ImmutableMultimap.of();
+        this.queryParameters = emptyMap();
         this.anchor = null;
     }
     
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
             final String protocol, final String hostName, final Integer port,
-            final String path, final Multimap<String, String> queryParameters,
+            final String path, final Map<String, List<String>> queryParameters,
             final String anchor)
     {
         this.inputEncoding = inputEncoding;
@@ -99,7 +94,7 @@ public class UrlBuilder {
         this.hostName = hostName;
         this.port = port;
         this.path = path;
-        this.queryParameters = ImmutableMultimap.copyOf(queryParameters);
+        this.queryParameters = copy(queryParameters);
         this.anchor = anchor;
     }
     
@@ -109,8 +104,9 @@ public class UrlBuilder {
 
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
             final String protocol, final String hostName, final Integer port,
-            final String path, final Multimap<String, String> queryParameters,
-            final String anchor) {
+            final String path, final Map<String, List<String>> queryParameters,
+            final String anchor)
+    {
         return new UrlBuilder(inputEncoding, outputEncoding, protocol, hostName, port, path, queryParameters, anchor);
     }
 
@@ -129,7 +125,7 @@ public class UrlBuilder {
         final Matcher m = URI_PATTERN.matcher(url);
         String protocol = null, hostName = null, path = null, anchor = null;
         Integer port = null;
-        Multimap<String, String> queryParameters = null;
+        Map<String, List<String>> queryParameters = null;
         if (m.find()) {
             protocol = m.group(2);
             if (m.group(4) != null) {
@@ -162,10 +158,10 @@ public class UrlBuilder {
                 decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
     }
 
-    private static Multimap<String, String> decodeQueryParameters(
+    private static Map<String, List<String>> decodeQueryParameters(
             final String query, final Charset inputEncoding)
     {
-        final Multimap<String, String> ret = HashMultimap.create();
+        final Map<String, List<String>> ret = new HashMap<>();
         if (query == null || query.isEmpty()) {
             return ret;
         }
@@ -178,7 +174,10 @@ public class UrlBuilder {
             } else {
                 value = null;
             }
-            ret.put(key, value);
+            if (!ret.containsKey(key)) {
+                ret.put(key, new ArrayList<String>());
+            }
+            ret.get(key).add(value);
         }
         return ret;
     }
@@ -251,13 +250,15 @@ public class UrlBuilder {
 
     protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, String> e : this.queryParameters.entries()) {
-            sb.append(urlEncode(e.getKey(), this.outputEncoding));
-            if (e.getValue() != null) {
-                sb.append('=');
-                sb.append(urlEncode(e.getValue(), this.outputEncoding));
+        for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
+            for (final String value : e.getValue()) {
+                sb.append(urlEncode(e.getKey(), this.outputEncoding));
+                if (value != null) {
+                    sb.append('=');
+                    sb.append(urlEncode(value, this.outputEncoding));
+                }
+                sb.append('&');
             }
-            sb.append('&');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
@@ -393,28 +394,92 @@ public class UrlBuilder {
     }
 
     public UrlBuilder addParameter(final String key, final String value) {
-        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
-        qp.put(key, value);
+        final Map<String, List<String>> qp = copyAndAdd(this.queryParameters, key, value);
         return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
     public UrlBuilder setParameter(final String key, final String value) {
-        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
-        qp.removeAll(key);
-        qp.put(key, value);
+        final Map<String, List<String>> qp = copyAndSet(this.queryParameters, key, value);
         return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
     public UrlBuilder removeParameter(final String key, final String value) {
-        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
-        qp.remove(key, value);
+        final Map<String, List<String>> qp = copyAndRemove(this.queryParameters, key, value);
         return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
     public UrlBuilder removeParameters(final String key) {
-        final Multimap<String, String> qp = HashMultimap.create(this.queryParameters);
-        qp.removeAll(key);
+        final Map<String, List<String>> qp = copyAndRemove(this.queryParameters, key);
         return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
     }
 
+    private static Map<String, List<String>> copy(final Map<String, List<String>> in) {
+        final Map<String, List<String>> ret = new HashMap<>();
+        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
+            ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
+        }
+        return unmodifiableMap(ret);
+    }
+    
+    private static Map<String, List<String>> copyAndAdd(final Map<String, List<String>> in,
+            final String key, final String value)
+    {
+        final Map<String, List<String>> ret = new HashMap<>();
+        boolean added = false;
+        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
+            if (key.equals(e.getKey())) {
+                final ArrayList<String> al = new ArrayList<>(e.getValue());
+                al.add(value);
+                ret.put(e.getKey(), unmodifiableList(al));
+                added = true;
+            } else {
+                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
+            }
+        }
+        if (!added) {
+            ret.put(key, unmodifiableList(singletonList(value)));
+        }
+        return unmodifiableMap(ret);
+    }
+    
+    private static Map<String, List<String>> copyAndSet(final Map<String, List<String>> in,
+            final String key, final String value)
+    {
+        final Map<String, List<String>> ret = new HashMap<>();
+        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
+            if (!key.equals(e.getKey())) {
+                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
+            }
+        }
+        ret.put(key, unmodifiableList(singletonList(value)));
+        return unmodifiableMap(ret);
+    }
+    
+    private static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
+            final String key, final String value)
+    {
+        final Map<String, List<String>> ret = new HashMap<>();
+        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
+            if (key.equals(e.getKey())) {
+                final ArrayList<String> al = new ArrayList<>(e.getValue());
+                al.remove(value);
+                ret.put(e.getKey(), unmodifiableList(al));
+            } else {
+                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
+            }
+        }
+        return unmodifiableMap(ret);
+    }
+    
+    private static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
+            final String key)
+    {
+        final Map<String, List<String>> ret = new HashMap<>();
+        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
+            if (!key.equals(e.getKey())) {
+                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
+            }
+        }
+        return unmodifiableMap(ret);
+    }
 }
