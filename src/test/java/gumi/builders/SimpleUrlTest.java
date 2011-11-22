@@ -1,7 +1,9 @@
 package gumi.builders;
 
+import static org.junit.Assert.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,12 +15,28 @@ public class SimpleUrlTest {
     @Test
     public void utf8Test() throws Exception {
         // höplä
-        Assert.assertEquals(UrlBuilder
+        assertEquals(UrlBuilder
                 .fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
                 .encodeAs("UTF-8").toString(),
                 "http://foo/h%C3%B6pl%C3%A4");
     }
 
+    @Test
+    public void parameterTest() {
+        final UrlBuilder ub1 = UrlBuilder.fromString("?a=b&a=c&b=c");
+        assertTrue(ub1.queryParameters.containsKey("a"));
+        assertTrue(ub1.queryParameters.containsKey("b"));
+        assertEquals(ub1.queryParameters.get("a"), Arrays.asList("b", "c"));
+    }
+    
+    @Test
+    public void brokenparameterTest() {
+        final UrlBuilder ub1 = UrlBuilder.fromString("?=b");
+        System.out.println(ub1.toString());
+        final UrlBuilder ub2 = UrlBuilder.fromString("?==b");
+        System.out.println(ub2.toString());
+    }
+    
     @Test
     public void simpleTest() throws Exception {
         final UrlBuilder ub1 = UrlBuilder.empty()
@@ -60,21 +78,22 @@ public class SimpleUrlTest {
         final String bar = URLDecoder.decode(foo, charset);
         final String url1 = "https://www:1234/foo?foo=" + foo;
 
-        Assert.assertEquals(UrlBuilder.empty().encodeAs("ISO-8859-1")
+        assertEquals("//test/foo?foo=%F6%E4%F6%E4%F6%E4",
+                UrlBuilder.empty().encodeAs("ISO-8859-1")
                 .withHost("test").withPath("/foo")
                 .addParameter("foo", "öäöäöä")
-                .toString(),
-                "http://test/foo?foo=%F6%E4%F6%E4%F6%E4");
+                .toString());
 
-        Assert.assertEquals(UrlBuilder.fromString(url1, charset).encodeAs(charset).toString(), url1);
+        assertEquals(UrlBuilder.fromString(url1, charset).encodeAs(charset).toString(), url1);
 
-        System.out.println(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").toString());
+        assertEquals(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").toString(),
+                "?foo=%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6");
 
-        System.out.println(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").encodeAs("ISO-8859-1").toString());
+        assertEquals(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").encodeAs("ISO-8859-1").toString(),
+                "?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6");
 
-        UrlBuilder.fromString("http://foo/bar?baz=1&xyzzy=2&qwerty=3").setParameter("xyzzy", "trööt").toString();
-
-        System.out.println(UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString());
+        assertEquals(UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString(),
+                "http://foo/h%C3%A4pl%C3%B6");
     }
 
     private static void assertRoundtrip(final String url) throws Exception {

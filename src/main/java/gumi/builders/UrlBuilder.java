@@ -55,8 +55,6 @@ public final class UrlBuilder {
     private static final Pattern AUTHORITY_PATTERN =
             Pattern.compile("([^:]*)(:([0-9]*))?");
 
-    private static final String DEFAULT_SCHEME = "http";
-
     private final Charset inputEncoding;
 
     private final Charset outputEncoding;
@@ -76,7 +74,7 @@ public final class UrlBuilder {
     private UrlBuilder() {
         this.inputEncoding = DEFAULT_ENCODING;
         this.outputEncoding = DEFAULT_ENCODING;
-        this.protocol = DEFAULT_SCHEME;
+        this.protocol = null;
         this.hostName = null;
         this.port = null;
         this.path = null;
@@ -302,13 +300,12 @@ public final class UrlBuilder {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        if (this.protocol == null) {
-            sb.append(DEFAULT_SCHEME);
-        } else {
+        if (this.protocol != null) {
             sb.append(this.protocol);
+            sb.append(":");
         }
-        sb.append("://");
         if (this.hostName != null) {
+            sb.append("//");
             sb.append(IDN.toASCII(this.hostName));
         }
         if (this.port != null) {
