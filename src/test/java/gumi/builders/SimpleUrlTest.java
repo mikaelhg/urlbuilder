@@ -32,9 +32,10 @@ public class SimpleUrlTest {
     @Test
     public void brokenparameterTest() {
         final UrlBuilder ub1 = UrlBuilder.fromString("?=b");
-        System.out.println(ub1.toString());
+        assertEquals(ub1.queryParameters.get("").get(0), "b");
         final UrlBuilder ub2 = UrlBuilder.fromString("?==b");
-        System.out.println(ub2.toString());
+        assertEquals(ub2.queryParameters.get("").get(0), "=b");
+        assertEquals(ub2.toString(), "?=%3Db");
     }
     
     @Test
@@ -49,11 +50,11 @@ public class SimpleUrlTest {
         final UrlBuilder ub2 = UrlBuilder.fromString("http://www.example.com/?foo=bar");
         final String urlString2 = ub2.toString();
 
-        Assert.assertEquals(urlString1, "http://www.example.com/?foo=bar");
-        Assert.assertEquals(urlString2, "http://www.example.com/?foo=bar");
+        assertEquals(urlString1, "http://www.example.com/?foo=bar");
+        assertEquals(urlString2, "http://www.example.com/?foo=bar");
 
         final String portUrl = "http://www.example.com:1234/?foo=bar";
-        Assert.assertEquals(portUrl, UrlBuilder.fromString(portUrl).toString());
+        assertEquals(portUrl, UrlBuilder.fromString(portUrl).toString());
     }
 
     @Test
