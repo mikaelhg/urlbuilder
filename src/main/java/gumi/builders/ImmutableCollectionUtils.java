@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Since I don't want the dependency to Guava to grow the JAR from kilobytes
@@ -19,21 +18,25 @@ class ImmutableCollectionUtils {
     }
     
     private static List<String> newList(final List<String> in, final String add) {
-        final List<String> list = new CopyOnWriteArrayList<>(in);
+        final List<String> list = new ArrayList<>(in);
         list.add(add);
         return unmodifiableList(list);
     }
     
-    private static List<String> newList(final String ... args) {
-        return unmodifiableList(new CopyOnWriteArrayList<>(args));
+    private static List<String> newList(final String arg) {
+        return unmodifiableList(singletonList(arg));
     }
     
     private static List<String> copy(final Collection<String> in) {
-        return unmodifiableList(new CopyOnWriteArrayList(in));
+        return unmodifiableList(new ArrayList(in));
+    }
+    
+    private static Map<String, List<String>> newMap() {
+        return new HashMap<>();
     }
     
     static Map<String, List<String>> copy(final Map<String, List<String>> in) {
-        final Map<String, List<String>> ret = new HashMap<>();
+        final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
         }
@@ -41,8 +44,9 @@ class ImmutableCollectionUtils {
     }
 
     static Map<String, List<String>> copyAndAdd(final Map<String, List<String>> in,
-            final String key, final String value) {
-        final Map<String, List<String>> ret = new HashMap<>();
+            final String key, final String value)
+    {
+        final Map<String, List<String>> ret = newMap();
         boolean added = false;
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (key.equals(e.getKey())) {
@@ -59,8 +63,9 @@ class ImmutableCollectionUtils {
     }
 
     static Map<String, List<String>> copyAndSet(final Map<String, List<String>> in,
-            final String key, final String value) {
-        final Map<String, List<String>> ret = new HashMap<>();
+            final String key, final String value)
+    {
+        final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (!key.equals(e.getKey())) {
                 ret.put(e.getKey(), copy(e.getValue()));
@@ -71,8 +76,9 @@ class ImmutableCollectionUtils {
     }
 
     static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
-            final String key, final String value) {
-        final Map<String, List<String>> ret = new HashMap<>();
+            final String key, final String value)
+    {
+        final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (key.equals(e.getKey())) {
                 ret.put(e.getKey(), newList(e.getValue(), value));
@@ -84,8 +90,9 @@ class ImmutableCollectionUtils {
     }
 
     static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
-            final String key) {
-        final Map<String, List<String>> ret = new HashMap<>();
+            final String key)
+    {
+        final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (!key.equals(e.getKey())) {
                 ret.put(e.getKey(), copy(e.getValue()));
