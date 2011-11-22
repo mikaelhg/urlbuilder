@@ -16,6 +16,7 @@ limitations under the License.
 package gumi.builders;
 
 import static java.util.Collections.*;
+import static gumi.builders.ImmutableCollectionUtils.*;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import java.net.IDN;
@@ -411,75 +412,5 @@ public final class UrlBuilder {
     public UrlBuilder removeParameters(final String key) {
         final Map<String, List<String>> qp = copyAndRemove(this.queryParameters, key);
         return of(inputEncoding, outputEncoding, protocol, hostName, port, path, qp, anchor);
-    }
-
-    private static Map<String, List<String>> copy(final Map<String, List<String>> in) {
-        final Map<String, List<String>> ret = new HashMap<>();
-        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
-            ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
-        }
-        return unmodifiableMap(ret);
-    }
-    
-    private static Map<String, List<String>> copyAndAdd(final Map<String, List<String>> in,
-            final String key, final String value)
-    {
-        final Map<String, List<String>> ret = new HashMap<>();
-        boolean added = false;
-        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
-            if (key.equals(e.getKey())) {
-                final ArrayList<String> al = new ArrayList<>(e.getValue());
-                al.add(value);
-                ret.put(e.getKey(), unmodifiableList(al));
-                added = true;
-            } else {
-                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
-            }
-        }
-        if (!added) {
-            ret.put(key, unmodifiableList(singletonList(value)));
-        }
-        return unmodifiableMap(ret);
-    }
-    
-    private static Map<String, List<String>> copyAndSet(final Map<String, List<String>> in,
-            final String key, final String value)
-    {
-        final Map<String, List<String>> ret = new HashMap<>();
-        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
-            if (!key.equals(e.getKey())) {
-                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
-            }
-        }
-        ret.put(key, unmodifiableList(singletonList(value)));
-        return unmodifiableMap(ret);
-    }
-    
-    private static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
-            final String key, final String value)
-    {
-        final Map<String, List<String>> ret = new HashMap<>();
-        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
-            if (key.equals(e.getKey())) {
-                final ArrayList<String> al = new ArrayList<>(e.getValue());
-                al.remove(value);
-                ret.put(e.getKey(), unmodifiableList(al));
-            } else {
-                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
-            }
-        }
-        return unmodifiableMap(ret);
-    }
-    
-    private static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
-            final String key)
-    {
-        final Map<String, List<String>> ret = new HashMap<>();
-        for (final Map.Entry<String, List<String>> e : in.entrySet()) {
-            if (!key.equals(e.getKey())) {
-                ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
-            }
-        }
-        return unmodifiableMap(ret);
     }
 }
