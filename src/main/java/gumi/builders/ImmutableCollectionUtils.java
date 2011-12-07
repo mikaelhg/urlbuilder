@@ -17,7 +17,7 @@ class ImmutableCollectionUtils {
     private ImmutableCollectionUtils() {
     }
     
-    private static List<String> newList(final List<String> in, final String add) {
+    private static List<String> copyAndAdd(final List<String> in, final String add) {
         final List<String> list = new ArrayList<>(in);
         list.add(add);
         return unmodifiableList(list);
@@ -28,7 +28,7 @@ class ImmutableCollectionUtils {
     }
     
     private static List<String> copy(final Collection<String> in) {
-        return unmodifiableList(new ArrayList(in));
+        return unmodifiableList(new ArrayList<>(in));
     }
     
     private static Map<String, List<String>> newMap() {
@@ -38,7 +38,7 @@ class ImmutableCollectionUtils {
     static Map<String, List<String>> copy(final Map<String, List<String>> in) {
         final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
-            ret.put(e.getKey(), unmodifiableList(new ArrayList(e.getValue())));
+            ret.put(e.getKey(), unmodifiableList(new ArrayList<>(e.getValue())));
         }
         return unmodifiableMap(ret);
     }
@@ -50,7 +50,7 @@ class ImmutableCollectionUtils {
         boolean added = false;
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (key.equals(e.getKey())) {
-                ret.put(e.getKey(), newList(e.getValue(), value));
+                ret.put(e.getKey(), copyAndAdd(e.getValue(), value));
                 added = true;
             } else {
                 ret.put(e.getKey(), copy(e.getValue()));
@@ -81,7 +81,7 @@ class ImmutableCollectionUtils {
         final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (key.equals(e.getKey())) {
-                ret.put(e.getKey(), newList(e.getValue(), value));
+                ret.put(e.getKey(), copyAndAdd(e.getValue(), value));
             } else {
                 ret.put(e.getKey(), copy(e.getValue()));
             }

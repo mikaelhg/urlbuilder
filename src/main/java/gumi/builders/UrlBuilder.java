@@ -146,8 +146,8 @@ public final class UrlBuilder {
     public static UrlBuilder fromUri(final URI uri) {
         try {
             return fromUrl(uri.toURL());
-        } catch (MalformedURLException e) {
-            return new UrlBuilder();
+        } catch (final MalformedURLException e) {
+            return empty();
         }
     }
 

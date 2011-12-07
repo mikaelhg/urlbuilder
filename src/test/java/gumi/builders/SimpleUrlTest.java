@@ -1,9 +1,15 @@
 package gumi.builders;
 
 import static org.junit.Assert.*;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Arrays;
+
+import gumi.builders.url.RuntimeMalformedURLException;
+import gumi.builders.url.RuntimeURISyntaxException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,7 +20,6 @@ public class SimpleUrlTest {
 
     @Test
     public void utf8Test() throws Exception {
-        // höplä
         assertEquals(UrlBuilder
                 .fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
                 .encodeAs("UTF-8").toString(),
