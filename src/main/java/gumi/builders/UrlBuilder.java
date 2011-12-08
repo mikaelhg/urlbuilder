@@ -124,7 +124,7 @@ public final class UrlBuilder {
         final Matcher m = URI_PATTERN.matcher(url);
         String protocol = null, hostName = null, path = null, anchor = null;
         Integer port = null;
-        Map<String, List<String>> queryParameters = null;
+        final Map<String, List<String>> queryParameters;
         if (m.find()) {
             protocol = m.group(2);
             if (m.group(4) != null) {
@@ -139,6 +139,8 @@ public final class UrlBuilder {
             path = decodePath(m.group(5), inputEncoding);
             queryParameters = decodeQueryParameters(m.group(7), inputEncoding);
             anchor = m.group(9);
+        } else {
+            queryParameters = emptyMap();
         }
         return of(inputEncoding, DEFAULT_ENCODING, protocol, hostName, port, path, queryParameters, anchor);
     }
