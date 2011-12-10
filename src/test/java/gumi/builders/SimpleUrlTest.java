@@ -2,21 +2,54 @@ package gumi.builders;
 
 import static org.junit.Assert.*;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import gumi.builders.url.RuntimeMalformedURLException;
-import gumi.builders.url.RuntimeURISyntaxException;
 import org.junit.Assert;
 import org.junit.Test;
+
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 /**
  * A few simple, handwritten, non-datadriven tests to get started.
  */
 public class SimpleUrlTest {
+
+    private static final Charset UTF8 = Charset.forName("UTF-8");
+
+    @Test
+    public void userInfoTest() throws Exception {
+        final String userInfo = "username:password";
+        final String model = "http://" + userInfo + "@server/path?a=b#fragment";
+        final UrlBuilder ub1 = UrlBuilder.fromString(model);
+        assertEquals(ub1.userInfo, userInfo);
+        assertEquals(ub1.toString(), model);
+        final URL url1 = ub1.toUrl();
+        assertEquals(url1.getUserInfo(), userInfo);
+        assertEquals(url1.toString(), model);
+        final UrlBuilder ub2 = UrlBuilder.fromUrl(new URL(model));
+        assertEquals(ub2.userInfo, userInfo);
+    }
+
+    @Test
+    public void incompleteUserInfoTest() throws Exception {
+        final String userInfo = "username:password";
+        final UrlBuilder ub1 = UrlBuilder.of(UTF8, UTF8, "http", userInfo, null, null, null, null, null);
+        assertEquals(ub1.userInfo, userInfo);
+        assertEquals(ub1.toString(), "http:");
+        final URL url1 = ub1.toUrl();
+        assertEquals(url1.toString(), "http:");
+        assertNull(url1.getUserInfo());
+        final UrlBuilder ub2 = UrlBuilder.fromString("http://username:password@");
+        assertEquals(ub2.userInfo, userInfo);
+        assertEquals(ub2.hostName, "");
+        final UrlBuilder ub3 = UrlBuilder.fromString("http://username:password@/");
+        assertEquals(ub3.userInfo, userInfo);
+        assertEquals(ub3.hostName, "");
+    }
 
     @Test
     public void utf8Test() throws Exception {
@@ -46,7 +79,7 @@ public class SimpleUrlTest {
     @Test
     public void simpleTest() throws Exception {
         final UrlBuilder ub1 = UrlBuilder.empty()
-                .withProtocol("http")
+                .withScheme("http")
                 .withHost("www.example.com")
                 .withPath("/")
                 .addParameter("foo", "bar");
