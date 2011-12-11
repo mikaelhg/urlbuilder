@@ -11,8 +11,6 @@ import java.util.Arrays;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
-
 /**
  * A few simple, handwritten, non-datadriven tests to get started.
  */
