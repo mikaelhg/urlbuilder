@@ -16,13 +16,19 @@ class ImmutableCollectionUtils {
 
     private ImmutableCollectionUtils() {
     }
-    
+
     private static List<String> copyAndAdd(final List<String> in, final String add) {
         final List<String> list = new ArrayList<>(in);
         list.add(add);
         return unmodifiableList(list);
     }
-    
+
+    private static List<String> copyAndRemove(final List<String> in, final String remove) {
+        final List<String> list = new ArrayList<>(in);
+        list.remove(remove);
+        return unmodifiableList(list);
+    }
+
     private static List<String> newList(final String arg) {
         return unmodifiableList(singletonList(arg));
     }
@@ -81,7 +87,7 @@ class ImmutableCollectionUtils {
         final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (key.equals(e.getKey())) {
-                ret.put(e.getKey(), copyAndAdd(e.getValue(), value));
+                ret.put(e.getKey(), copyAndRemove(e.getValue(), value));
             } else {
                 ret.put(e.getKey(), copy(e.getValue()));
             }
