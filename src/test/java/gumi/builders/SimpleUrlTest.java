@@ -2,6 +2,7 @@ package gumi.builders;
 
 import static org.junit.Assert.*;
 
+import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -47,6 +48,20 @@ public class SimpleUrlTest {
         final UrlBuilder ub3 = UrlBuilder.fromString("http://username:password@/");
         assertEquals(ub3.userInfo, userInfo);
         assertEquals(ub3.hostName, "");
+    }
+
+    @Test(expected = NumberFormatException.class)
+    public void brokenUrlEncodingTest() throws Exception {
+        UrlBuilder.fromString("http://localhost/%ax");
+    }
+
+    @Test
+    public void brokenUrlEncodingRoundtripTest() throws Exception {
+        final String broken1 = "http://localhost/?foo=%ax";
+        final String broken2 = "http://localhost/?foo=%a";
+        final URL url1 = new URL(broken1);
+        System.out.println(url1);
+        UrlBuilder.fromUrl(url1);
     }
 
     @Test
