@@ -56,15 +56,6 @@ public class SimpleUrlTest {
     }
 
     @Test
-    public void brokenUrlEncodingRoundtripTest() throws Exception {
-        final String broken1 = "http://localhost/?foo=%ax";
-        final String broken2 = "http://localhost/?foo=%a";
-        final URL url1 = new URL(broken1);
-        System.out.println(url1);
-        UrlBuilder.fromUrl(url1);
-    }
-
-    @Test
     public void utf8Test() throws Exception {
         assertEquals(UrlBuilder
                 .fromString("http://foo/h%F6pl%E4", "ISO-8859-1")

@@ -15,20 +15,15 @@ limitations under the License.
 */
 package gumi.builders;
 
-import static java.util.Collections.*;
 import static gumi.builders.ImmutableCollectionUtils.*;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
-
 import java.io.IOException;
-import java.net.IDN;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import static java.util.Collections.emptyMap;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -263,8 +258,7 @@ public final class UrlBuilder {
     private static String urlDecode(final String input, final Charset charset) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
-        int i = 0;
-        for (i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             final char c0 = input.charAt(i);
             if (c0 == '+') {
                 sb.append(' ');
@@ -457,11 +451,13 @@ public final class UrlBuilder {
      * Sets the query parameters to a deep copy of the input parameter. Use <tt>null</tt> to remove the whole section.
      */
     public UrlBuilder withQuery(final Map<String, List<String>> query) {
+        final Map<String, List<String>> q;
         if (query == null) {
-            return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, EMPTY_MAP, fragment);
+            q = Collections.<String, List<String>>emptyMap();
         } else {
-            return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, copy(query), fragment);
+            q = copy(query);
         }
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, q, fragment);
     }
 
     /**

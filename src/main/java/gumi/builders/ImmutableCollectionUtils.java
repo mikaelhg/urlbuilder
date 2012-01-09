@@ -1,15 +1,11 @@
 package gumi.builders;
 
 import static java.util.Collections.*;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Since I don't want the dependency to Guava to grow the JAR from kilobytes
- * to megabytes, I implement a few multimap helpers. If I find a way to reduce
+ * to megabytes, I reinvent a few multimap helpers. If I find a way to reduce
  * the size of packaging Guava instead, I'll remove this.
  */
 class ImmutableCollectionUtils {
@@ -40,7 +36,8 @@ class ImmutableCollectionUtils {
     private static Map<String, List<String>> newMap() {
         return new HashMap<>();
     }
-    
+
+    /** Deep copy, with immutable values. */
     static Map<String, List<String>> copy(final Map<String, List<String>> in) {
         final Map<String, List<String>> ret = newMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
