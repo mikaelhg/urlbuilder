@@ -120,7 +120,7 @@ public final class UrlBuilder {
     /**
      * Construct a UrlBuilder from a full or partial URL string.
      * When percent-decoding the query parameters, assume that they were encoded with <b>inputEncoding</b>.
-     * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax)
+     * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
         return fromString(url, Charset.forName(inputEncoding));
@@ -129,7 +129,7 @@ public final class UrlBuilder {
     /**
      * Construct a UrlBuilder from a full or partial URL string.
      * When percent-decoding the query parameters, assume that they were encoded with <b>inputEncoding</b>.
-     * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax)
+     * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
         if (url == null || url.isEmpty()) {
@@ -177,7 +177,7 @@ public final class UrlBuilder {
 
     /**
      * Construct a UrlBuilder from a {@link java.net.URL}.
-     * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax)
+     * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromUrl(final URL url) {
         return of(DEFAULT_ENCODING, DEFAULT_ENCODING,
