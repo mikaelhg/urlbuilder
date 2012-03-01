@@ -1,5 +1,5 @@
 /*
-Copyright 2011 Mikael Gueck
+Copyright 2012 Mikael Gueck
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import java.util.regex.Pattern;
  *
  * URL: http://www.ietf.org/rfc/rfc1738.txt
  * URI: http://tools.ietf.org/html/rfc3986
- * @author Mikael Gueck gumi@iki.fi
+ * @author Mikael Gueck gumi{@literal @}iki.fi
  */
 public final class UrlBuilder {
 
@@ -50,7 +50,7 @@ public final class UrlBuilder {
     private final Charset outputEncoding;
 
     public final String scheme;
-    
+
     public final String userInfo;
 
     public final String hostName;
@@ -74,7 +74,7 @@ public final class UrlBuilder {
         this.queryParameters = emptyMap();
         this.fragment = null;
     }
-    
+
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
             final String scheme, final String userInfo,
             final String hostName, final Integer port, final String path,
@@ -94,7 +94,7 @@ public final class UrlBuilder {
         }
         this.fragment = fragment;
     }
-    
+
     public static UrlBuilder empty() {
         return new UrlBuilder();
     }
@@ -355,7 +355,7 @@ public final class UrlBuilder {
             out.append(this.fragment);
         }
     }
-    
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
