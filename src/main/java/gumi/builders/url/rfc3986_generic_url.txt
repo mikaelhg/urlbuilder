@@ -1,0 +1,30 @@
+# Regular Expressions Cookbook
+# 7.7  Validating Generic URLs
+\A
+(# Scheme
+ (?<scheme>[a-z][a-z0-9+\-\.]*):
+ (# Authority & path
+  //
+  (?<user>[a-z0-9\-._~%!$&'()*+,;=]+@)?              # User
+  (?<host>[a-z0-9\-._~%]+                            # Named host
+  |       \[[a-f0-9:.]+\]                            # IPv6 host
+  |       \[v[a-f0-9][a-z0-9\-._~%!$&'()*+,;=:]+\])  # IPvFuture host
+  (?<port>:[0-9]+)?                                  # Port
+  (?<hostpath>(/[a-z0-9\-._~%!$&'()*+,;=:@]+)*/?)    # Path
+ |# Path without authority
+  (?<schemepath>/?[a-z0-9\-._~%!$&'()*+,;=:@]+
+                (/[a-z0-9\-._~%!$&'()*+,;=:@]+)*/?)?
+ )
+|# Relative URL (no scheme or authority)
+ (?<relpath>
+  # Relative path
+  [a-z0-9\-._~%!$&'()*+,;=@]+(/[a-z0-9\-._~%!$&'()*+,;=:@]+)*/?
+ |# Absolute path
+  (/[a-z0-9\-._~%!$&'()*+,;=:@]+)+/?
+ )
+)
+# Query
+(?<query>\?[a-z0-9\-._~%!$&'()*+,;=:@/?]*)?
+# Fragment
+(?<fragment>\#[a-z0-9\-._~%!$&'()*+,;=:@/?]*)?
+\Z
