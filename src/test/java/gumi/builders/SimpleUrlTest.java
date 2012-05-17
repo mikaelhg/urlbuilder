@@ -139,6 +139,23 @@ public class SimpleUrlTest {
                 "http://foo/h%C3%A4pl%C3%B6");
     }
 
+  	@Test
+  	public void testPortParsing() {
+  		assertUrlBuilderEquals(null, "localhost", 8080, "/thing", UrlBuilder.fromString("http://localhost:8080/thing"));
+  		assertUrlBuilderEquals(null, "localhost", null, "/thing", UrlBuilder.fromString("http://localhost/thing"));
+  		assertUrlBuilderEquals("arabung", "localhost", null, "/thing", UrlBuilder.fromString("http://arabung@localhost/thing"));
+  		assertUrlBuilderEquals("arabung", "localhost", 808, "/thing", UrlBuilder.fromString("http://arabung@localhost:808/thing"));
+  		assertUrlBuilderEquals(null, "github.com", null, "", UrlBuilder.fromString("https://github.com"));
+  		assertUrlBuilderEquals(null, "github.com", 443, "", UrlBuilder.fromString("https://github.com:443.com"));
+  	}
+
+  	private static void assertUrlBuilderEquals(String expectedUserInfo, String expectedHostName, Integer expectedPort, String expectedPath, UrlBuilder ub) {
+  		assertEquals(expectedUserInfo, ub.userInfo);
+  		assertEquals(expectedHostName, ub.hostName);
+  		assertEquals(expectedPort, ub.port);
+  		assertEquals(expectedPath, ub.path);
+  	}
+
     private static void assertRoundtrip(final String url) throws Exception {
         Assert.assertEquals(url, UrlBuilder.fromString(url).toString());
     }
