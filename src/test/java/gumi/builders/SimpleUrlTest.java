@@ -2,10 +2,7 @@ package gumi.builders;
 
 import static org.junit.Assert.*;
 
-import java.net.URI;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
+import java.net.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
@@ -70,7 +67,7 @@ public class SimpleUrlTest {
         assertTrue(ub1.queryParameters.containsKey("b"));
         assertEquals(ub1.queryParameters.get("a"), Arrays.asList("b", "c"));
     }
-    
+
     @Test
     public void brokenparameterTest() {
         final UrlBuilder ub1 = UrlBuilder.fromString("?=b");
@@ -79,7 +76,7 @@ public class SimpleUrlTest {
         assertEquals(ub2.queryParameters.get("").get(0), "=b");
         assertEquals(ub2.toString(), "?=%3Db");
     }
-    
+
     @Test
     public void simpleTest() throws Exception {
         final UrlBuilder ub1 = UrlBuilder.empty()
@@ -124,7 +121,7 @@ public class SimpleUrlTest {
         assertEquals("//test/foo?foo=%F6%E4%F6%E4%F6%E4",
                 UrlBuilder.empty().encodeAs("ISO-8859-1")
                 .withHost("test").withPath("/foo")
-                .addParameter("foo", "Ã¶Ã¤Ã¶Ã¤Ã¶Ã¤")
+                .addParameter("foo", "öäöäöä")
                 .toString());
 
         assertEquals(UrlBuilder.fromString(url1, charset).encodeAs(charset).toString(), url1);
@@ -137,6 +134,22 @@ public class SimpleUrlTest {
 
         assertEquals(UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString(),
                 "http://foo/h%C3%A4pl%C3%B6");
+    }
+
+    @Test
+    public void parsePortAndHostname() {
+        String url = "http://foo:8080/foo";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals(new Integer(8080), builder.port);
+        assertEquals("foo", builder.hostName);
+    }
+
+    @Test
+    public void encodedPathFromURI() throws URISyntaxException {
+        URI uri = new URI("http://foo/a%20b");
+        assertEquals("http://foo/a+b",UrlBuilder.fromUri(uri).toString());
+        uri = new URI("http://foo/a%7Bb");
+        assertEquals("http://foo/a%7Bb",UrlBuilder.fromUri(uri).toString());
     }
 
     private static void assertRoundtrip(final String url) throws Exception {

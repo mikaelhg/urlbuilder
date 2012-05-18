@@ -43,7 +43,7 @@ public final class UrlBuilder {
     private static final Pattern URI_PATTERN =
             Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
 
-    private static final Pattern AUTHORITY_PATTERN = Pattern.compile("((.*)@)?(.*)?(:([0-9]*))?");
+    private static final Pattern AUTHORITY_PATTERN = Pattern.compile("((.*)@)?([^:]*)(:(\\d+))?");
 
     private final Charset inputEncoding;
 
@@ -150,8 +150,8 @@ public final class UrlBuilder {
                     if (n.group(3) != null) {
                         hostName = IDN.toUnicode(n.group(3));
                     }
-                    if (n.group(4) != null) {
-                        port = Integer.parseInt(n.group(4));
+                    if (n.group(5) != null) {
+                        port = Integer.parseInt(n.group(5));
                     }
                 }
             }
@@ -171,7 +171,7 @@ public final class UrlBuilder {
         return of(DEFAULT_ENCODING, DEFAULT_ENCODING,
                 uri.getScheme(), uri.getUserInfo(), uri.getHost(),
                 uri.getPort() == -1 ? null : uri.getPort(),
-                uri.getRawPath(),
+                urlDecode(uri.getRawPath(), DEFAULT_ENCODING),
                 decodeQueryParameters(uri.getRawQuery(), DEFAULT_ENCODING), uri.getFragment());
     }
 
