@@ -121,7 +121,7 @@ public class SimpleUrlTest {
         assertEquals("//test/foo?foo=%F6%E4%F6%E4%F6%E4",
                 UrlBuilder.empty().encodeAs("ISO-8859-1")
                 .withHost("test").withPath("/foo")
-                .addParameter("foo", "öäöäöä")
+                .addParameter("foo", "Ã¶Ã¤Ã¶Ã¤Ã¶Ã¤")
                 .toString());
 
         assertEquals(UrlBuilder.fromString(url1, charset).encodeAs(charset).toString(), url1);
