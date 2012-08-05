@@ -38,3 +38,21 @@ Todo:
 
 * More unit tests for corner cases
 * Preserve URL property order
+
+Use with Maven:
+-----------------------
+
+    <repositories>
+      <repository>
+        <id>maven2.gueck.com-releases</id>
+        <url>http://maven2.gueck.com/releases</url>
+      </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>gumi</groupId>
+            <artifactId>builders</artifactId>
+            <version>1.1</version>
+        </dependency>
+    </dependencies>
