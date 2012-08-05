@@ -6,24 +6,38 @@
 
     <groupId>gumi</groupId>
     <artifactId>builders</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <distributionManagement>
+      <repository>
+        <id>maven2.gueck.com-s3</id>
+        <url>s3://maven2.gueck.com/releases</url>
+      </repository>
+    </distributionManagement>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>2.5.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
             </plugin>
         </plugins>
+        <extensions>
+          <extension>
+            <groupId>org.springframework.build.aws</groupId>
+            <artifactId>org.springframework.build.aws.maven</artifactId>
+            <version>3.0.0.RELEASE</version>
+          </extension>
+        </extensions>
     </build>
 
     <dependencies>
