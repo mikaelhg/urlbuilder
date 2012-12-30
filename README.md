@@ -36,7 +36,7 @@ Create and modify URLs and URL parameters easily, with a builder class.
 Todo:
 -----
 
-* More unit tests for corner cases
+* More unit tests for corner cases (your help is needed!)
 * Preserve URL property order
 
 Use with Maven:
