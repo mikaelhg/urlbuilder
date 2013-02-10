@@ -137,6 +137,17 @@ public class SimpleUrlTest {
     }
 
     @Test
+    public void testEmptyParameterNameAfterAmpersand() {
+        assertEquals("foo", UrlBuilder.fromString("http://www.google.com/?q=foo&").queryParameters.get("q").get(0));
+    }
+
+    @Test
+    public void testParameterOrderStability() {
+        final String qp1 = "?a=1&b=2&a=3&b=4";
+        assertEquals(qp1, UrlBuilder.fromString(qp1).toString());
+    }
+
+    @Test
     public void testPortParsing() {
         assertUrlBuilderEquals(null, "localhost", 8080, "/thing", UrlBuilder.fromString("http://localhost:8080/thing"));
         assertUrlBuilderEquals(null, "localhost", null, "/thing", UrlBuilder.fromString("http://localhost/thing"));
