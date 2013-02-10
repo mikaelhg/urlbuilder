@@ -26,7 +26,11 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -537,6 +541,21 @@ public final class UrlBuilder {
         for (Map.Entry<String, List<String>> e : in.entrySet()) {
             for (String value : e.getValue()) {
                 ret.put(e.getKey(), value);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Compatibility with non-Guava code
+     */
+    public Map<String, List<String>> getQueryParametersAsMap() {
+        Map<String, List<String>> ret = emptyMap();
+        for (Map.Entry<String, String> e : queryParameters.entries()) {
+            if (!ret.containsKey(e.getKey())) {
+                ret.put(e.getKey(), singletonList(e.getValue()));
+            } else {
+                ret.get(e.getKey()).add(e.getValue());
             }
         }
         return ret;
