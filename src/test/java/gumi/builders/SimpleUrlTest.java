@@ -65,15 +65,15 @@ public class SimpleUrlTest {
         final UrlBuilder ub1 = UrlBuilder.fromString("?a=b&a=c&b=c");
         assertTrue(ub1.queryParameters.containsKey("a"));
         assertTrue(ub1.queryParameters.containsKey("b"));
-        assertEquals(ub1.queryParameters.get("a"), Arrays.asList("b", "c"));
+        assertEquals(ub1.queryParameters.get("a").toArray(), new String[]{"b", "c"});
     }
 
     @Test
     public void brokenparameterTest() {
         final UrlBuilder ub1 = UrlBuilder.fromString("?=b");
-        assertEquals(ub1.queryParameters.get("").get(0), "b");
+        assertEquals(ub1.queryParameters.get("").iterator().next(), "b");
         final UrlBuilder ub2 = UrlBuilder.fromString("?==b");
-        assertEquals(ub2.queryParameters.get("").get(0), "=b");
+        assertEquals(ub2.queryParameters.get("").iterator().next(), "=b");
         assertEquals(ub2.toString(), "?=%3Db");
     }
 
@@ -138,7 +138,7 @@ public class SimpleUrlTest {
 
     @Test
     public void testEmptyParameterNameAfterAmpersand() {
-        assertEquals("foo", UrlBuilder.fromString("http://www.google.com/?q=foo&").queryParameters.get("q").get(0));
+        assertEquals("foo", UrlBuilder.fromString("http://www.google.com/?q=foo&").queryParameters.get("q").iterator().next());
     }
 
     @Test
