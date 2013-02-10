@@ -16,6 +16,9 @@ limitations under the License.
 package gumi.builders;
 
 import static gumi.builders.ImmutableCollectionUtils.*;
+
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import java.io.IOException;
@@ -23,7 +26,11 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonList;
+
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,7 +66,7 @@ public final class UrlBuilder {
 
     public final String path;
 
-    public final Map<String, List<String>> queryParameters;
+    public final Multimap<String, String> queryParameters;
 
     public final String fragment;
 
@@ -71,14 +78,14 @@ public final class UrlBuilder {
         this.hostName = null;
         this.port = null;
         this.path = null;
-        this.queryParameters = emptyMap();
+        this.queryParameters = LinkedHashMultimap.create();
         this.fragment = null;
     }
 
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
             final String scheme, final String userInfo,
             final String hostName, final Integer port, final String path,
-            final Map<String, List<String>> queryParameters, final String fragment)
+            final Multimap<String, String> queryParameters, final String fragment)
     {
         this.inputEncoding = inputEncoding;
         this.outputEncoding = outputEncoding;
@@ -88,9 +95,9 @@ public final class UrlBuilder {
         this.port = port;
         this.path = path;
         if (queryParameters == null) {
-            this.queryParameters = emptyMap();
+            this.queryParameters = LinkedHashMultimap.create();
         } else {
-            this.queryParameters = copy(queryParameters);
+            this.queryParameters = LinkedHashMultimap.create(queryParameters);
         }
         this.fragment = fragment;
     }
@@ -103,6 +110,16 @@ public final class UrlBuilder {
             final String scheme, final String userInfo,
             final String hostName, final Integer port, final String path,
             final Map<String, List<String>> queryParameters, final String fragment)
+    {
+        return new UrlBuilder(inputEncoding, outputEncoding,
+                scheme, userInfo, hostName, port, path,
+                copyToMultimap(queryParameters), fragment);
+    }
+
+    private static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
+            final String scheme, final String userInfo,
+            final String hostName, final Integer port, final String path,
+            final Multimap<String, String> queryParameters, final String fragment)
     {
         return new UrlBuilder(inputEncoding, outputEncoding,
                 scheme, userInfo, hostName, port, path,
@@ -138,7 +155,7 @@ public final class UrlBuilder {
         final Matcher m = URI_PATTERN.matcher(url);
         String scheme = null, userInfo = null, hostName = null, path = null, fragment = null;
         Integer port = null;
-        final Map<String, List<String>> queryParameters;
+        final Multimap<String, String> queryParameters;
         if (m.find()) {
             scheme = m.group(2);
             if (m.group(4) != null) {
@@ -159,7 +176,7 @@ public final class UrlBuilder {
             queryParameters = decodeQueryParameters(m.group(7), inputEncoding);
             fragment = m.group(9);
         } else {
-            queryParameters = emptyMap();
+            queryParameters = LinkedHashMultimap.create();
         }
         return of(inputEncoding, DEFAULT_ENCODING, scheme, userInfo, hostName, port, path, queryParameters, fragment);
     }
@@ -187,10 +204,10 @@ public final class UrlBuilder {
                 decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
     }
 
-    private static Map<String, List<String>> decodeQueryParameters(
+    private static Multimap<String, String> decodeQueryParameters(
             final String query, final Charset inputEncoding)
     {
-        final Map<String, List<String>> ret = new HashMap<String, List<String>>();
+        final Multimap<String, String> ret = LinkedHashMultimap.create();
         if (query == null || query.isEmpty()) {
             return ret;
         }
@@ -203,10 +220,7 @@ public final class UrlBuilder {
             } else {
                 value = null;
             }
-            if (!ret.containsKey(key)) {
-                ret.put(key, new ArrayList<String>());
-            }
-            ret.get(key).add(value);
+            ret.put(key, value);
         }
         return ret;
     }
@@ -278,15 +292,13 @@ public final class UrlBuilder {
 
     protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
-            for (final String value : e.getValue()) {
-                sb.append(urlEncode(e.getKey(), this.outputEncoding));
-                if (value != null) {
-                    sb.append('=');
-                    sb.append(urlEncode(value, this.outputEncoding));
-                }
-                sb.append('&');
+        for (final Map.Entry<String, String> e : this.queryParameters.entries()) {
+            sb.append(urlEncode(e.getKey(), this.outputEncoding));
+            if (e.getValue() != null) {
+                sb.append('=');
+                sb.append(urlEncode(e.getValue(), this.outputEncoding));
             }
+            sb.append('&');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
@@ -451,13 +463,16 @@ public final class UrlBuilder {
      * Sets the query parameters to a deep copy of the input parameter. Use <tt>null</tt> to remove the whole section.
      */
     public UrlBuilder withQuery(final Map<String, List<String>> query) {
-        final Map<String, List<String>> q;
-        if (query == null) {
-            q = Collections.<String, List<String>>emptyMap();
-        } else {
-            q = copy(query);
-        }
-        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, q, fragment);
+        // query will be copied
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, query, fragment);
+    }
+
+    /**
+     * Sets the query parameters to a deep copy of the input parameter. Use <tt>null</tt> to remove the whole section.
+     */
+    public UrlBuilder withQuery(final Multimap<String, String> query) {
+        // query will be copied
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, query, fragment);
     }
 
     /**
@@ -485,7 +500,8 @@ public final class UrlBuilder {
      * Adds a query parameter.
      */
     public UrlBuilder addParameter(final String key, final String value) {
-        final Map<String, List<String>> qp = copyAndAdd(this.queryParameters, key, value);
+        final LinkedHashMultimap<String, String> qp = LinkedHashMultimap.create(this.queryParameters);
+        qp.put(key, value);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -493,7 +509,9 @@ public final class UrlBuilder {
      * Replaces a query parameter.
      */
     public UrlBuilder setParameter(final String key, final String value) {
-        final Map<String, List<String>> qp = copyAndSet(this.queryParameters, key, value);
+        // TODO: need to remove existing values
+        final LinkedHashMultimap<String, String> qp = LinkedHashMultimap.create(this.queryParameters);
+        qp.put(key, value);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -501,7 +519,8 @@ public final class UrlBuilder {
      * Removes a query parameter for a key and value.
      */
     public UrlBuilder removeParameter(final String key, final String value) {
-        final Map<String, List<String>> qp = copyAndRemove(this.queryParameters, key, value);
+        final LinkedHashMultimap<String, String> qp = LinkedHashMultimap.create(this.queryParameters);
+        qp.remove(key, value);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -509,7 +528,36 @@ public final class UrlBuilder {
      * Removes all query parameters with this key.
      */
     public UrlBuilder removeParameters(final String key) {
-        final Map<String, List<String>> qp = copyAndRemove(this.queryParameters, key);
+        final LinkedHashMultimap<String, String> qp = LinkedHashMultimap.create(this.queryParameters);
+        qp.removeAll(key);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
+    }
+
+    private static Multimap<String, String> copyToMultimap(Map<String, List<String>> in) {
+        if (in == null)
+            return null;
+
+        Multimap<String, String> ret = LinkedHashMultimap.create();
+        for (Map.Entry<String, List<String>> e : in.entrySet()) {
+            for (String value : e.getValue()) {
+                ret.put(e.getKey(), value);
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Compatibility with non-Guava code
+     */
+    public Map<String, List<String>> getQueryParametersAsMap() {
+        Map<String, List<String>> ret = emptyMap();
+        for (Map.Entry<String, String> e : queryParameters.entries()) {
+            if (!ret.containsKey(e.getKey())) {
+                ret.put(e.getKey(), singletonList(e.getValue()));
+            } else {
+                ret.get(e.getKey()).add(e.getValue());
+            }
+        }
+        return ret;
     }
 }

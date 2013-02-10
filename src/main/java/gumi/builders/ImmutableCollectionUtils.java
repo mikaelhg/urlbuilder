@@ -51,7 +51,7 @@ class ImmutableCollectionUtils {
     }
 
     private static Map<String, List<String>> newMap() {
-        return new HashMap<String, List<String>>();
+        return new LinkedHashMap<String, List<String>>();
     }
 
     /** Deep copy, with immutable values. */
