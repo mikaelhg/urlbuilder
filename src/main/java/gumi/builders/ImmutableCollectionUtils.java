@@ -50,13 +50,13 @@ class ImmutableCollectionUtils {
         return unmodifiableList(new ArrayList<String>(in));
     }
 
-    private static Map<String, List<String>> newMap() {
-        return new HashMap<String, List<String>>();
+    public static Map<String, List<String>> newOrderedMap() {
+        return new LinkedHashMap<String, List<String>>();
     }
 
     /** Deep copy, with immutable values. */
     static Map<String, List<String>> copy(final Map<String, List<String>> in) {
-        final Map<String, List<String>> ret = newMap();
+        final Map<String, List<String>> ret = newOrderedMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             ret.put(e.getKey(), unmodifiableList(new ArrayList<String>(e.getValue())));
         }
@@ -66,7 +66,7 @@ class ImmutableCollectionUtils {
     static Map<String, List<String>> copyAndAdd(final Map<String, List<String>> in,
             final String key, final String value)
     {
-        final Map<String, List<String>> ret = newMap();
+        final Map<String, List<String>> ret = newOrderedMap();
         boolean added = false;
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (key.equals(e.getKey())) {
@@ -85,7 +85,7 @@ class ImmutableCollectionUtils {
     static Map<String, List<String>> copyAndSet(final Map<String, List<String>> in,
             final String key, final String value)
     {
-        final Map<String, List<String>> ret = newMap();
+        final Map<String, List<String>> ret = newOrderedMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (!key.equals(e.getKey())) {
                 ret.put(e.getKey(), copy(e.getValue()));
@@ -98,7 +98,7 @@ class ImmutableCollectionUtils {
     static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
             final String key, final String value)
     {
-        final Map<String, List<String>> ret = newMap();
+        final Map<String, List<String>> ret = newOrderedMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (key.equals(e.getKey())) {
                 ret.put(e.getKey(), copyAndRemove(e.getValue(), value));
@@ -112,7 +112,7 @@ class ImmutableCollectionUtils {
     static Map<String, List<String>> copyAndRemove(final Map<String, List<String>> in,
             final String key)
     {
-        final Map<String, List<String>> ret = newMap();
+        final Map<String, List<String>> ret = newOrderedMap();
         for (final Map.Entry<String, List<String>> e : in.entrySet()) {
             if (!key.equals(e.getKey())) {
                 ret.put(e.getKey(), copy(e.getValue()));
