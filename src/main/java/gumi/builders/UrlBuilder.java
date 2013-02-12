@@ -190,7 +190,7 @@ public final class UrlBuilder {
     private static Map<String, List<String>> decodeQueryParameters(
             final String query, final Charset inputEncoding)
     {
-        final Map<String, List<String>> ret = new HashMap<String, List<String>>();
+        final Map<String, List<String>> ret = newOrderedMap();
         if (query == null || query.isEmpty()) {
             return ret;
         }
