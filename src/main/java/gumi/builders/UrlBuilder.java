@@ -18,6 +18,8 @@ package gumi.builders;
 import static gumi.builders.ImmutableCollectionUtils.*;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
+import gumi.builders.url.UrlParameterMultimap;
+
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
@@ -59,7 +61,7 @@ public final class UrlBuilder {
 
     public final String path;
 
-    public final Map<String, List<String>> queryParameters;
+    public final UrlParameterMultimap queryParameters;
 
     public final String fragment;
 
@@ -71,14 +73,14 @@ public final class UrlBuilder {
         this.hostName = null;
         this.port = null;
         this.path = null;
-        this.queryParameters = emptyMap();
+        this.queryParameters = new UrlParameterMultimap().immutable();
         this.fragment = null;
     }
 
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
             final String scheme, final String userInfo,
             final String hostName, final Integer port, final String path,
-            final Map<String, List<String>> queryParameters, final String fragment)
+            final UrlParameterMultimap queryParameters, final String fragment)
     {
         this.inputEncoding = inputEncoding;
         this.outputEncoding = outputEncoding;
@@ -87,11 +89,7 @@ public final class UrlBuilder {
         this.hostName = hostName;
         this.port = port;
         this.path = path;
-        if (queryParameters == null) {
-            this.queryParameters = emptyMap();
-        } else {
-            this.queryParameters = copy(queryParameters);
-        }
+        this.queryParameters = queryParameters;
         this.fragment = fragment;
     }
 
@@ -102,7 +100,7 @@ public final class UrlBuilder {
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
             final String scheme, final String userInfo,
             final String hostName, final Integer port, final String path,
-            final Map<String, List<String>> queryParameters, final String fragment)
+            final UrlParameterMultimap queryParameters, final String fragment)
     {
         return new UrlBuilder(inputEncoding, outputEncoding,
                 scheme, userInfo, hostName, port, path,
@@ -138,7 +136,7 @@ public final class UrlBuilder {
         final Matcher m = URI_PATTERN.matcher(url);
         String scheme = null, userInfo = null, hostName = null, path = null, fragment = null;
         Integer port = null;
-        final Map<String, List<String>> queryParameters;
+        final UrlParameterMultimap queryParameters;
         if (m.find()) {
             scheme = m.group(2);
             if (m.group(4) != null) {
@@ -159,7 +157,7 @@ public final class UrlBuilder {
             queryParameters = decodeQueryParameters(m.group(7), inputEncoding);
             fragment = m.group(9);
         } else {
-            queryParameters = emptyMap();
+            queryParameters = new UrlParameterMultimap();
         }
         return of(inputEncoding, DEFAULT_ENCODING, scheme, userInfo, hostName, port, path, queryParameters, fragment);
     }
@@ -187,10 +185,10 @@ public final class UrlBuilder {
                 decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
     }
 
-    private static Map<String, List<String>> decodeQueryParameters(
+    private static UrlParameterMultimap decodeQueryParameters(
             final String query, final Charset inputEncoding)
     {
-        final Map<String, List<String>> ret = newOrderedMap();
+        final UrlParameterMultimap ret = new UrlParameterMultimap();
         if (query == null || query.isEmpty()) {
             return ret;
         }
@@ -203,10 +201,7 @@ public final class UrlBuilder {
             } else {
                 value = null;
             }
-            if (!ret.containsKey(key)) {
-                ret.put(key, new ArrayList<String>());
-            }
-            ret.get(key).add(value);
+            ret.add(key, value);
         }
         return ret;
     }
@@ -278,15 +273,13 @@ public final class UrlBuilder {
 
     protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, List<String>> e : this.queryParameters.entrySet()) {
-            for (final String value : e.getValue()) {
-                sb.append(urlEncode(e.getKey(), this.outputEncoding));
-                if (value != null) {
-                    sb.append('=');
-                    sb.append(urlEncode(value, this.outputEncoding));
-                }
-                sb.append('&');
+        for (final Map.Entry<String, String> e : this.queryParameters.flatEntrySet()) {
+            sb.append(urlEncode(e.getKey(), this.outputEncoding));
+            if (e.getValue() != null) {
+                sb.append('=');
+                sb.append(urlEncode(e.getValue(), this.outputEncoding));
             }
+            sb.append('&');
         }
         sb.deleteCharAt(sb.length() - 1);
         return sb.toString();
@@ -346,7 +339,7 @@ public final class UrlBuilder {
         if (this.path != null) {
             out.append(encodePath(this.path, this.outputEncoding));
         }
-        if (!this.queryParameters.isEmpty()) {
+        if (this.queryParameters != null && !this.queryParameters.isEmpty()) {
             out.append('?');
             out.append(this.encodeQueryParameters());
         }
@@ -450,12 +443,12 @@ public final class UrlBuilder {
     /**
      * Sets the query parameters to a deep copy of the input parameter. Use <tt>null</tt> to remove the whole section.
      */
-    public UrlBuilder withQuery(final Map<String, List<String>> query) {
-        final Map<String, List<String>> q;
+    public UrlBuilder withQuery(final UrlParameterMultimap query) {
+        final UrlParameterMultimap q;
         if (query == null) {
-            q = Collections.<String, List<String>>emptyMap();
+            q = new UrlParameterMultimap();
         } else {
-            q = copy(query);
+            q = query.deepCopy();
         }
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, q, fragment);
     }
@@ -485,7 +478,7 @@ public final class UrlBuilder {
      * Adds a query parameter.
      */
     public UrlBuilder addParameter(final String key, final String value) {
-        final Map<String, List<String>> qp = copyAndAdd(this.queryParameters, key, value);
+        final UrlParameterMultimap qp = queryParameters.deepCopy().add(key, value).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -493,7 +486,7 @@ public final class UrlBuilder {
      * Replaces a query parameter.
      */
     public UrlBuilder setParameter(final String key, final String value) {
-        final Map<String, List<String>> qp = copyAndSet(this.queryParameters, key, value);
+        final UrlParameterMultimap qp = queryParameters.deepCopy().replaceValues(key, value).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -501,7 +494,7 @@ public final class UrlBuilder {
      * Removes a query parameter for a key and value.
      */
     public UrlBuilder removeParameter(final String key, final String value) {
-        final Map<String, List<String>> qp = copyAndRemove(this.queryParameters, key, value);
+        final UrlParameterMultimap qp = queryParameters.deepCopy().remove(key, value).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -509,7 +502,7 @@ public final class UrlBuilder {
      * Removes all query parameters with this key.
      */
     public UrlBuilder removeParameters(final String key) {
-        final Map<String, List<String>> qp = copyAndRemove(this.queryParameters, key);
+        final UrlParameterMultimap qp = queryParameters.deepCopy().removeAllValues(key).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 }

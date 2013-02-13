@@ -142,7 +142,6 @@ public class SimpleUrlTest {
         assertEquals("foo", UrlBuilder.fromString("http://www.google.com/?q=foo&").queryParameters.get("q").get(0));
     }
 
-    @Ignore("Array parameters aren't stable at the moment")
     @Test
     public void testArrayParameterOrderStability() {
         final String qp1 = "?a=1&b=2&a=3&b=4";
