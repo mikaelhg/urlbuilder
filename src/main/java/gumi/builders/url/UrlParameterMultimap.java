@@ -7,10 +7,12 @@ import java.util.*;
  */
 public class UrlParameterMultimap implements Map<String, List<String>> {
 
-    private List<Entry<String, String>> data;
+    private final List<Entry<String, String>> data;
 
-    public UrlParameterMultimap() {
-        this.data = new LinkedList<Entry<String, String>>();
+    public static final class Immutable extends UrlParameterMultimap {
+        public Immutable(final List<Entry<String, String>> data) {
+            super(Collections.unmodifiableList(new LinkedList<Entry<String, String>>(data)));
+        }
     }
 
     private UrlParameterMultimap(final List<Entry<String, String>> data) {
@@ -25,16 +27,30 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
         return data.isEmpty();
     }
 
-    private static final Entry<String, String> newEntry(final String key, final String value) {
+    private static Entry<String, String> newEntry(final String key, final String value) {
         return new AbstractMap.SimpleImmutableEntry<String, String>(key, value);
     }
 
+    public static UrlParameterMultimap newMultimap() {
+        return new UrlParameterMultimap(new LinkedList<Entry<String, String>>());
+    }
+
+    /**
+     * Make a mutable copy.
+     */
     public UrlParameterMultimap deepCopy() {
         return new UrlParameterMultimap(new LinkedList<Entry<String, String>>(data));
     }
 
-    public UrlParameterMultimap immutable() {
-        return new UrlParameterMultimap(Collections.unmodifiableList(data));
+    /**
+     * Make a immutable copy.
+     */
+    public Immutable immutable() {
+        if (this instanceof Immutable) {
+            return (Immutable) this;
+        } else {
+            return new Immutable(data);
+        }
     }
 
     public boolean containsKey(final Object key) {

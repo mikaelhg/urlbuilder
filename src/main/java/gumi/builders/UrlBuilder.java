@@ -15,17 +15,16 @@ limitations under the License.
 */
 package gumi.builders;
 
-import static gumi.builders.ImmutableCollectionUtils.*;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import gumi.builders.url.UrlParameterMultimap;
+import static gumi.builders.url.UrlParameterMultimap.*;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import static java.util.Collections.emptyMap;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,7 +60,9 @@ public final class UrlBuilder {
 
     public final String path;
 
-    public final UrlParameterMultimap queryParameters;
+    public final Map<String, List<String>> queryParameters;
+
+    private final UrlParameterMultimap.Immutable queryParametersMultimap;
 
     public final String fragment;
 
@@ -73,14 +74,15 @@ public final class UrlBuilder {
         this.hostName = null;
         this.port = null;
         this.path = null;
-        this.queryParameters = new UrlParameterMultimap().immutable();
+        this.queryParametersMultimap = newMultimap().immutable();
+        this.queryParameters = this.queryParametersMultimap;
         this.fragment = null;
     }
 
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
             final String scheme, final String userInfo,
             final String hostName, final Integer port, final String path,
-            final UrlParameterMultimap queryParameters, final String fragment)
+            final UrlParameterMultimap queryParametersMultimap, final String fragment)
     {
         this.inputEncoding = inputEncoding;
         this.outputEncoding = outputEncoding;
@@ -89,7 +91,12 @@ public final class UrlBuilder {
         this.hostName = hostName;
         this.port = port;
         this.path = path;
-        this.queryParameters = queryParameters;
+        if (queryParametersMultimap == null) {
+            this.queryParametersMultimap = newMultimap().immutable();
+        } else {
+            this.queryParametersMultimap = queryParametersMultimap.immutable();
+        }
+        this.queryParameters = this.queryParametersMultimap;
         this.fragment = fragment;
     }
 
@@ -97,6 +104,10 @@ public final class UrlBuilder {
         return new UrlBuilder();
     }
 
+    /**
+     * Unless users complain, of(...) will be made private.
+     */
+    @Deprecated
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
             final String scheme, final String userInfo,
             final String hostName, final Integer port, final String path,
@@ -157,7 +168,7 @@ public final class UrlBuilder {
             queryParameters = decodeQueryParameters(m.group(7), inputEncoding);
             fragment = m.group(9);
         } else {
-            queryParameters = new UrlParameterMultimap();
+            queryParameters = newMultimap();
         }
         return of(inputEncoding, DEFAULT_ENCODING, scheme, userInfo, hostName, port, path, queryParameters, fragment);
     }
@@ -188,7 +199,7 @@ public final class UrlBuilder {
     private static UrlParameterMultimap decodeQueryParameters(
             final String query, final Charset inputEncoding)
     {
-        final UrlParameterMultimap ret = new UrlParameterMultimap();
+        final UrlParameterMultimap ret = newMultimap();
         if (query == null || query.isEmpty()) {
             return ret;
         }
@@ -273,7 +284,7 @@ public final class UrlBuilder {
 
     protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, String> e : this.queryParameters.flatEntrySet()) {
+        for (final Map.Entry<String, String> e : this.queryParametersMultimap.flatEntrySet()) {
             sb.append(urlEncode(e.getKey(), this.outputEncoding));
             if (e.getValue() != null) {
                 sb.append('=');
@@ -339,7 +350,7 @@ public final class UrlBuilder {
         if (this.path != null) {
             out.append(encodePath(this.path, this.outputEncoding));
         }
-        if (this.queryParameters != null && !this.queryParameters.isEmpty()) {
+        if (this.queryParametersMultimap != null && !this.queryParametersMultimap.isEmpty()) {
             out.append('?');
             out.append(this.encodeQueryParameters());
         }
@@ -388,49 +399,49 @@ public final class UrlBuilder {
      * When percent-escaping the StringBuilder's output, use this character set.
      */
     public UrlBuilder encodeAs(final Charset charset) {
-        return of(inputEncoding, charset, scheme, userInfo, hostName, port, path, queryParameters, fragment);
+        return of(inputEncoding, charset, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * When percent-escaping the StringBuilder's output, use this character set.
      */
     public UrlBuilder encodeAs(final String charsetName) {
-        return of(inputEncoding, Charset.forName(charsetName), scheme, userInfo, hostName, port, path, queryParameters, fragment);
+        return of(inputEncoding, Charset.forName(charsetName), scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * Set the protocol (or scheme).
      */
     public UrlBuilder withScheme(final String scheme) {
-        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParameters, fragment);
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * Set the host name. Accepts internationalized host names, and decodes them.
      */
     public UrlBuilder withHost(final String hostName) {
-        return of(inputEncoding, outputEncoding, scheme, userInfo, IDN.toUnicode(hostName), port, path, queryParameters, fragment);
+        return of(inputEncoding, outputEncoding, scheme, userInfo, IDN.toUnicode(hostName), port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * Set the port. Use <tt>null</tt> to denote the protocol's default port.
      */
     public UrlBuilder withPort(final Integer port) {
-        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParameters, fragment);
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * Set the decoded, non-url-encoded path.
      */
     public UrlBuilder withPath(final String path) {
-        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParameters, fragment);
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * Decodes and sets the path from a url-encoded string.
      */
     public UrlBuilder withPath(final String path, final Charset encoding) {
-        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, decodePath(path, encoding), queryParameters, fragment);
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, decodePath(path, encoding), queryParametersMultimap, fragment);
     }
 
     /**
@@ -446,7 +457,7 @@ public final class UrlBuilder {
     public UrlBuilder withQuery(final UrlParameterMultimap query) {
         final UrlParameterMultimap q;
         if (query == null) {
-            q = new UrlParameterMultimap();
+            q = newMultimap();
         } else {
             q = query.deepCopy();
         }
@@ -471,14 +482,14 @@ public final class UrlBuilder {
      * Sets the fragment/anchor.
      */
     public UrlBuilder withFragment(final String fragment) {
-        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParameters, fragment);
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * Adds a query parameter.
      */
     public UrlBuilder addParameter(final String key, final String value) {
-        final UrlParameterMultimap qp = queryParameters.deepCopy().add(key, value).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().add(key, value).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -486,7 +497,7 @@ public final class UrlBuilder {
      * Replaces a query parameter.
      */
     public UrlBuilder setParameter(final String key, final String value) {
-        final UrlParameterMultimap qp = queryParameters.deepCopy().replaceValues(key, value).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().replaceValues(key, value).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -494,7 +505,7 @@ public final class UrlBuilder {
      * Removes a query parameter for a key and value.
      */
     public UrlBuilder removeParameter(final String key, final String value) {
-        final UrlParameterMultimap qp = queryParameters.deepCopy().remove(key, value).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().remove(key, value).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -502,7 +513,7 @@ public final class UrlBuilder {
      * Removes all query parameters with this key.
      */
     public UrlBuilder removeParameters(final String key) {
-        final UrlParameterMultimap qp = queryParameters.deepCopy().removeAllValues(key).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().removeAllValues(key).immutable();
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 }
