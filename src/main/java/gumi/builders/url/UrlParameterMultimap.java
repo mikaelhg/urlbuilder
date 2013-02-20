@@ -55,7 +55,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     public boolean containsKey(final Object key) {
         if (key == null) {
-            throw new NullPointerException("key can't be null");
+            throw new IllegalArgumentException("key can't be null");
         }
         for (final Entry<String, String> e : data) {
             if (key.equals(e.getKey())) {
@@ -67,7 +67,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     public boolean containsValue(final Object value) {
         if (value == null) {
-            throw new NullPointerException("value can't be null");
+            throw new IllegalArgumentException("value can't be null");
         }
         for (final Entry<String, String> e : data) {
             if (value.equals(e.getValue())) {
@@ -115,7 +115,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     public List<String> remove(final Object key) {
         if (key == null) {
-            throw new NullPointerException("can't remove null");
+            throw new IllegalArgumentException("can't remove null");
         }
         final List<String> ret = new ArrayList<String>();
         for (final Entry<String, String> e : data) {
@@ -134,7 +134,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     public UrlParameterMultimap remove(final String key, final String value) {
         if (key == null || value == null) {
-            throw new NullPointerException("can't remove null");
+            throw new IllegalArgumentException("can't remove null");
         }
         for (final Entry<String, String> e : data) {
             if (key.equals(e.getKey()) && value.equals(e.getValue())) {
