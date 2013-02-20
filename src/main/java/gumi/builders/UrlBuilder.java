@@ -486,7 +486,7 @@ public final class UrlBuilder {
     }
 
     /**
-     * Adds a query parameter.
+     * Adds a query parameter. New parameters are added to the end of the query string.
      */
     public UrlBuilder addParameter(final String key, final String value) {
         final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().add(key, value).immutable();
@@ -495,6 +495,7 @@ public final class UrlBuilder {
 
     /**
      * Replaces a query parameter.
+     * Existing parameters with this name are removed, and the new one added to the end of the query string.
      */
     public UrlBuilder setParameter(final String key, final String value) {
         final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().replaceValues(key, value).immutable();

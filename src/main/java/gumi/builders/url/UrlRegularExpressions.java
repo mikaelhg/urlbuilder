@@ -29,9 +29,10 @@ public class UrlRegularExpressions {
     private static String readResource(final String name) {
         final StringBuilder ret = new StringBuilder();
         InputStream is = null;
+        InputStreamReader reader = null;
         try {
             is = UrlRegularExpressions.class.getClassLoader().getResourceAsStream(name);
-            final InputStreamReader reader = new InputStreamReader(is, ASCII);
+            reader = new InputStreamReader(is, ASCII);
             int read = 0;
             final char[] buf = new char[1024];
             do {
@@ -44,6 +45,7 @@ public class UrlRegularExpressions {
             throw new RuntimeException(ex);
         } finally {
             closeQuietly(is);
+            closeQuietly(reader);
         }
         return ret.toString();
     }
