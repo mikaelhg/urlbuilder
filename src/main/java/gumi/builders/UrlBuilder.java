@@ -504,7 +504,7 @@ public final class UrlBuilder {
      * Adds a query parameter. New parameters are added to the end of the query string.
      */
     public UrlBuilder addParameter(final String key, final String value) {
-        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().add(key, value).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().add(key, value);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -513,7 +513,7 @@ public final class UrlBuilder {
      * Existing parameters with this name are removed, and the new one added to the end of the query string.
      */
     public UrlBuilder setParameter(final String key, final String value) {
-        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().replaceValues(key, value).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().replaceValues(key, value);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -521,7 +521,7 @@ public final class UrlBuilder {
      * Removes a query parameter for a key and value.
      */
     public UrlBuilder removeParameter(final String key, final String value) {
-        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().remove(key, value).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().remove(key, value);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 
@@ -529,7 +529,7 @@ public final class UrlBuilder {
      * Removes all query parameters with this key.
      */
     public UrlBuilder removeParameters(final String key) {
-        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().removeAllValues(key).immutable();
+        final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().removeAllValues(key);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
 }
