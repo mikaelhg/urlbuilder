@@ -187,4 +187,17 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
         }
         return Collections.unmodifiableList(ret);
     }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (!(other instanceof UrlParameterMultimap))
+            return false;
+        final UrlParameterMultimap otherMultimap = (UrlParameterMultimap) other;
+        return data.equals(otherMultimap.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return data.hashCode();
+    }
 }
