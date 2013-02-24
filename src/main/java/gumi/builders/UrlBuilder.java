@@ -105,7 +105,7 @@ public final class UrlBuilder {
     }
 
     /**
-     * Unless users complain, of(...) will be made private.
+     * Unless users complain, of(...) will be made private. UrlBuilders should be constructed using witnX() methods.
      */
     @Deprecated
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
@@ -417,6 +417,14 @@ public final class UrlBuilder {
     }
 
     /**
+     * Set the userInfo. It's usually either of the form "username" or "username:password".
+     */
+    public UrlBuilder withUserInfo(final String userInfo) {
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+    }
+
+
+    /**
      * Set the host name. Accepts internationalized host names, and decodes them.
      */
     public UrlBuilder withHost(final String hostName) {
@@ -483,6 +491,13 @@ public final class UrlBuilder {
      */
     public UrlBuilder withFragment(final String fragment) {
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+    }
+
+    /**
+     * Sets the parameters.
+     */
+    public UrlBuilder withParameters(final UrlParameterMultimap parameters) {
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, parameters, fragment);
     }
 
     /**

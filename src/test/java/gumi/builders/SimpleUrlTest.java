@@ -34,7 +34,7 @@ public class SimpleUrlTest {
     @Test
     public void incompleteUserInfoTest() throws Exception {
         final String userInfo = "username:password";
-        final UrlBuilder ub1 = UrlBuilder.of(UTF8, UTF8, "http", userInfo, null, null, null, null, null);
+        final UrlBuilder ub1 = UrlBuilder.empty().withScheme("http").withUserInfo(userInfo);
         assertEquals(ub1.userInfo, userInfo);
         assertEquals(ub1.toString(), "http:");
         final URL url1 = ub1.toUrl();
