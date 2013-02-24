@@ -189,7 +189,12 @@ public class SimpleUrlTest {
         assertEquals("http://foo/a%7Bb",UrlBuilder.fromUri(uri).toString());
     }
 
-    private static void assertRoundtrip(final String url) throws Exception {
+    @Test
+    public void schemaless() {
+        assertRoundtrip("//google.com/logo.png");
+    }
+
+    private static void assertRoundtrip(final String url) {
         Assert.assertEquals(url, UrlBuilder.fromString(url).toString());
     }
 
