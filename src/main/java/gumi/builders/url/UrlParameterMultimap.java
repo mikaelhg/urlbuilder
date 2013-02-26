@@ -190,8 +190,9 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof UrlParameterMultimap))
+        if (!(other instanceof UrlParameterMultimap)) {
             return false;
+        }
         final UrlParameterMultimap otherMultimap = (UrlParameterMultimap) other;
         return data.equals(otherMultimap.data);
     }
