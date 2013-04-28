@@ -51,8 +51,8 @@ Use with Maven:
 
     <dependencies>
         <dependency>
-            <groupId>gumi</groupId>
-            <artifactId>builders</artifactId>
-            <version>1.1</version>
+            <groupId>mikaelhg</groupId>
+            <artifactId>urlbuilder</artifactId>
+            <version>1.3</version>
         </dependency>
     </dependencies>

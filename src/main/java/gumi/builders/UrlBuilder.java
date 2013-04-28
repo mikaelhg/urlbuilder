@@ -105,7 +105,7 @@ public final class UrlBuilder {
     }
 
     /**
-     * Unless users complain, of(...) will be made private. UrlBuilders should be constructed using witnX() methods.
+     * Unless users complain, of(...) will be made private. UrlBuilders should be constructed using withX() methods.
      */
     @Deprecated
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
