@@ -192,7 +192,7 @@ public final class UrlBuilder {
         return of(DEFAULT_ENCODING, DEFAULT_ENCODING,
                 url.getProtocol(), url.getUserInfo(), url.getHost(),
                 url.getPort() == -1 ? null : url.getPort(),
-                url.getPath(),
+                urlDecode(url.getPath(), DEFAULT_ENCODING),
                 decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
     }
 

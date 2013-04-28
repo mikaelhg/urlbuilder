@@ -1,6 +1,11 @@
 package gumi.builders;
 
 import cucumber.api.java.en.*;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import static org.junit.Assert.*;
 
 public class UrlBuilderStepDefinitions {
@@ -15,6 +20,11 @@ public class UrlBuilderStepDefinitions {
     @Given("^I create a builder from the string (.*)$")
     public void i_create_a_builder_from_the_string_x(final String urlString) {
         builder = UrlBuilder.fromString(urlString);
+    }
+
+    @Given("^I create a builder from the URL (.*)$")
+    public void i_create_a_builder_from_the_url_x(final String urlString) throws MalformedURLException {
+        builder = UrlBuilder.fromUrl(new URL(urlString));
     }
 
     @Given("^I create a builder from the (.*) encoded string (.*)$")
