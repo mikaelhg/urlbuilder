@@ -39,7 +39,6 @@ Todo:
 -----
 
 * More unit tests for corner cases (your help is needed!)
-* Preserve URL property order
 
 Use with Maven:
 -----------------------
