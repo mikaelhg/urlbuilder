@@ -100,9 +100,9 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     public List<String> put(final String key, final List<String> value) {
         final List<String> overflow = new ArrayList<String>(value);
-        for (final Entry<String, String> e : data) {
+        for (final Entry<String, String> e : new ArrayList<Entry<String, String>>(data)) {
             if (key.equals(e.getKey()) && value.contains(e.getValue())) {
-                overflow.remove(key);
+                overflow.remove(e.getValue());
             } else if (key.equals(e.getKey())) {
                 data.remove(e);
             }

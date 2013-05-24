@@ -1,9 +1,11 @@
 package gumi.builders;
 
 import gumi.builders.url.UrlParameterMultimap;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.AbstractMap;
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -27,6 +29,16 @@ public class MultimapTest {
         final UrlParameterMultimap.Immutable m1 = UrlParameterMultimap.newMultimap().immutable();
     }
 
+    @Test
+    public void putArray() {
+        final UrlParameterMultimap m1 = UrlParameterMultimap.newMultimap();
+        m1.put("a", Arrays.asList("1", "2", "3"));
+        m1.put("b", Arrays.asList("4", "5", "6"));
+        m1.put("a", Arrays.asList("2", "3", "7"));
+        assertEquals(Arrays.asList(newEntry("a", "2"), newEntry("a", "3"), newEntry("b", "4"),
+                newEntry("b", "5"), newEntry("b", "6"), newEntry("a", "7")),
+                m1.flatEntrySet());
+    }
 
     @Test
     public void addEntries() {
