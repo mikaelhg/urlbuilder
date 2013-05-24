@@ -162,7 +162,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
         return ret;
     }
 
-    public List<Entry<String, String>> flatEntrySet() {
+    public List<Entry<String, String>> flatEntryList() {
         return data;
     }
 

@@ -1,7 +1,6 @@
 package gumi.builders;
 
 import gumi.builders.url.UrlParameterMultimap;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.AbstractMap;
@@ -37,16 +36,16 @@ public class MultimapTest {
         m1.put("a", Arrays.asList("2", "3", "7"));
         assertEquals(Arrays.asList(newEntry("a", "2"), newEntry("a", "3"), newEntry("b", "4"),
                 newEntry("b", "5"), newEntry("b", "6"), newEntry("a", "7")),
-                m1.flatEntrySet());
+                m1.flatEntryList());
     }
 
     @Test
     public void addEntries() {
         final UrlParameterMultimap m1 = UrlParameterMultimap.newMultimap();
         m1.add("a", "1").add("b", "2").add("c", "3");
-        assertEquals(m1.flatEntrySet().get(0), newEntry("a", "1"));
-        assertEquals(m1.flatEntrySet().get(1), newEntry("b", "2"));
-        assertEquals(m1.flatEntrySet().get(2), newEntry("c", "3"));
+        assertEquals(m1.flatEntryList().get(0), newEntry("a", "1"));
+        assertEquals(m1.flatEntryList().get(1), newEntry("b", "2"));
+        assertEquals(m1.flatEntryList().get(2), newEntry("c", "3"));
     }
 
     @Test(expected = UnsupportedOperationException.class)

@@ -284,7 +284,7 @@ public final class UrlBuilder {
 
     protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, String> e : this.queryParametersMultimap.flatEntrySet()) {
+        for (final Map.Entry<String, String> e : this.queryParametersMultimap.flatEntryList()) {
             sb.append(urlEncode(e.getKey(), this.outputEncoding));
             if (e.getValue() != null) {
                 sb.append('=');
