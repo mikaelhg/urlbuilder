@@ -306,7 +306,7 @@ public final class UrlBuilder {
             final String element = st.nextToken();
             if ("/".equals(element)) {
                 sb.append(element);
-            } else if (element != null && !element.isEmpty()) {
+            } else if (!element.isEmpty()) {
                 sb.append(urlEncode(element, encoding));
             }
         }
@@ -323,7 +323,7 @@ public final class UrlBuilder {
             final String element = st.nextToken();
             if ("/".equals(element)) {
                 sb.append(element);
-            } else if (element != null && !element.isEmpty()) {
+            } else if (!element.isEmpty()) {
                 sb.append(urlDecode(element, encoding));
             }
         }
