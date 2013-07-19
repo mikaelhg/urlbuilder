@@ -14,7 +14,7 @@ Create and modify URLs and URL parameters easily, with a builder class.
         .toString() == "http://foo/h%C3%B6pl%C3%A4"
 
     final UrlBuilder ub1 = UrlBuilder.fromEmpty()
-        .withProtocol("http")
+        .withScheme("http")
         .withHost("www.example.com")
         .withPath("/")
         .addParameter("foo", "bar");

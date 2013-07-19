@@ -410,7 +410,7 @@ public final class UrlBuilder {
     }
 
     /**
-     * Set the protocol (or scheme).
+     * Set the protocol (or scheme), such as "http" or "https".
      */
     public UrlBuilder withScheme(final String scheme) {
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
@@ -422,7 +422,6 @@ public final class UrlBuilder {
     public UrlBuilder withUserInfo(final String userInfo) {
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
-
 
     /**
      * Set the host name. Accepts internationalized host names, and decodes them.
