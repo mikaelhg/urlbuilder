@@ -80,10 +80,9 @@ public final class UrlBuilder {
     }
 
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
-            final String scheme, final String userInfo,
-            final String hostName, final Integer port, final String path,
-            final UrlParameterMultimap queryParametersMultimap, final String fragment)
-    {
+                       final String scheme, final String userInfo,
+                       final String hostName, final Integer port, final String path,
+                       final UrlParameterMultimap queryParametersMultimap, final String fragment) {
         this.inputEncoding = inputEncoding;
         this.outputEncoding = outputEncoding;
         this.scheme = scheme;
@@ -109,10 +108,9 @@ public final class UrlBuilder {
      */
     @Deprecated
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
-            final String scheme, final String userInfo,
-            final String hostName, final Integer port, final String path,
-            final UrlParameterMultimap queryParameters, final String fragment)
-    {
+                                final String scheme, final String userInfo,
+                                final String hostName, final Integer port, final String path,
+                                final UrlParameterMultimap queryParameters, final String fragment) {
         return new UrlBuilder(inputEncoding, outputEncoding,
                 scheme, userInfo, hostName, port, path,
                 queryParameters, fragment);
@@ -197,8 +195,7 @@ public final class UrlBuilder {
     }
 
     private static UrlParameterMultimap decodeQueryParameters(
-            final String query, final Charset inputEncoding)
-    {
+            final String query, final Charset inputEncoding) {
         final UrlParameterMultimap ret = newMultimap();
         if (query == null || query.isEmpty()) {
             return ret;
@@ -530,5 +527,9 @@ public final class UrlBuilder {
     public UrlBuilder removeParameters(final String key) {
         final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().removeAllValues(key);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
+    }
+
+    public boolean hasParameter(final String key) {
+        return queryParameters.containsKey(key);
     }
 }
