@@ -18,23 +18,28 @@ package gumi.builders;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import gumi.builders.url.UrlParameterMultimap;
-import static gumi.builders.url.UrlParameterMultimap.*;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static gumi.builders.url.UrlParameterMultimap.newMultimap;
 
 /**
  * Build and manipulate URLs easily. Instances of this class are immutable
  * after their constructor returns.
- *
+ * <p/>
  * URL: http://www.ietf.org/rfc/rfc1738.txt
  * URI: http://tools.ietf.org/html/rfc3986
+ *
  * @author Mikael Gueck gumi{@literal @}iki.fi
  */
 public final class UrlBuilder {
@@ -80,10 +85,9 @@ public final class UrlBuilder {
     }
 
     private UrlBuilder(final Charset inputEncoding, final Charset outputEncoding,
-            final String scheme, final String userInfo,
-            final String hostName, final Integer port, final String path,
-            final UrlParameterMultimap queryParametersMultimap, final String fragment)
-    {
+                       final String scheme, final String userInfo,
+                       final String hostName, final Integer port, final String path,
+                       final UrlParameterMultimap queryParametersMultimap, final String fragment) {
         this.inputEncoding = inputEncoding;
         this.outputEncoding = outputEncoding;
         this.scheme = scheme;
@@ -109,10 +113,9 @@ public final class UrlBuilder {
      */
     @Deprecated
     public static UrlBuilder of(final Charset inputEncoding, final Charset outputEncoding,
-            final String scheme, final String userInfo,
-            final String hostName, final Integer port, final String path,
-            final UrlParameterMultimap queryParameters, final String fragment)
-    {
+                                final String scheme, final String userInfo,
+                                final String hostName, final Integer port, final String path,
+                                final UrlParameterMultimap queryParameters, final String fragment) {
         return new UrlBuilder(inputEncoding, outputEncoding,
                 scheme, userInfo, hostName, port, path,
                 queryParameters, fragment);
@@ -129,6 +132,7 @@ public final class UrlBuilder {
     /**
      * Construct a UrlBuilder from a full or partial URL string.
      * When percent-decoding the query parameters, assume that they were encoded with <b>inputEncoding</b>.
+     *
      * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
@@ -138,6 +142,7 @@ public final class UrlBuilder {
     /**
      * Construct a UrlBuilder from a full or partial URL string.
      * When percent-decoding the query parameters, assume that they were encoded with <b>inputEncoding</b>.
+     *
      * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
@@ -186,6 +191,7 @@ public final class UrlBuilder {
 
     /**
      * Construct a UrlBuilder from a {@link java.net.URL}.
+     *
      * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromUrl(final URL url) {
@@ -197,8 +203,7 @@ public final class UrlBuilder {
     }
 
     private static UrlParameterMultimap decodeQueryParameters(
-            final String query, final Charset inputEncoding)
-    {
+            final String query, final Charset inputEncoding) {
         final UrlParameterMultimap ret = newMultimap();
         if (query == null || query.isEmpty()) {
             return ret;
@@ -530,5 +535,9 @@ public final class UrlBuilder {
     public UrlBuilder removeParameters(final String key) {
         final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().removeAllValues(key);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
+    }
+
+    public boolean hasParameter(final String key) {
+        return queryParameters.containsKey(key);
     }
 }
