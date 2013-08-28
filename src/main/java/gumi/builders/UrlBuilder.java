@@ -18,28 +18,23 @@ package gumi.builders;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import gumi.builders.url.UrlParameterMultimap;
+import static gumi.builders.url.UrlParameterMultimap.*;
 
 import java.io.IOException;
 import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static gumi.builders.url.UrlParameterMultimap.newMultimap;
 
 /**
  * Build and manipulate URLs easily. Instances of this class are immutable
  * after their constructor returns.
- * <p/>
+ *
  * URL: http://www.ietf.org/rfc/rfc1738.txt
  * URI: http://tools.ietf.org/html/rfc3986
- *
  * @author Mikael Gueck gumi{@literal @}iki.fi
  */
 public final class UrlBuilder {
@@ -132,7 +127,6 @@ public final class UrlBuilder {
     /**
      * Construct a UrlBuilder from a full or partial URL string.
      * When percent-decoding the query parameters, assume that they were encoded with <b>inputEncoding</b>.
-     *
      * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
@@ -142,7 +136,6 @@ public final class UrlBuilder {
     /**
      * Construct a UrlBuilder from a full or partial URL string.
      * When percent-decoding the query parameters, assume that they were encoded with <b>inputEncoding</b>.
-     *
      * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
@@ -191,7 +184,6 @@ public final class UrlBuilder {
 
     /**
      * Construct a UrlBuilder from a {@link java.net.URL}.
-     *
      * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
      */
     public static UrlBuilder fromUrl(final URL url) {
