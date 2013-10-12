@@ -198,4 +198,36 @@ public class SimpleUrlTest {
         Assert.assertEquals(url, UrlBuilder.fromString(url).toString());
     }
 
+    @Test
+    public void testRemoveParameter() {
+        String url = "http://somehost.com/page?parameter1=value1";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals("http://somehost.com/page",
+                builder.removeParameter("parameter1", "value1").toString());
+    }
+
+    @Test
+    public void testRemoveOneParameterByKey() {
+        String url = "http://somehost.com/page?parameter1=value1";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals("http://somehost.com/page",
+                builder.removeParameters("parameter1").toString());
+    }
+
+    @Test
+    public void testRemoveTwoParametersByKey() {
+        String url = "http://somehost.com/page?parameter1=value1&parameter1=value2";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals("http://somehost.com/page",
+                builder.removeParameters("parameter1").toString());
+    }
+
+    @Test
+    public void testRemoveThreeParametersByKey() {
+        String url = "http://somehost.com/page?parameter1=value1&parameter1=value2&parameter1=value3";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals("http://somehost.com/page",
+                builder.removeParameters("parameter1").toString());
+    }
+
 }
