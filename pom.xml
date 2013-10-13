@@ -22,10 +22,10 @@
     </properties>
 
     <distributionManagement>
-      <repository>
-        <id>maven2.gueck.com-s3</id>
-        <url>s3://maven2.gueck.com/releases</url>
-      </repository>
+        <repository>
+            <id>maven2.gueck.com-s3</id>
+            <url>s3://maven2.gueck.com/releases</url>
+        </repository>
     </distributionManagement>
 
     <build>
@@ -33,7 +33,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.1</version>
                 <configuration>
                     <source>1.5</source>
                     <target>1.5</target>
@@ -41,11 +41,11 @@
             </plugin>
         </plugins>
         <extensions>
-          <extension>
-            <groupId>org.springframework.build.aws</groupId>
-            <artifactId>org.springframework.build.aws.maven</artifactId>
-            <version>3.0.0.RELEASE</version>
-          </extension>
+            <extension>
+                <groupId>org.springframework.build.aws</groupId>
+                <artifactId>org.springframework.build.aws.maven</artifactId>
+                <version>3.0.0.RELEASE</version>
+            </extension>
         </extensions>
     </build>
 
