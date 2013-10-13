@@ -100,11 +100,13 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     public List<String> put(final String key, final List<String> value) {
         final List<String> overflow = new ArrayList<String>(value);
-        for (final Entry<String, String> e : new ArrayList<Entry<String, String>>(data)) {
+        final ListIterator<Entry<String, String>> it = data.listIterator();
+        while (it.hasNext()) {
+            final Entry<String, String> e = it.next();
             if (key.equals(e.getKey()) && value.contains(e.getValue())) {
                 overflow.remove(e.getValue());
             } else if (key.equals(e.getKey())) {
-                data.remove(e);
+                it.remove();
             }
         }
         for (final String v : overflow) {
@@ -118,10 +120,12 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
             throw new IllegalArgumentException("can't remove null");
         }
         final List<String> ret = new ArrayList<String>();
-        for (final Entry<String, String> e : data) {
+        final ListIterator<Entry<String, String>> it = data.listIterator();
+        while (it.hasNext()) {
+            final Entry<String, String> e = it.next();
             if (key.equals(e.getKey())) {
                 ret.add(e.getValue());
-                data.remove(e);
+                it.remove();
             }
         }
         return ret;
@@ -136,9 +140,11 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
         if (key == null || value == null) {
             throw new IllegalArgumentException("can't remove null");
         }
-        for (final Entry<String, String> e : data) {
+        final ListIterator<Entry<String, String>> it = data.listIterator();
+        while (it.hasNext()) {
+            final Entry<String, String> e = it.next();
             if (key.equals(e.getKey()) && value.equals(e.getValue())) {
-                data.remove(e);
+                it.remove();
             }
         }
         return this;
