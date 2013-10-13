@@ -230,4 +230,11 @@ public class SimpleUrlTest {
                 builder.removeParameters("parameter1").toString());
     }
 
+    @Test
+    public void containsParameter() {
+        final UrlBuilder ub1 = UrlBuilder.fromString("/?a=1");
+        assertTrue("builder contains parameter", ub1.queryParameters.containsKey("a"));
+        assertFalse("builder doesn't contain parameter", ub1.queryParameters.containsKey("b"));
+    }
+
 }
