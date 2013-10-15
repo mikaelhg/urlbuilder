@@ -241,4 +241,28 @@ public class SimpleUrlTest {
         assertFalse("builder doesn't contain parameter", ub1.queryParameters.containsKey("b"));
     }
 
+    @Test
+    public void testSetParameterShouldReplaceExistingParameter() {
+        String url = "http://somehost.com/page?parameter1=value1";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals("http://somehost.com/page?parameter1=value2",
+                builder.setParameter("parameter1", "value2").toString());
+    }
+
+    @Test
+    public void testAddParameterShouldAppendOneNewParameter() {
+        String url = "http://somehost.com/page?parameter1=value1";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals("http://somehost.com/page?parameter1=value1&parameter1=value2",
+                builder.addParameter("parameter1", "value2").toString());
+    }
+
+    @Test
+    public void testWithFragmentShouldAppendAnchor() {
+        String url = "http://somehost.com/page";
+        UrlBuilder builder = UrlBuilder.fromString(url);
+        assertEquals("http://somehost.com/page#anchor",
+                builder.withFragment("anchor").toString());
+    }
+
 }
