@@ -202,6 +202,7 @@ public class SimpleUrlTest {
     public void testRemoveParameter() {
         String url = "http://somehost.com/page?parameter1=value1";
         UrlBuilder builder = UrlBuilder.fromString(url);
+        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
         assertEquals("http://somehost.com/page",
                 builder.removeParameter("parameter1", "value1").toString());
     }
@@ -210,6 +211,7 @@ public class SimpleUrlTest {
     public void testRemoveOneParameterByKey() {
         String url = "http://somehost.com/page?parameter1=value1";
         UrlBuilder builder = UrlBuilder.fromString(url);
+        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
         assertEquals("http://somehost.com/page",
                 builder.removeParameters("parameter1").toString());
     }
@@ -218,6 +220,7 @@ public class SimpleUrlTest {
     public void testRemoveTwoParametersByKey() {
         String url = "http://somehost.com/page?parameter1=value1&parameter1=value2";
         UrlBuilder builder = UrlBuilder.fromString(url);
+        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
         assertEquals("http://somehost.com/page",
                 builder.removeParameters("parameter1").toString());
     }
@@ -226,6 +229,7 @@ public class SimpleUrlTest {
     public void testRemoveThreeParametersByKey() {
         String url = "http://somehost.com/page?parameter1=value1&parameter1=value2&parameter1=value3";
         UrlBuilder builder = UrlBuilder.fromString(url);
+        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
         assertEquals("http://somehost.com/page",
                 builder.removeParameters("parameter1").toString());
     }
