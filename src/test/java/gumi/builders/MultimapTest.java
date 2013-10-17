@@ -7,7 +7,7 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * Ideally, these tests should provide 100% coverage for UrlParameterMultimap.
@@ -55,4 +55,31 @@ public class MultimapTest {
         final UrlParameterMultimap.Immutable i1 = m1.immutable();
         i1.add("d", "4");
     }
+    
+    @Test
+    public void containsKey() {
+        UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        assertTrue(parameterMap.containsKey("key1"));
+        assertFalse(parameterMap.containsKey("key2"));
+    }
+
+    @Test
+    public void containsValue() {
+        UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        assertTrue(parameterMap.containsValue("value1"));
+        assertFalse(parameterMap.containsValue("value2"));
+    }
+
+    @Test
+    public void replaceValues() {
+        UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        parameterMap.replaceValues("key1", "value2");
+        assertFalse(parameterMap.containsValue("value1"));
+        assertTrue(parameterMap.containsValue("value2"));
+    }
+
+    private static UrlParameterMultimap givenParameterMapWithKeyAndValue() {
+        return UrlParameterMultimap.newMultimap().add("key1", "value1");
+    }
+    
 }
