@@ -1,7 +1,7 @@
 Java URL builder
 ================
 
-[![Build Status](https://travis-ci.org/mikaelhg/urlbuilder.png)](https://travis-ci.org/mikaelhg/urlbuilder)
+[![Build Status](https://travis-ci.org/mikaelhg/urlbuilder.png?branch=master)](https://travis-ci.org/mikaelhg/urlbuilder)
 
 Create and modify URLs and URL parameters easily, with a builder class.
 
