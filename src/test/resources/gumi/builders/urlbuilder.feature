@@ -13,3 +13,6 @@ Feature: UrlBuilder url creation
     Given I create a builder from the URL http://www.example.com/a%20b/
     Then as a string it should be http://www.example.com/a+b/
 
+  Scenario: Equals character in query parameter value
+    Given I create a builder from the string /?a=1=2
+    Then the parameter a should be 1=2

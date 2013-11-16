@@ -52,6 +52,11 @@ public class UrlBuilderStepDefinitions {
         assertEquals(result, builder.toString());
     }
 
+    @Then("^the parameter (.*) should be (.*)$")
+    public void the_parameter_key_should_be_value(final String key, final String value) {
+        assertEquals(value, builder.queryParameters.get(key).get(0));
+    }
+
     @Then("^it should be an empty string$")
     public void it_should_be_an_empty_string() {
         assertEquals("", builder.toString());
