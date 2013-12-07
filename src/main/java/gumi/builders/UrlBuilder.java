@@ -25,6 +25,7 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,6 +101,9 @@ public final class UrlBuilder {
         this.fragment = fragment;
     }
 
+    /**
+     * Construct an empty builder instance.
+     */
     public static UrlBuilder empty() {
         return new UrlBuilder();
     }
@@ -120,7 +124,7 @@ public final class UrlBuilder {
 
     /**
      * Construct a UrlBuilder from a full or partial URL string.
-     * Assume that the query paremeters were percent-encoded, as the standard suggest, as UTF-8.
+     * Assume that the query paremeters were percent-encoded, as the standard suggests, as UTF-8.
      */
     public static UrlBuilder fromString(final String url) {
         return fromString(url, DEFAULT_ENCODING);
@@ -486,13 +490,6 @@ public final class UrlBuilder {
     }
 
     /**
-     * Sets the fragment/anchor.
-     */
-    public UrlBuilder withFragment(final String fragment) {
-        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
-    }
-
-    /**
      * Sets the parameters.
      */
     public UrlBuilder withParameters(final UrlParameterMultimap parameters) {
@@ -531,4 +528,12 @@ public final class UrlBuilder {
         final UrlParameterMultimap qp = queryParametersMultimap.deepCopy().removeAllValues(key);
         return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, qp, fragment);
     }
+
+    /**
+     * Sets the fragment/anchor.
+     */
+    public UrlBuilder withFragment(final String fragment) {
+        return of(inputEncoding, outputEncoding, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+    }
+
 }
