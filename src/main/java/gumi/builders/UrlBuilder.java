@@ -1,5 +1,5 @@
 /*
-Copyright 2012 Mikael Gueck
+Copyright 2013 Mikael Gueck
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.net.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -200,6 +199,7 @@ public final class UrlBuilder {
                 decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
     }
 
+    // Could be moved to a separate url codec class.
     private static UrlParameterMultimap decodeQueryParameters(
             final String query, final Charset inputEncoding)
     {
@@ -221,6 +221,7 @@ public final class UrlBuilder {
         return ret;
     }
 
+    // Could be moved to a separate url codec class.
     private static boolean isUrlSafe(final char c) {
         return ('a' <= c && 'z' >= c) ||
                 ('A' <= c && 'Z' >= c) ||
@@ -228,6 +229,7 @@ public final class UrlBuilder {
                 (c == '-' || c == '_' || c == '.' || c == '~' || c == ' ');
     }
 
+    // Could be moved to a separate url codec class.
     private static String urlEncode(final String input, final Charset charset) {
         final StringBuilder sb = new StringBuilder();
         final CharBuffer cb = CharBuffer.allocate(1);
@@ -241,6 +243,8 @@ public final class UrlBuilder {
                 cb.rewind();
                 final ByteBuffer bb = charset.encode(cb);
                 for (int i = 0; i < bb.limit(); i++) {
+                    // Until someone has a real problem with the performance of this bit,
+                    // I will leave this less optimal, but much simpler implementation in place
                     sb.append('%');
                     sb.append(String.format("%1$02X", bb.get(i)));
                 }
@@ -249,6 +253,7 @@ public final class UrlBuilder {
         return sb.toString();
     }
 
+    // Could be moved to a separate url codec class.
     private static byte[] nextDecodeableSequence(final String input, final int position) {
         final int len = input.length();
         final byte[] data = new byte[len];
@@ -265,6 +270,7 @@ public final class UrlBuilder {
         return Arrays.copyOfRange(data, 0, j);
     }
 
+    // Could be moved to a separate url codec class.
     private static String urlDecode(final String input, final Charset charset) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
@@ -300,6 +306,7 @@ public final class UrlBuilder {
         return sb.toString();
     }
 
+    // Could be moved to a separate url codec class.
     private static String encodePath(final String input, final Charset encoding) {
         final StringBuilder sb = new StringBuilder();
         if (input == null || input.isEmpty()) {
@@ -317,6 +324,7 @@ public final class UrlBuilder {
         return sb.toString();
     }
 
+    // Could be moved to a separate url codec class.
     private static String decodePath(final String input, final Charset encoding) {
         final StringBuilder sb = new StringBuilder();
         if (input == null || input.isEmpty()) {

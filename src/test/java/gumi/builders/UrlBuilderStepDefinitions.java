@@ -52,6 +52,11 @@ public class UrlBuilderStepDefinitions {
         assertEquals(result, builder.toString());
     }
 
+    @Then("^as a (.*) encoded string it should be (.*)$")
+    public void as_a_y_encoded_string_it_should_be_x(final String encoding, final String result) {
+        assertEquals(result, builder.encodeAs(encoding).toString());
+    }
+
     @Then("^the parameter (.*) should be (.*)$")
     public void the_parameter_key_should_be_value(final String key, final String value) {
         assertEquals(value, builder.queryParameters.get(key).get(0));

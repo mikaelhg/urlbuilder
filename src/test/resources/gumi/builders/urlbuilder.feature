@@ -16,3 +16,4 @@ Feature: UrlBuilder url creation
   Scenario: Equals character in query parameter value
     Given I create a builder from the string /?a=1=2
     Then the parameter a should be 1=2
+
