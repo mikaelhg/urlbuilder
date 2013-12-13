@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -76,6 +77,55 @@ public class MultimapTest {
         parameterMap.replaceValues("key1", "value2");
         assertFalse(parameterMap.containsValue("value1"));
         assertTrue(parameterMap.containsValue("value2"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullParameterShouldTriggerAnIllegalArgumentException() {
+        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        parameterMap.containsKey(null);
+        parameterMap.containsValue(null);
+        parameterMap.remove(null);
+        parameterMap.remove(null, null);
+        parameterMap.remove("key1", null);
+        parameterMap.remove(null, "value1");
+    }
+
+    @Test
+    public void removeKey() {
+        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        final List<String> removedMap = parameterMap.remove("key1");
+        assertFalse(parameterMap.containsKey("key1"));
+        assertTrue(removedMap.contains("value1"));
+    }
+
+    @Test
+    public void removeKeyAndValue() {
+        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        parameterMap.add("key1", "value2");
+        parameterMap.remove("key1", "value1");
+        assertTrue(parameterMap.containsKey("key1"));
+        parameterMap.remove("key1", "value2");
+        assertFalse(parameterMap.containsKey("key1"));
+    }
+
+    @Test
+    public void checkSizeIsEmptyAndClear() {
+        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        assertFalse(parameterMap.isEmpty());
+        assertEquals(1, parameterMap.size());
+        parameterMap.clear();
+        assertTrue(parameterMap.isEmpty());
+        assertEquals(0, parameterMap.size());
+    }
+
+    @Test
+    public void removeAllValues() {
+        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        parameterMap.add("key1", "value2");
+        parameterMap.removeAllValues("key1");
+        assertFalse(parameterMap.containsKey("key1"));
+        assertFalse(parameterMap.containsValue("value1"));
+        assertFalse(parameterMap.containsValue("value2"));
     }
 
     private static UrlParameterMultimap givenParameterMapWithKeyAndValue() {
