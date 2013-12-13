@@ -59,40 +59,54 @@ public class MultimapTest {
     
     @Test
     public void containsKey() {
-        UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        UrlParameterMultimap parameterMap = newMapWithContent();
         assertTrue(parameterMap.containsKey("key1"));
         assertFalse(parameterMap.containsKey("key2"));
     }
 
     @Test
     public void containsValue() {
-        UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        UrlParameterMultimap parameterMap = newMapWithContent();
         assertTrue(parameterMap.containsValue("value1"));
         assertFalse(parameterMap.containsValue("value2"));
     }
 
     @Test
     public void replaceValues() {
-        UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        UrlParameterMultimap parameterMap = newMapWithContent();
         parameterMap.replaceValues("key1", "value2");
         assertFalse(parameterMap.containsValue("value1"));
         assertTrue(parameterMap.containsValue("value2"));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void nullParameterShouldTriggerAnIllegalArgumentException() {
-        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
-        parameterMap.containsKey(null);
-        parameterMap.containsValue(null);
-        parameterMap.remove(null);
-        parameterMap.remove(null, null);
-        parameterMap.remove("key1", null);
-        parameterMap.remove(null, "value1");
+    public void nullContainsKey() {
+        newMapWithContent().containsKey(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullContainsValue() {
+        newMapWithContent().containsValue(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullRemove() {
+        newMapWithContent().remove(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullRemove2() {
+        newMapWithContent().remove("", null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void nullRemove3() {
+        newMapWithContent().remove(null, "");
     }
 
     @Test
     public void removeKey() {
-        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        final UrlParameterMultimap parameterMap = newMapWithContent();
         final List<String> removedMap = parameterMap.remove("key1");
         assertFalse(parameterMap.containsKey("key1"));
         assertTrue(removedMap.contains("value1"));
@@ -100,7 +114,7 @@ public class MultimapTest {
 
     @Test
     public void removeKeyAndValue() {
-        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        final UrlParameterMultimap parameterMap = newMapWithContent();
         parameterMap.add("key1", "value2");
         parameterMap.remove("key1", "value1");
         assertTrue(parameterMap.containsKey("key1"));
@@ -110,7 +124,7 @@ public class MultimapTest {
 
     @Test
     public void checkSizeIsEmptyAndClear() {
-        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        final UrlParameterMultimap parameterMap = newMapWithContent();
         assertFalse(parameterMap.isEmpty());
         assertEquals(1, parameterMap.size());
         parameterMap.clear();
@@ -120,7 +134,7 @@ public class MultimapTest {
 
     @Test
     public void removeAllValues() {
-        final UrlParameterMultimap parameterMap = givenParameterMapWithKeyAndValue();
+        final UrlParameterMultimap parameterMap = newMapWithContent();
         parameterMap.add("key1", "value2");
         parameterMap.removeAllValues("key1");
         assertFalse(parameterMap.containsKey("key1"));
@@ -128,7 +142,7 @@ public class MultimapTest {
         assertFalse(parameterMap.containsValue("value2"));
     }
 
-    private static UrlParameterMultimap givenParameterMapWithKeyAndValue() {
+    private static UrlParameterMultimap newMapWithContent() {
         return UrlParameterMultimap.newMultimap().add("key1", "value1");
     }
     
