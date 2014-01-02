@@ -18,6 +18,14 @@ public class SimpleUrlTest {
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
     @Test
+    public void encodeAsCharsetStringTest() {
+        final Charset ASCII = Charset.forName("ASCII");
+        final UrlBuilder ub1 = UrlBuilder.empty().encodeAs(ASCII);
+        final UrlBuilder ub2 = UrlBuilder.empty().encodeAs("ASCII");
+        assertEquals(ub1.outputEncoding, ub2.outputEncoding);
+    }
+
+    @Test
     public void userInfoTest() throws Exception {
         final String userInfo = "username:password";
         final String model = "http://" + userInfo + "@server/path?a=b#fragment";
