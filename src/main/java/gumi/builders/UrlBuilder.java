@@ -46,9 +46,9 @@ public final class UrlBuilder {
 
     private static final Pattern AUTHORITY_PATTERN = Pattern.compile("((.*)@)?([^:]*)(:(\\d+))?");
 
-    private final Charset inputEncoding;
+    public final Charset inputEncoding;
 
-    private final Charset outputEncoding;
+    public final Charset outputEncoding;
 
     public final String scheme;
 
