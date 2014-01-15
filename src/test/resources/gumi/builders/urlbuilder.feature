@@ -31,6 +31,11 @@ Feature: UrlBuilder url creation
     Then the parameter some + key should be some =?value
       And as a string it should be http://example.com/?some%20%2B%20key=some%20%3D%3Fvalue
 
+  Scenario: From URL with special characters in the fragment
+    Given I create a builder from the URL http://example.com/#=?%23
+    Then the fragment should be =?#
+      And as a string it should be http://example.com/#=?%23
+
   Scenario: Equals character in query parameter value
     Given I create a builder from the string /?a=1=2
     Then the parameter a should be 1=2

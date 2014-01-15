@@ -66,6 +66,11 @@ public class UrlBuilderStepDefinitions {
         assertEquals(value, builder.queryParameters.get(key).get(0));
     }
 
+    @Then("^the fragment should be (.*)$")
+    public void the_fragment_should_be_f(final String f) {
+        assertEquals(f, builder.fragment);
+    }
+
     @Then("^it should be an empty string$")
     public void it_should_be_an_empty_string() {
         assertEquals("", builder.toString());
