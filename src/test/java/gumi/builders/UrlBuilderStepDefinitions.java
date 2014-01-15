@@ -2,7 +2,6 @@ package gumi.builders;
 
 import cucumber.api.java.en.*;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -55,6 +54,11 @@ public class UrlBuilderStepDefinitions {
     @Then("^as a (.*) encoded string it should be (.*)$")
     public void as_a_y_encoded_string_it_should_be_x(final String encoding, final String result) {
         assertEquals(result, builder.encodeAs(encoding).toString());
+    }
+
+    @Then("^the path should be (.*)$")
+    public void the_path_should_be_f(final String p) {
+        assertEquals(p, builder.path);
     }
 
     @Then("^the parameter (.*) should be (.*)$")

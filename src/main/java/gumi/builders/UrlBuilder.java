@@ -183,8 +183,9 @@ public final class UrlBuilder {
         return of(DEFAULT_ENCODING, DEFAULT_ENCODING,
                 uri.getScheme(), uri.getUserInfo(), uri.getHost(),
                 uri.getPort() == -1 ? null : uri.getPort(),
-                urlDecode(uri.getRawPath(), DEFAULT_ENCODING),
-                decodeQueryParameters(uri.getRawQuery(), DEFAULT_ENCODING), uri.getFragment());
+                urlDecodePath(uri.getRawPath(), DEFAULT_ENCODING),
+                decodeQueryParameters(uri.getRawQuery(), DEFAULT_ENCODING),
+                uri.getFragment());
     }
 
     /**
@@ -195,8 +196,9 @@ public final class UrlBuilder {
         return of(DEFAULT_ENCODING, DEFAULT_ENCODING,
                 url.getProtocol(), url.getUserInfo(), url.getHost(),
                 url.getPort() == -1 ? null : url.getPort(),
-                urlDecode(url.getPath(), DEFAULT_ENCODING),
-                decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING), url.getRef());
+                urlDecodePath(url.getPath(), DEFAULT_ENCODING),
+                decodeQueryParameters(url.getQuery(), DEFAULT_ENCODING),
+                url.getRef());
     }
 
     // Could be moved to a separate url codec class.
@@ -210,9 +212,9 @@ public final class UrlBuilder {
         for (final String part : query.split("&")) {
             final String[] kvp = part.split("=", 2);
             final String key, value;
-            key = urlDecode(kvp[0], inputEncoding);
+            key = urlDecodeQuery(kvp[0], inputEncoding);
             if (kvp.length == 2) {
-                value = urlDecode(kvp[1], inputEncoding);
+                value = urlDecodeQuery(kvp[1], inputEncoding);
             } else {
                 value = null;
             }
@@ -222,21 +224,53 @@ public final class UrlBuilder {
     }
 
     // Could be moved to a separate url codec class.
-    private static boolean isUrlSafe(final char c) {
-        return ('a' <= c && 'z' >= c) ||
-                ('A' <= c && 'Z' >= c) ||
-                ('0' <= c && '9' >= c) ||
-                (c == '-' || c == '_' || c == '.' || c == '~' || c == ' ');
+    private static boolean isPathSafe(final char c) {
+        // Excludes % used in %XX chars
+        return isUnreserved(c)
+                || isSubDelimeter(c)
+                || c == ':'
+                || c == '@';
     }
 
     // Could be moved to a separate url codec class.
-    private static String urlEncode(final String input, final Charset charset) {
+    private static boolean isUnreserved(final char c) {
+        return ('a' <= c && c <= 'z') ||
+                ('A' <= c && c <= 'Z') ||
+                ('0' <= c && c <= '9') ||
+                (c == '-' || c == '.' || c == '_' || c == '~');
+    }
+
+    // Could be moved to a separate url codec class.
+    private static boolean isSubDelimeter(final char c) {
+        return "!$&'()*+,;=".contains("" + c);
+    }
+
+    // Could be moved to a separate url codec class.
+    private static String pathEncode(final String input, final Charset charset) {
+        final boolean isPath = true;
+        return urlEncode(input, charset, isPath);
+    }
+
+    // Could be moved to a separate url codec class.
+    private static String queryEncode(final String input, final Charset charset) {
+        final boolean isPath = false;
+        return urlEncode(input, charset, isPath);
+    }
+
+    // Could be moved to a separate url codec class.
+    private static String fragmentEncode(final String input, final Charset charset) {
+        final boolean isPath = false;
+        return urlEncode(input, charset, isPath);
+    }
+
+    private static String urlEncode(final String input, final Charset charset, final boolean isPath
+            ) {
         final StringBuilder sb = new StringBuilder();
         final CharBuffer cb = CharBuffer.allocate(1);
         for (final char c : input.toCharArray()) {
-            if (c == ' ') {
-                sb.append('+');
-            } else if (isUrlSafe(c)) {
+            // We're %-encoding + to be on the safe side.
+            if ((isPath && isPathSafe(c) && c != '+')
+                    || isUnreserved(c)) {
                 sb.append(c);
             } else {
                 cb.put(0, c);
@@ -271,12 +305,22 @@ public final class UrlBuilder {
     }
 
     // Could be moved to a separate url codec class.
-    private static String urlDecode(final String input, final Charset charset) {
+    private static String urlDecodePath(final String input, final Charset charset) {
+        final boolean decodePlusAsSpace = false;
+        return urlDecode(input, charset, decodePlusAsSpace);
+    }
+
+    private static String urlDecodeQuery(final String input, final Charset charset) {
+        final boolean decodePlusAsSpace = true;
+        return urlDecode(input, charset, decodePlusAsSpace);
+    }
+
+    private static String urlDecode(final String input, final Charset charset, final boolean decodePlusAsSpace) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
         for (int i = 0; i < len; i++) {
             final char c0 = input.charAt(i);
-            if (c0 == '+') {
+            if (c0 == '+' && decodePlusAsSpace) {
                 sb.append(' ');
             } else if (c0 != '%') {
                 sb.append(c0);
@@ -295,10 +339,10 @@ public final class UrlBuilder {
     protected String encodeQueryParameters() {
         final StringBuilder sb = new StringBuilder();
         for (final Map.Entry<String, String> e : this.queryParametersMultimap.flatEntryList()) {
-            sb.append(urlEncode(e.getKey(), this.outputEncoding));
+            sb.append(queryEncode(e.getKey(), this.outputEncoding));
             if (e.getValue() != null) {
                 sb.append('=');
-                sb.append(urlEncode(e.getValue(), this.outputEncoding));
+                sb.append(queryEncode(e.getValue(), this.outputEncoding));
             }
             sb.append('&');
         }
@@ -318,7 +362,7 @@ public final class UrlBuilder {
             if ("/".equals(element)) {
                 sb.append(element);
             } else if (!element.isEmpty()) {
-                sb.append(urlEncode(element, encoding));
+                sb.append(pathEncode(element, encoding));
             }
         }
         return sb.toString();
@@ -326,17 +370,20 @@ public final class UrlBuilder {
 
     // Could be moved to a separate url codec class.
     private static String decodePath(final String input, final Charset encoding) {
-        final StringBuilder sb = new StringBuilder();
         if (input == null || input.isEmpty()) {
-            return sb.toString();
+            return "";
         }
-        final StringTokenizer st = new StringTokenizer(input, "/", true);
+
+        final StringBuilder sb = new StringBuilder();
+        final boolean RETURN_DELIMETERS = true;
+        final StringTokenizer st = new StringTokenizer(input, "/", RETURN_DELIMETERS);
+
         while (st.hasMoreElements()) {
             final String element = st.nextToken();
             if ("/".equals(element)) {
                 sb.append(element);
             } else if (!element.isEmpty()) {
-                sb.append(urlDecode(element, encoding));
+                sb.append(urlDecodePath(element, encoding));
             }
         }
         return sb.toString();
