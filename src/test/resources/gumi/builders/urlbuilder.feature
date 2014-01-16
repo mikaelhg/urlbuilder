@@ -40,3 +40,6 @@ Feature: UrlBuilder url creation
     Given I create a builder from the string /?a=1=2
     Then the parameter a should be 1=2
 
+  Scenario: From URI with a null path and query
+    Given I create a builder from a URI mailto:bob@example.com with a null path and query
+    Then as a string it should be mailto:

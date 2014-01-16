@@ -1,11 +1,11 @@
 package gumi.builders;
 
-import cucumber.api.java.en.*;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import static org.junit.Assert.*;
+
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import java.net.*;
 
 public class UrlBuilderStepDefinitions {
 
@@ -24,6 +24,15 @@ public class UrlBuilderStepDefinitions {
     @Given("^I create a builder from the URL (.*)$")
     public void i_create_a_builder_from_the_url_x(final String urlString) throws MalformedURLException {
         builder = UrlBuilder.fromUrl(new URL(urlString));
+    }
+
+    @Given("^I create a builder from a URI (.*) with a null path and query$")
+    public void i_create_a_builder_from_a_uri_with_a_null_path_and_query(final String uriString)
+            throws URISyntaxException {
+        URI uri = new URI(uriString);
+        assertNull(uri.getPath());
+        assertNull(uri.getQuery());
+        builder = UrlBuilder.fromUri(uri);
     }
 
     @Given("^I create a builder from the (.*) encoded string (.*)$")

@@ -189,7 +189,7 @@ public final class UrlBuilder {
                 new Encoder(DEFAULT_ENCODING),
                 uri.getScheme(), uri.getUserInfo(), uri.getHost(),
                 uri.getPort() == -1 ? null : uri.getPort(),
-                decoder.urlDecodePath(uri.getRawPath()),
+                decoder.decodePath(uri.getRawPath()),
                 decoder.parseQueryString(uri.getRawQuery()),
                 decoder.decodeFragment(uri.getFragment()));
     }
@@ -204,7 +204,7 @@ public final class UrlBuilder {
                 new Encoder(DEFAULT_ENCODING),
                 url.getProtocol(), url.getUserInfo(), url.getHost(),
                 url.getPort() == -1 ? null : url.getPort(),
-                decoder.urlDecodePath(url.getPath()),
+                decoder.decodePath(url.getPath()),
                 decoder.parseQueryString(url.getQuery()),
                 decoder.decodeFragment(url.getRef()));
     }
