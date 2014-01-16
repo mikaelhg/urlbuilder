@@ -101,4 +101,13 @@ public class UrlBuilderStepDefinitions {
         assertEquals("", builder.toString());
     }
 
+    @Then("^the unicode path should be a smiley$")
+    public void the_unicode_path_should_be_a_smiley() {
+        assertEquals("/\u263A", builder.path);
+    }
+
+    @Then("^the unicode path should be a playing card ace of spades$")
+    public void the_unicode_path_should_be_a_playing_card_ace_of_spades() {
+        assertEquals("/\uD83C\uDCA1", builder.path);
+    }
 }
