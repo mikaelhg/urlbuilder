@@ -1,0 +1,126 @@
+/*
+Copyright 2013 Mikael Gueck
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+package gumi.builders.url;
+
+import static gumi.builders.url.UrlParameterMultimap.*;
+
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.StringTokenizer;
+
+public class Decoder {
+
+    private final Charset inputEncoding;
+
+    public Decoder(final Charset inputEncoding) {
+        this.inputEncoding = inputEncoding;
+    }
+
+    public String decodeFragment(final String fragment) {
+        if (fragment == null || fragment.isEmpty()) {
+            return fragment;
+        }
+        final boolean decodePlusAsSpace = false;
+        return urlDecode(fragment, decodePlusAsSpace);
+    }
+
+    public UrlParameterMultimap decodeQueryParameters(final String query) {
+        final UrlParameterMultimap ret = newMultimap();
+        if (query == null || query.isEmpty()) {
+            return ret;
+        }
+        for (final String part : query.split("&")) {
+            final String[] kvp = part.split("=", 2);
+            final String key, value;
+            key = urlDecodeQuery(kvp[0]);
+            if (kvp.length == 2) {
+                value = urlDecodeQuery(kvp[1]);
+            } else {
+                value = null;
+            }
+            ret.add(key, value);
+        }
+        return ret;
+    }
+
+    private byte[] nextDecodeableSequence(final String input, final int position) {
+        final int len = input.length();
+        final byte[] data = new byte[len];
+        int j = 0;
+        for (int i = position; i < len; i++) {
+            final char c0 = input.charAt(i);
+            if (c0 != '%' || (len < i + 2)) {
+                return Arrays.copyOfRange(data, 0, j);
+            } else {
+                data[j++] = (byte) Integer.parseInt(input.substring(i + 1, i + 3), 16);
+                i += 2;
+            }
+        }
+        return Arrays.copyOfRange(data, 0, j);
+    }
+
+    public String urlDecodePath(final String input) {
+        final boolean decodePlusAsSpace = false;
+        return urlDecode(input, decodePlusAsSpace);
+    }
+
+    public String decodePath(final String input) {
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        final boolean RETURN_DELIMETERS = true;
+        final StringTokenizer st = new StringTokenizer(input, "/", RETURN_DELIMETERS);
+
+        while (st.hasMoreElements()) {
+            final String element = st.nextToken();
+            if ("/".equals(element)) {
+                sb.append(element);
+            } else if (!element.isEmpty()) {
+                sb.append(urlDecodePath(element));
+            }
+        }
+        return sb.toString();
+    }
+
+    public String urlDecodeQuery(final String input) {
+        final boolean decodePlusAsSpace = true;
+        return urlDecode(input, decodePlusAsSpace);
+    }
+
+    public String urlDecode(final String input, final boolean decodePlusAsSpace) {
+        final StringBuilder sb = new StringBuilder();
+        final int len = input.length();
+        for (int i = 0; i < len; i++) {
+            final char c0 = input.charAt(i);
+            if (c0 == '+' && decodePlusAsSpace) {
+                sb.append(' ');
+            } else if (c0 != '%') {
+                sb.append(c0);
+            } else if (len < i + 2) {
+                // the string will end before we will be able to read a sequence
+                i += 2;
+            } else {
+                final byte[] bytes = nextDecodeableSequence(input, i);
+                sb.append(inputEncoding.decode(ByteBuffer.wrap(bytes)));
+                i += bytes.length * 3 - 1;
+            }
+        }
+        return sb.toString();
+    }
+}
