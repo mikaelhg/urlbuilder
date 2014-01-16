@@ -18,6 +18,8 @@ package gumi.builders;
 import gumi.builders.url.RuntimeMalformedURLException;
 import gumi.builders.url.RuntimeURISyntaxException;
 import gumi.builders.url.UrlParameterMultimap;
+
+import static gumi.builders.url.Rfc3986Util.*;
 import static gumi.builders.url.UrlParameterMultimap.*;
 
 import java.io.IOException;
@@ -232,35 +234,6 @@ public final class UrlBuilder {
     }
 
     // Could be moved to a separate url codec class.
-    private static boolean isFragmentSafe(final char c) {
-        return isPathSafe(c)
-                || c == '/'
-                || c == '?';
-    }
-
-    // Could be moved to a separate url codec class.
-    private static boolean isPathSafe(final char c) {
-        // Excludes % used in %XX chars
-        return isUnreserved(c)
-                || isSubDelimeter(c)
-                || c == ':'
-                || c == '@';
-    }
-
-    // Could be moved to a separate url codec class.
-    private static boolean isUnreserved(final char c) {
-        return ('a' <= c && c <= 'z') ||
-                ('A' <= c && c <= 'Z') ||
-                ('0' <= c && c <= '9') ||
-                (c == '-' || c == '.' || c == '_' || c == '~');
-    }
-
-    // Could be moved to a separate url codec class.
-    private static boolean isSubDelimeter(final char c) {
-        return "!$&'()*+,;=".contains("" + c);
-    }
-
-    // Could be moved to a separate url codec class.
     private static String pathEncode(final String input, final Charset charset) {
         final boolean isPath = true;
         final boolean isFragment = false;
@@ -287,7 +260,7 @@ public final class UrlBuilder {
         final CharBuffer cb = CharBuffer.allocate(1);
         for (final char c : input.toCharArray()) {
             // We're %-encoding + to be on the safe side.
-            if ((isPath && isPathSafe(c) && c != '+')
+            if ((isPath && isPChar(c) && c != '+')
                     || isFragment && isFragmentSafe(c)
                     || isUnreserved(c)) {
                 sb.append(c);
