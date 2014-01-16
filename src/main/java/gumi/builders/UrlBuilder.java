@@ -209,21 +209,6 @@ public final class UrlBuilder {
                 decoder.decodeFragment(url.getRef()));
     }
 
-
-    protected String encodeQueryParameters() {
-        final StringBuilder sb = new StringBuilder();
-        for (final Map.Entry<String, String> e : this.queryParametersMultimap.flatEntryList()) {
-            sb.append(encoder.queryEncode(e.getKey()));
-            if (e.getValue() != null) {
-                sb.append('=');
-                sb.append(encoder.queryEncode(e.getValue()));
-            }
-            sb.append('&');
-        }
-        sb.deleteCharAt(sb.length() - 1);
-        return sb.toString();
-    }
-
     public void toString(final Appendable out) throws IOException {
         if (this.scheme != null) {
             out.append(this.scheme);
@@ -246,11 +231,11 @@ public final class UrlBuilder {
         }
         if (this.queryParametersMultimap != null && !this.queryParametersMultimap.isEmpty()) {
             out.append('?');
-            out.append(this.encodeQueryParameters());
+            out.append(encoder.encodeQueryParameters(queryParametersMultimap));
         }
         if (this.fragment != null) {
             out.append('#');
-            out.append(encoder.fragmentEncode(this.fragment));
+            out.append(encoder.encodeFragment(this.fragment));
         }
     }
 

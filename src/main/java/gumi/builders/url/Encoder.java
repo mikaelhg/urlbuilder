@@ -20,6 +20,7 @@ import static gumi.builders.url.Rfc3986Util.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 public class Encoder {
@@ -35,10 +36,6 @@ public class Encoder {
         this.outputEncoding = outputEncoding;
     }
 
-    public Charset getOutputEncoding() {
-        return outputEncoding;
-    }
-
     public String encodePath(final String input) {
         final StringBuilder sb = new StringBuilder();
         if (input == null || input.isEmpty()) {
@@ -50,21 +47,33 @@ public class Encoder {
             if ("/".equals(element)) {
                 sb.append(element);
             } else if (!element.isEmpty()) {
-                sb.append(pathEncode(element));
+                sb.append(urlEncode(element, IS_PATH, IS_NOT_FRAGMENT));
             }
         }
         return sb.toString();
     }
 
-    public String pathEncode(final String input) {
-        return urlEncode(input, IS_PATH, IS_NOT_FRAGMENT);
+    public String encodeQueryParameters(final UrlParameterMultimap queryParametersMultimap) {
+        if (queryParametersMultimap == null)
+            throw new IllegalArgumentException("queryParametersMultimap is required to not be null.");
+        final StringBuilder sb = new StringBuilder();
+        for (final Map.Entry<String, String> e : queryParametersMultimap.flatEntryList()) {
+            sb.append(encodeQueryElement(e.getKey()));
+            if (e.getValue() != null) {
+                sb.append('=');
+                sb.append(encodeQueryElement(e.getValue()));
+            }
+            sb.append('&');
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
     }
 
-    public String queryEncode(final String input) {
+    private String encodeQueryElement(final String input) {
         return urlEncode(input, IS_NOT_PATH, IS_NOT_FRAGMENT);
     }
 
-    public String fragmentEncode(final String input) {
+    public String encodeFragment(final String input) {
         return urlEncode(input, IS_NOT_PATH, IS_FRAGMENT);
     }
 
