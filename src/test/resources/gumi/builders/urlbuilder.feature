@@ -40,6 +40,17 @@ Feature: UrlBuilder url creation
     Given I create a builder from the string /?a=1=2
     Then the parameter a should be 1=2
 
+  Scenario: From URL with user info
+    Given I create a builder from the URL https://bob:passwd@example.com/secure
+    Then as a string it should be https://bob:passwd@example.com/secure
+      And the user info should be bob:passwd
+      And the host name should be example.com
+
+  Scenario: From URL with encoded characters in the user info
+    Given I create a builder from the URL https://bobby%20droptables:passwd@example.com/secure
+    Then as a string it should be https://bobby%20droptables:passwd@example.com/secure
+      And PENDING: the user info should be bobby droptables:passwd
+
   Scenario: From URI with a null path and query
     Given I create a builder from a URI mailto:bob@example.com with a null path and query
     Then as a string it should be mailto:

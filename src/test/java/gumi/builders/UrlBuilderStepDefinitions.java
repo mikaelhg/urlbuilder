@@ -2,6 +2,7 @@ package gumi.builders;
 
 import static org.junit.Assert.*;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -55,6 +56,11 @@ public class UrlBuilderStepDefinitions {
         builder = builder.withPath(value);
     }
 
+    @Then("^PENDING: (.*$)")
+    public void pending(final String m) {
+        throw new PendingException("Implement or fix: " + m);
+    }
+
     @Then("^as a string it should be (.*)$")
     public void as_a_string_it_should_be_x(final String result) {
         assertEquals(result, builder.toString());
@@ -63,6 +69,16 @@ public class UrlBuilderStepDefinitions {
     @Then("^as a (.*) encoded string it should be (.*)$")
     public void as_a_y_encoded_string_it_should_be_x(final String encoding, final String result) {
         assertEquals(result, builder.encodeAs(encoding).toString());
+    }
+
+    @Then("^the user info should be (.*)$")
+    public void the_user_info_should_be_u(final String u) {
+        assertEquals(u, builder.userInfo);
+    }
+
+    @Then("^the host name should be (.*)$")
+    public void the_host_name_should_be_h(final String h) {
+        assertEquals(h, builder.hostName);
     }
 
     @Then("^the path should be (.*)$")
