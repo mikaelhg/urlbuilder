@@ -38,7 +38,7 @@ public class Decoder {
         return urlDecode(fragment, decodePlusAsSpace);
     }
 
-    public UrlParameterMultimap decodeQueryParameters(final String query) {
+    public UrlParameterMultimap parseQueryString(final String query) {
         final UrlParameterMultimap ret = newMultimap();
         if (query == null || query.isEmpty()) {
             return ret;
@@ -46,9 +46,9 @@ public class Decoder {
         for (final String part : query.split("&")) {
             final String[] kvp = part.split("=", 2);
             final String key, value;
-            key = urlDecodeQuery(kvp[0]);
+            key = decodeQueryElement(kvp[0]);
             if (kvp.length == 2) {
-                value = urlDecodeQuery(kvp[1]);
+                value = decodeQueryElement(kvp[1]);
             } else {
                 value = null;
             }
@@ -98,7 +98,7 @@ public class Decoder {
         return sb.toString();
     }
 
-    public String urlDecodeQuery(final String input) {
+    public String decodeQueryElement(final String input) {
         final boolean decodePlusAsSpace = true;
         return urlDecode(input, decodePlusAsSpace);
     }

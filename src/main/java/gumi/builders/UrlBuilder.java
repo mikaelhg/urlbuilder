@@ -171,7 +171,7 @@ public final class UrlBuilder {
                 }
             }
             path = decoder.decodePath(m.group(5));
-            queryParameters = decoder.decodeQueryParameters(m.group(7));
+            queryParameters = decoder.parseQueryString(m.group(7));
             fragment = decoder.decodeFragment(m.group(9));
         } else {
             queryParameters = newMultimap();
@@ -190,7 +190,7 @@ public final class UrlBuilder {
                 uri.getScheme(), uri.getUserInfo(), uri.getHost(),
                 uri.getPort() == -1 ? null : uri.getPort(),
                 decoder.urlDecodePath(uri.getRawPath()),
-                decoder.decodeQueryParameters(uri.getRawQuery()),
+                decoder.parseQueryString(uri.getRawQuery()),
                 decoder.decodeFragment(uri.getFragment()));
     }
 
@@ -205,7 +205,7 @@ public final class UrlBuilder {
                 url.getProtocol(), url.getUserInfo(), url.getHost(),
                 url.getPort() == -1 ? null : url.getPort(),
                 decoder.urlDecodePath(url.getPath()),
-                decoder.decodeQueryParameters(url.getQuery()),
+                decoder.parseQueryString(url.getQuery()),
                 decoder.decodeFragment(url.getRef()));
     }
 
@@ -384,7 +384,7 @@ public final class UrlBuilder {
      */
     public UrlBuilder withQuery(final String query) {
         return new UrlBuilder(decoder, encoder, scheme, userInfo, hostName, port, path,
-                decoder.decodeQueryParameters(query), fragment);
+                decoder.parseQueryString(query), fragment);
     }
 
     /**
@@ -393,7 +393,7 @@ public final class UrlBuilder {
     public UrlBuilder withQuery(final String query, final Charset encoding) {
         final Decoder queryDecoder = new Decoder(encoding);
         return new UrlBuilder(decoder, encoder, scheme, userInfo, hostName, port, path,
-                queryDecoder.decodeQueryParameters(query), fragment);
+                queryDecoder.parseQueryString(query), fragment);
     }
 
     /**
