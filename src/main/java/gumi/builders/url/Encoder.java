@@ -37,10 +37,10 @@ public class Encoder {
     }
 
     public String encodePath(final String input) {
-        final StringBuilder sb = new StringBuilder();
         if (input == null || input.isEmpty()) {
-            return sb.toString();
+            return "";
         }
+        final StringBuilder sb = new StringBuilder();
         final StringTokenizer st = new StringTokenizer(input, "/", true);
         while (st.hasMoreElements()) {
             final String element = st.nextToken();
@@ -74,6 +74,9 @@ public class Encoder {
     }
 
     public String encodeFragment(final String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
         return urlEncode(input, IS_NOT_PATH, IS_FRAGMENT);
     }
 
