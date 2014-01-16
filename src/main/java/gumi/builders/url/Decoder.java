@@ -24,6 +24,9 @@ import java.util.StringTokenizer;
 
 public class Decoder {
 
+    private static final boolean DECODE_PLUS_AS_SPACE = true;
+    private static final boolean DO_NOT_DECODE_PLUS_AS_SPACE = false;
+
     private final Charset inputEncoding;
 
     public Decoder(final Charset inputEncoding) {
@@ -46,9 +49,9 @@ public class Decoder {
         for (final String part : query.split("&")) {
             final String[] kvp = part.split("=", 2);
             final String key, value;
-            key = decodeQueryElement(kvp[0]);
+            key = urlDecode(kvp[0], DECODE_PLUS_AS_SPACE);
             if (kvp.length == 2) {
-                value = decodeQueryElement(kvp[1]);
+                value = urlDecode(kvp[1], DECODE_PLUS_AS_SPACE);
             } else {
                 value = null;
             }
@@ -73,11 +76,6 @@ public class Decoder {
         return Arrays.copyOfRange(data, 0, j);
     }
 
-    public String urlDecodePath(final String input) {
-        final boolean decodePlusAsSpace = false;
-        return urlDecode(input, decodePlusAsSpace);
-    }
-
     public String decodePath(final String input) {
         if (input == null || input.isEmpty()) {
             return "";
@@ -92,18 +90,13 @@ public class Decoder {
             if ("/".equals(element)) {
                 sb.append(element);
             } else if (!element.isEmpty()) {
-                sb.append(urlDecodePath(element));
+                sb.append(urlDecode(element, DO_NOT_DECODE_PLUS_AS_SPACE));
             }
         }
         return sb.toString();
     }
 
-    public String decodeQueryElement(final String input) {
-        final boolean decodePlusAsSpace = true;
-        return urlDecode(input, decodePlusAsSpace);
-    }
-
-    public String urlDecode(final String input, final boolean decodePlusAsSpace) {
+    private String urlDecode(final String input, final boolean decodePlusAsSpace) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
         for (int i = 0; i < len; i++) {
