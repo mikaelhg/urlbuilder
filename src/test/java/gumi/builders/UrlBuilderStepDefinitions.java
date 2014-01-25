@@ -1,12 +1,12 @@
 package gumi.builders;
 
-import cucumber.api.java.en.*;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import static org.junit.Assert.*;
+
+import cucumber.api.PendingException;
+import cucumber.api.java.en.Given;
+import cucumber.api.java.en.Then;
+import cucumber.api.java.en.When;
+import java.net.*;
 
 public class UrlBuilderStepDefinitions {
 
@@ -25,6 +25,15 @@ public class UrlBuilderStepDefinitions {
     @Given("^I create a builder from the URL (.*)$")
     public void i_create_a_builder_from_the_url_x(final String urlString) throws MalformedURLException {
         builder = UrlBuilder.fromUrl(new URL(urlString));
+    }
+
+    @Given("^I create a builder from a URI (.*) with a null path and query$")
+    public void i_create_a_builder_from_a_uri_with_a_null_path_and_query(final String uriString)
+            throws URISyntaxException {
+        URI uri = new URI(uriString);
+        assertNull(uri.getPath());
+        assertNull(uri.getQuery());
+        builder = UrlBuilder.fromUri(uri);
     }
 
     @Given("^I create a builder from the (.*) encoded string (.*)$")
@@ -47,6 +56,11 @@ public class UrlBuilderStepDefinitions {
         builder = builder.withPath(value);
     }
 
+    @Then("^PENDING: (.*$)")
+    public void pending(final String m) {
+        throw new PendingException("Implement or fix: " + m);
+    }
+
     @Then("^as a string it should be (.*)$")
     public void as_a_string_it_should_be_x(final String result) {
         assertEquals(result, builder.toString());
@@ -57,9 +71,29 @@ public class UrlBuilderStepDefinitions {
         assertEquals(result, builder.encodeAs(encoding).toString());
     }
 
+    @Then("^the user info should be (.*)$")
+    public void the_user_info_should_be_u(final String u) {
+        assertEquals(u, builder.userInfo);
+    }
+
+    @Then("^the host name should be (.*)$")
+    public void the_host_name_should_be_h(final String h) {
+        assertEquals(h, builder.hostName);
+    }
+
+    @Then("^the path should be (.*)$")
+    public void the_path_should_be_f(final String p) {
+        assertEquals(p, builder.path);
+    }
+
     @Then("^the parameter (.*) should be (.*)$")
     public void the_parameter_key_should_be_value(final String key, final String value) {
         assertEquals(value, builder.queryParameters.get(key).get(0));
+    }
+
+    @Then("^the fragment should be (.*)$")
+    public void the_fragment_should_be_f(final String f) {
+        assertEquals(f, builder.fragment);
     }
 
     @Then("^it should be an empty string$")
@@ -67,4 +101,13 @@ public class UrlBuilderStepDefinitions {
         assertEquals("", builder.toString());
     }
 
+    @Then("^the unicode path should be a smiley$")
+    public void the_unicode_path_should_be_a_smiley() {
+        assertEquals("/\u263A", builder.path);
+    }
+
+    @Then("^the unicode path should be a playing card ace of spades$")
+    public void the_unicode_path_should_be_a_playing_card_ace_of_spades() {
+        assertEquals("/\uD83C\uDCA1", builder.path);
+    }
 }
