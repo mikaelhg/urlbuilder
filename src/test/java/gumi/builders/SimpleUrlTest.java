@@ -192,7 +192,7 @@ public class SimpleUrlTest {
     @Test
     public void encodedPathFromURI() throws URISyntaxException {
         URI uri = new URI("http://foo/a%20b");
-        assertEquals("http://foo/a+b",UrlBuilder.fromUri(uri).toString());
+        assertEquals("http://foo/a%20b",UrlBuilder.fromUri(uri).toString());
         uri = new URI("http://foo/a%7Bb");
         assertEquals("http://foo/a%7Bb",UrlBuilder.fromUri(uri).toString());
     }
