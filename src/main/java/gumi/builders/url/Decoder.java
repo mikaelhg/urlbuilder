@@ -1,5 +1,5 @@
 /*
-Copyright 2013 Mikael Gueck
+Copyright 2014 Mikael Gueck
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
 public class Decoder {
 
     private static final boolean DECODE_PLUS_AS_SPACE = true;
+
     private static final boolean DO_NOT_DECODE_PLUS_AS_SPACE = false;
 
     private final Charset inputEncoding;

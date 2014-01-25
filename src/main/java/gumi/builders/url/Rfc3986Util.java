@@ -1,5 +1,5 @@
 /*
-Copyright 2013 Mikael Gueck
+Copyright 2014 Mikael Gueck
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,8 +15,11 @@ limitations under the License.
  */
 package gumi.builders.url;
 
+import java.util.Arrays;
 
-public class Rfc3986Util {
+class Rfc3986Util {
+
+    private static final char[] SUB_DELIMITERS = { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' };
 
     private Rfc3986Util() {
     }
@@ -43,7 +46,7 @@ public class Rfc3986Util {
     }
 
     public static boolean isSubDelimeter(final char c) {
-        return "!$&'()*+,;=".contains("" + c);
+        return Arrays.binarySearch(SUB_DELIMITERS, c) >= 0;
     }
 
 }

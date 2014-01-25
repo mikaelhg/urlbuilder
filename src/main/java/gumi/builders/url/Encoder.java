@@ -1,5 +1,5 @@
 /*
-Copyright 2013 Mikael Gueck
+Copyright 2014 Mikael Gueck
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -26,8 +26,11 @@ import java.util.StringTokenizer;
 public class Encoder {
 
     private static final boolean IS_PATH = true;
+
     private static final boolean IS_NOT_PATH = false;
+
     private static final boolean IS_FRAGMENT = true;
+
     private static final boolean IS_NOT_FRAGMENT = false;
 
     private final Charset outputEncoding;
