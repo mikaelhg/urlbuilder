@@ -22,6 +22,14 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
+/**
+ * Percent-decoding according to the URI and URL standards.
+ *
+ * Don't use this class in application code, as it will likely
+ * become package-private at some point. The @Deprecated marker
+ * is there to communicate this to application developers.
+ */
+@Deprecated
 public class Decoder {
 
     private static final boolean DECODE_PLUS_AS_SPACE = true;

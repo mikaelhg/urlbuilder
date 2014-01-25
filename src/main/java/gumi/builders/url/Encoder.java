@@ -23,6 +23,14 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+/**
+ * Percent-encoding according to the URI and URL standards.
+ *
+ * Don't use this class in application code, as it will likely
+ * become package-private at some point. The @Deprecated marker
+ * is there to communicate this to application developers.
+ */
+@Deprecated
 public class Encoder {
 
     private static final boolean IS_PATH = true;
