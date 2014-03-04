@@ -1,1 +1,1 @@
-image: java:openjdk7
+image: bradrydzewski/java:openjdk7
