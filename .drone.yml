@@ -1,3 +1,5 @@
 image: bradrydzewski/java:openjdk7
 script:
   - mvn -B clean compile package
+cache:
+  - .m2
