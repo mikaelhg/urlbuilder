@@ -5,3 +5,4 @@ script:
   - mvn -B clean compile package
 cache:
   - /tmp/m2repo
+
