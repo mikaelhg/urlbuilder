@@ -1,5 +1,7 @@
 image: bradrydzewski/java:openjdk7
+env:
+  - M2_REPO=/tmp/m2repo
 script:
   - mvn -B clean compile package
 cache:
-  - .m2
+  - /tmp/m2repo
