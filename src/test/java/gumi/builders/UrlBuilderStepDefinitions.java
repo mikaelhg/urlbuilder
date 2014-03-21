@@ -7,10 +7,13 @@ import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import java.net.*;
+import java.util.List;
 
 public class UrlBuilderStepDefinitions {
 
     private UrlBuilder builder;
+
+    private List<String> urls;
 
     @Given("^I create an empty builder$")
     public void i_create_an_empty_builder() {
@@ -41,6 +44,11 @@ public class UrlBuilderStepDefinitions {
         builder = UrlBuilder.fromString(urlString, encoding);
     }
 
+    @Given("^I have these URLs:$")
+    public void i_have_these_urls(final List<String> urls) {
+        this.urls = urls;
+    }
+
     @When("^I set the schema to (.*)$")
     public void i_set_the_schema_to_x(final String value) {
         builder = builder.withScheme(value);
@@ -54,6 +62,13 @@ public class UrlBuilderStepDefinitions {
     @When("^I set the path to (.*)$")
     public void i_set_the_path_to_x(final String value) {
         builder = builder.withPath(value);
+    }
+
+    @Then("^the urls stay the same after a roundtrip conversion$")
+    public void the_urls_stay_the_same_after_a_roundtrip_conversion() {
+        for (final String url : urls) {
+            assertEquals(url, UrlBuilder.fromString(url).toString());
+        }
     }
 
     @Then("^PENDING: (.*$)")

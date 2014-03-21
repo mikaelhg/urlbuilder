@@ -54,3 +54,17 @@ Feature: UrlBuilder url creation
   Scenario: From URI with a null path and query
     Given I create a builder from a URI mailto:bob@example.com with a null path and query
     Then as a string it should be mailto:
+
+  Scenario: Round trip conversion
+    Given I have these URLs:
+      | https://                     |
+      | https://www                  |
+      | https://www:1234             |
+      | https://www:1234/            |
+      | https://www:1234/foo         |
+      | https://www:1234/foo/bar     |
+      | https://www:1234/foo/bar/    |
+      | https://www:1234/foo/bar//   |
+      | https://www:1234/foo//bar//  |
+      | //google.com/logo.png        |
+    Then the urls stay the same after a roundtrip conversion

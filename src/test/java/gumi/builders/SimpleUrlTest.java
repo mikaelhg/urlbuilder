@@ -15,8 +15,6 @@ import org.junit.Test;
  */
 public class SimpleUrlTest {
 
-    private static final Charset UTF8 = Charset.forName("UTF-8");
-
     @Test
     public void encodeAsCharsetStringTest() {
         final Charset ASCII = Charset.forName("ASCII");
@@ -106,19 +104,6 @@ public class SimpleUrlTest {
     }
 
     @Test
-    public void partialStringTest() throws Exception {
-        assertRoundtrip("https://");
-        assertRoundtrip("https://www");
-        assertRoundtrip("https://www:1234");
-        assertRoundtrip("https://www:1234/");
-        assertRoundtrip("https://www:1234/foo");
-        assertRoundtrip("https://www:1234/foo/bar");
-        assertRoundtrip("https://www:1234/foo/bar/");
-        assertRoundtrip("https://www:1234/foo/bar//");
-        assertRoundtrip("https://www:1234/foo//bar//");
-    }
-
-    @Test
     public void urlExceptionTest() throws Exception {
         UrlBuilder.fromString("https://www:1234/").toUriWithException();
 
@@ -195,15 +180,6 @@ public class SimpleUrlTest {
         assertEquals("http://foo/a%20b",UrlBuilder.fromUri(uri).toString());
         uri = new URI("http://foo/a%7Bb");
         assertEquals("http://foo/a%7Bb",UrlBuilder.fromUri(uri).toString());
-    }
-
-    @Test
-    public void schemaless() {
-        assertRoundtrip("//google.com/logo.png");
-    }
-
-    private static void assertRoundtrip(final String url) {
-        Assert.assertEquals(url, UrlBuilder.fromString(url).toString());
     }
 
     @Test
