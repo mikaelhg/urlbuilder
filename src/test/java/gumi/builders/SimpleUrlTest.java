@@ -1,14 +1,11 @@
 package gumi.builders;
 
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.Test;
 
 /**
  * A few simple, handwritten, non-datadriven tests to get started.
@@ -54,7 +51,7 @@ public class SimpleUrlTest {
         assertEquals(ub3.hostName, "");
     }
 
-    @Test(expected = NumberFormatException.class)
+    @Test(expectedExceptions = NumberFormatException.class)
     public void brokenUrlEncodingTest() throws Exception {
         UrlBuilder.fromString("http://localhost/%ax");
     }
@@ -221,8 +218,8 @@ public class SimpleUrlTest {
     @Test
     public void containsParameter() {
         final UrlBuilder ub1 = UrlBuilder.fromString("/?a=1");
-        assertTrue("builder contains parameter", ub1.queryParameters.containsKey("a"));
-        assertFalse("builder doesn't contain parameter", ub1.queryParameters.containsKey("b"));
+        assertTrue(ub1.queryParameters.containsKey("a"), "builder contains parameter");
+        assertFalse(ub1.queryParameters.containsKey("b"), "builder doesn't contain parameter");
     }
     
     @Test

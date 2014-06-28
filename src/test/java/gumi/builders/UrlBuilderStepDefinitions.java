@@ -1,8 +1,7 @@
 package gumi.builders;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.*;
 
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -71,24 +70,19 @@ public class UrlBuilderStepDefinitions {
         }
     }
 
-    @Then("^PENDING: (.*$)")
-    public void pending(final String m) {
-        throw new PendingException("Implement or fix: " + m);
-    }
-
     @Then("^as a string it should be (.*)$")
     public void as_a_string_it_should_be_x(final String result) {
-        assertEquals(result, builder.toString());
+        assertEquals(builder.toString(), result);
     }
 
     @Then("^as a (.*) encoded string it should be (.*)$")
     public void as_a_y_encoded_string_it_should_be_x(final String encoding, final String result) {
-        assertEquals(result, builder.encodeAs(encoding).toString());
+        assertEquals(builder.encodeAs(encoding).toString(), result);
     }
 
     @Then("^the user info should be (.*)$")
-    public void the_user_info_should_be_u(final String u) {
-        assertEquals(u, builder.userInfo);
+    public void the_user_info_should_be_u(final String userInfo) {
+        assertEquals(builder.userInfo, userInfo);
     }
 
     @Then("^the host name should be (.*)$")
@@ -97,32 +91,32 @@ public class UrlBuilderStepDefinitions {
     }
 
     @Then("^the path should be (.*)$")
-    public void the_path_should_be_f(final String p) {
-        assertEquals(p, builder.path);
+    public void the_path_should_be_f(final String path) {
+        assertEquals(builder.path, path);
     }
 
     @Then("^the parameter (.*) should be (.*)$")
     public void the_parameter_key_should_be_value(final String key, final String value) {
-        assertEquals(value, builder.queryParameters.get(key).get(0));
+        assertEquals(builder.queryParameters.get(key).get(0), value);
     }
 
     @Then("^the fragment should be (.*)$")
-    public void the_fragment_should_be_f(final String f) {
-        assertEquals(f, builder.fragment);
+    public void the_fragment_should_be_f(final String fragment) {
+        assertEquals(builder.fragment, fragment);
     }
 
     @Then("^it should be an empty string$")
     public void it_should_be_an_empty_string() {
-        assertEquals("", builder.toString());
+        assertEquals(builder.toString(), "");
     }
 
     @Then("^the unicode path should be a smiley$")
     public void the_unicode_path_should_be_a_smiley() {
-        assertEquals("/\u263A", builder.path);
+        assertEquals(builder.path, "/\u263A");
     }
 
     @Then("^the unicode path should be a playing card ace of spades$")
     public void the_unicode_path_should_be_a_playing_card_ace_of_spades() {
-        assertEquals("/\uD83C\uDCA1", builder.path);
+        assertEquals(builder.path, "/\uD83C\uDCA1");
     }
 }

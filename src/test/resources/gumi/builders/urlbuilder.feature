@@ -49,7 +49,7 @@ Feature: UrlBuilder url creation
   Scenario: From URL with encoded characters in the user info
     Given I create a builder from the URL https://bobby%20droptables:passwd@example.com/secure
     Then as a string it should be https://bobby%20droptables:passwd@example.com/secure
-      And PENDING: the user info should be bobby droptables:passwd
+      And the user info should be bobby droptables:passwd
 
   Scenario: From URI with a null path and query
     Given I create a builder from a URI mailto:bob@example.com with a null path and query

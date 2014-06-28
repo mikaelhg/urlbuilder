@@ -1,14 +1,14 @@
 package gumi.builders;
 
 import gumi.builders.url.UrlParameterMultimap;
-import org.junit.Test;
+import org.testng.annotations.Test;
+import static org.testng.Assert.*;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
 
-import static org.junit.Assert.*;
 
 /**
  * Ideally, these tests should provide 100% coverage for UrlParameterMultimap.
@@ -49,7 +49,7 @@ public class MultimapTest {
         assertEquals(m1.flatEntryList().get(2), newEntry("c", "3"));
     }
 
-    @Test(expected = UnsupportedOperationException.class)
+    @Test(expectedExceptions = UnsupportedOperationException.class)
     public void mutateImmutableParameterMap() {
         final UrlParameterMultimap m1 = UrlParameterMultimap.newMultimap();
         m1.add("a", "1").add("b", "2").add("c", "3");
@@ -79,27 +79,27 @@ public class MultimapTest {
         assertTrue(parameterMap.containsValue("value2"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void nullContainsKey() {
         newMapWithContent().containsKey(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void nullContainsValue() {
         newMapWithContent().containsValue(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void nullRemove() {
         newMapWithContent().remove(null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void nullRemove2() {
         newMapWithContent().remove("", null);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expectedExceptions = IllegalArgumentException.class)
     public void nullRemove3() {
         newMapWithContent().remove(null, "");
     }
