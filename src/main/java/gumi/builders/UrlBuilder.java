@@ -189,7 +189,7 @@ public final class UrlBuilder {
         } else {
             queryParameters = newMultimap();
         }
-        return of(DEFAULT_ENCODING, DEFAULT_ENCODING, decoder, null, scheme, userInfo, hostName, port, path, queryParameters, fragment);
+        return of(null, DEFAULT_ENCODING, decoder, null, scheme, userInfo, hostName, port, path, queryParameters, fragment);
     }
 
     /**
@@ -288,14 +288,15 @@ public final class UrlBuilder {
      * When percent-escaping the StringBuilder's output, use this character set.
      */
     public UrlBuilder encodeAs(final Charset charset) {
-        return of(inputEncoding, charset, decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+        return of(inputEncoding, charset, decoder, new Encoder(charset), scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
      * When percent-escaping the StringBuilder's output, use this character set.
      */
     public UrlBuilder encodeAs(final String charsetName) {
-        return of(inputEncoding, Charset.forName(charsetName), decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+        final Charset outputEncoding = Charset.forName(charsetName);
+        return of(inputEncoding, outputEncoding, decoder, new Encoder(outputEncoding), scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
     /**
