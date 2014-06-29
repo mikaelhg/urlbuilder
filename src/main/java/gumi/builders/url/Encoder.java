@@ -103,27 +103,39 @@ public class Encoder {
     }
 
     private String urlEncode(final String input, final boolean isPath,
-            final boolean isFragment, final boolean isUserInfo) {
+            final boolean isFragment, final boolean isUserInfo)
+    {
         final StringBuilder sb = new StringBuilder();
-        final CharBuffer cb = CharBuffer.allocate(1);
-        for (final char c : input.toCharArray()) {
-            // We're %-encoding + to be on the safe side.
-            if ((isPath && isPChar(c) && c != '+')
-                    || isFragment && isFragmentSafe(c)
-                    || isUserInfo && c == ':'
-                    || isUnreserved(c))
-            {
-                sb.append(c);
-            } else {
-                cb.put(0, c);
-                cb.rewind();
-                final ByteBuffer bb = outputEncoding.encode(cb);
-                for (int i = 0; i < bb.limit(); i++) {
-                    // Until someone has a real problem with the performance of this bit,
-                    // I will leave this less optimal, but much simpler implementation in place
-                    sb.append('%');
-                    sb.append(String.format("%1$02X", bb.get(i)));
+        final char[] inputChars = input.toCharArray();
+        final CharBuffer cb = CharBuffer.allocate(2);
+        for (int i = 0; i < Character.codePointCount(inputChars, 0, inputChars.length); i++) {
+            final int codePoint = Character.codePointAt(inputChars, i);
+            cb.rewind();
+
+            if (Character.isBmpCodePoint(codePoint)) {
+                final char c = Character.toChars(codePoint)[0];
+                if ((isPath && isPChar(c) && c != '+')
+                        || isFragment && isFragmentSafe(c)
+                        || isUserInfo && c == ':'
+                        || isUnreserved(c))
+                {
+                    sb.append(c);
+                    continue;
+                } else {
+                    cb.append(c);
                 }
+            } else {
+                cb.append(Character.highSurrogate(codePoint));
+                cb.append(Character.lowSurrogate(codePoint));
+            }
+            final int pos = cb.position();
+            cb.rewind();
+            final ByteBuffer bb = outputEncoding.encode(cb.subSequence(0, pos));
+            for (int j = 0; j < bb.limit(); j++) {
+                // Until someone has a real problem with the performance of this bit,
+                // I will leave this less optimal, but much simpler implementation in place
+                sb.append('%');
+                sb.append(String.format("%1$02X", bb.get(j)));
             }
         }
         return sb.toString();

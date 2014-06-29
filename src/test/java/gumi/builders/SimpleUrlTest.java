@@ -1,11 +1,12 @@
 package gumi.builders;
 
 import org.testng.annotations.Test;
-import static org.testng.Assert.*;
 
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+
+import static org.testng.Assert.*;
 
 /**
  * A few simple, handwritten, non-datadriven tests to get started.
@@ -109,11 +110,11 @@ public class SimpleUrlTest {
         final String bar = URLDecoder.decode(foo, charset);
         final String url1 = "https://www:1234/foo?foo=" + foo;
 
-        assertEquals("//test/foo?foo=%F6%E4%F6%E4%F6%E4",
-                UrlBuilder.empty().encodeAs("ISO-8859-1")
+        assertEquals(UrlBuilder.empty().encodeAs("ISO-8859-1")
                 .withHost("test").withPath("/foo")
                 .addParameter("foo", "öäöäöä")
-                .toString());
+                .toString(),
+                "//test/foo?foo=%F6%E4%F6%E4%F6%E4");
 
         assertEquals(UrlBuilder.fromString(url1, charset).encodeAs(charset).toString(), url1);
 
