@@ -41,10 +41,21 @@ public class Encoder {
 
     private static final boolean IS_NOT_FRAGMENT = false;
 
+    private static final boolean IS_USERINFO = true;
+
+    private static final boolean IS_NOT_USERINFO = false;
+
     private final Charset outputEncoding;
 
     public Encoder(final Charset outputEncoding) {
         this.outputEncoding = outputEncoding;
+    }
+
+    public String encodeUserInfo(String input) {
+        if (null == input || input.isEmpty()) {
+            return "";
+        }
+        return urlEncode(input, IS_NOT_PATH, IS_NOT_FRAGMENT, IS_USERINFO);
     }
 
     public String encodePath(final String input) {
@@ -58,7 +69,7 @@ public class Encoder {
             if ("/".equals(element)) {
                 sb.append(element);
             } else if (!element.isEmpty()) {
-                sb.append(urlEncode(element, IS_PATH, IS_NOT_FRAGMENT));
+                sb.append(urlEncode(element, IS_PATH, IS_NOT_FRAGMENT, IS_NOT_USERINFO));
             }
         }
         return sb.toString();
@@ -81,25 +92,27 @@ public class Encoder {
     }
 
     private String encodeQueryElement(final String input) {
-        return urlEncode(input, IS_NOT_PATH, IS_NOT_FRAGMENT);
+        return urlEncode(input, IS_NOT_PATH, IS_NOT_FRAGMENT, IS_NOT_USERINFO);
     }
 
     public String encodeFragment(final String input) {
         if (input == null || input.isEmpty()) {
             return input;
         }
-        return urlEncode(input, IS_NOT_PATH, IS_FRAGMENT);
+        return urlEncode(input, IS_NOT_PATH, IS_FRAGMENT, IS_NOT_USERINFO);
     }
 
     private String urlEncode(final String input, final boolean isPath,
-            final boolean isFragment) {
+            final boolean isFragment, final boolean isUserInfo) {
         final StringBuilder sb = new StringBuilder();
         final CharBuffer cb = CharBuffer.allocate(1);
         for (final char c : input.toCharArray()) {
             // We're %-encoding + to be on the safe side.
             if ((isPath && isPChar(c) && c != '+')
                     || isFragment && isFragmentSafe(c)
-                    || isUnreserved(c)) {
+                    || isUserInfo && c == ':'
+                    || isUnreserved(c))
+            {
                 sb.append(c);
             } else {
                 cb.put(0, c);

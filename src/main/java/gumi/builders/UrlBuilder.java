@@ -157,7 +157,7 @@ public final class UrlBuilder {
                 final Matcher n = AUTHORITY_PATTERN.matcher(m.group(4));
                 if (n.find()) {
                     if (n.group(2) != null) {
-                        userInfo = n.group(2);
+                        userInfo = decoder.decodeUserInfo(n.group(2));
                     }
                     if (n.group(3) != null) {
                         hostName = IDN.toUnicode(n.group(3));
@@ -211,7 +211,7 @@ public final class UrlBuilder {
         if (this.hostName != null) {
             out.append("//");
             if (this.userInfo != null) {
-                out.append(this.userInfo);
+                out.append(encoder.encodeUserInfo(this.userInfo));
                 out.append('@');
             }
             out.append(IDN.toASCII(this.hostName));

@@ -47,7 +47,7 @@ Feature: UrlBuilder url creation
       And the host name should be example.com
 
   Scenario: From URL with encoded characters in the user info
-    Given I create a builder from the URL https://bobby%20droptables:passwd@example.com/secure
+    Given I create a builder from the string https://bobby%20droptables:passwd@example.com/secure
     Then as a string it should be https://bobby%20droptables:passwd@example.com/secure
       And the user info should be bobby droptables:passwd
 

@@ -36,18 +36,25 @@ public class Decoder {
 
     private static final boolean DO_NOT_DECODE_PLUS_AS_SPACE = false;
 
-    private final Charset inputEncoding;
+    protected final Charset inputEncoding;
 
     public Decoder(final Charset inputEncoding) {
         this.inputEncoding = inputEncoding;
+    }
+
+    public String decodeUserInfo(final String userInfo) {
+        if (null == userInfo || userInfo.isEmpty()) {
+            return userInfo;
+        } else {
+            return urlDecode(userInfo, DECODE_PLUS_AS_SPACE);
+        }
     }
 
     public String decodeFragment(final String fragment) {
         if (fragment == null || fragment.isEmpty()) {
             return fragment;
         }
-        final boolean decodePlusAsSpace = false;
-        return urlDecode(fragment, decodePlusAsSpace);
+        return urlDecode(fragment, DO_NOT_DECODE_PLUS_AS_SPACE);
     }
 
     public UrlParameterMultimap parseQueryString(final String query) {
@@ -125,4 +132,5 @@ public class Decoder {
         }
         return sb.toString();
     }
+
 }
