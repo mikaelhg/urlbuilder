@@ -107,12 +107,10 @@ public class Encoder {
     {
         final StringBuilder sb = new StringBuilder();
         final char[] inputChars = input.toCharArray();
-        final CharBuffer cb = CharBuffer.allocate(2);
         for (int i = 0; i < Character.codePointCount(inputChars, 0, inputChars.length); i++) {
+            final CharBuffer cb;
             final int codePoint = Character.codePointAt(inputChars, i);
-            cb.rewind();
-
-            if (Character.isBmpCodePoint(codePoint)) {
+            if (isBmpCodePoint(codePoint)) {
                 final char c = Character.toChars(codePoint)[0];
                 if ((isPath && isPChar(c) && c != '+')
                         || isFragment && isFragmentSafe(c)
@@ -122,15 +120,16 @@ public class Encoder {
                     sb.append(c);
                     continue;
                 } else {
+                    cb = CharBuffer.allocate(1);
                     cb.append(c);
                 }
             } else {
-                cb.append(Character.highSurrogate(codePoint));
-                cb.append(Character.lowSurrogate(codePoint));
+                cb = CharBuffer.allocate(2);
+                cb.append(highSurrogate(codePoint));
+                cb.append(lowSurrogate(codePoint));
             }
-            final int pos = cb.position();
             cb.rewind();
-            final ByteBuffer bb = outputEncoding.encode(cb.subSequence(0, pos));
+            final ByteBuffer bb = outputEncoding.encode(cb);
             for (int j = 0; j < bb.limit(); j++) {
                 // Until someone has a real problem with the performance of this bit,
                 // I will leave this less optimal, but much simpler implementation in place
@@ -141,4 +140,19 @@ public class Encoder {
         return sb.toString();
     }
 
+    /** Character.highSurrogate is not available in Java 6... **/
+    protected static char highSurrogate(int codePoint) {
+        return (char) ((codePoint >>> 10)
+                + (Character.MIN_HIGH_SURROGATE - (Character.MIN_SUPPLEMENTARY_CODE_POINT >>> 10)));
+    }
+
+    /** Character.lowSurrogate is not available in Java 6... **/
+    protected static char lowSurrogate(int codePoint) {
+        return (char) ((codePoint & 0x3ff) + Character.MIN_LOW_SURROGATE);
+    }
+
+    /** Character.isBmpCodePoint is not available in Java 6... **/
+    protected static boolean isBmpCodePoint(int codePoint) {
+        return codePoint >>> 16 == 0;
+    }
 }
