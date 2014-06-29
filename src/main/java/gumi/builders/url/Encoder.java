@@ -25,27 +25,22 @@ import java.util.StringTokenizer;
 
 /**
  * Percent-encoding according to the URI and URL standards.
- *
- * Don't use this class in application code, as it will likely
- * become package-private at some point. The @Deprecated marker
- * is there to communicate this to application developers.
  */
-@Deprecated
 public class Encoder {
 
-    private static final boolean IS_PATH = true;
+    protected static final boolean IS_PATH = true;
 
-    private static final boolean IS_NOT_PATH = false;
+    protected static final boolean IS_NOT_PATH = false;
 
-    private static final boolean IS_FRAGMENT = true;
+    protected static final boolean IS_FRAGMENT = true;
 
-    private static final boolean IS_NOT_FRAGMENT = false;
+    protected static final boolean IS_NOT_FRAGMENT = false;
 
-    private static final boolean IS_USERINFO = true;
+    protected static final boolean IS_USERINFO = true;
 
-    private static final boolean IS_NOT_USERINFO = false;
+    protected static final boolean IS_NOT_USERINFO = false;
 
-    private final Charset outputEncoding;
+    protected final Charset outputEncoding;
 
     public Encoder(final Charset outputEncoding) {
         this.outputEncoding = outputEncoding;
@@ -91,7 +86,7 @@ public class Encoder {
         return sb.toString();
     }
 
-    private String encodeQueryElement(final String input) {
+    protected String encodeQueryElement(final String input) {
         return urlEncode(input, IS_NOT_PATH, IS_NOT_FRAGMENT, IS_NOT_USERINFO);
     }
 
@@ -102,7 +97,7 @@ public class Encoder {
         return urlEncode(input, IS_NOT_PATH, IS_FRAGMENT, IS_NOT_USERINFO);
     }
 
-    private String urlEncode(final String input, final boolean isPath,
+    protected String urlEncode(final String input, final boolean isPath,
             final boolean isFragment, final boolean isUserInfo)
     {
         final StringBuilder sb = new StringBuilder();

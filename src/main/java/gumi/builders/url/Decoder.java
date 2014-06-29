@@ -24,17 +24,12 @@ import java.util.StringTokenizer;
 
 /**
  * Percent-decoding according to the URI and URL standards.
- *
- * Don't use this class in application code, as it will likely
- * become package-private at some point. The @Deprecated marker
- * is there to communicate this to application developers.
  */
-@Deprecated
 public class Decoder {
 
-    private static final boolean DECODE_PLUS_AS_SPACE = true;
+    protected static final boolean DECODE_PLUS_AS_SPACE = true;
 
-    private static final boolean DO_NOT_DECODE_PLUS_AS_SPACE = false;
+    protected static final boolean DO_NOT_DECODE_PLUS_AS_SPACE = false;
 
     protected final Charset inputEncoding;
 
@@ -76,7 +71,7 @@ public class Decoder {
         return ret;
     }
 
-    private byte[] nextDecodeableSequence(final String input, final int position) {
+    protected byte[] nextDecodeableSequence(final String input, final int position) {
         final int len = input.length();
         final byte[] data = new byte[len];
         int j = 0;
@@ -112,7 +107,7 @@ public class Decoder {
         return sb.toString();
     }
 
-    private String urlDecode(final String input, final boolean decodePlusAsSpace) {
+    protected String urlDecode(final String input, final boolean decodePlusAsSpace) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
         for (int i = 0; i < len; i++) {
