@@ -67,4 +67,11 @@ Feature: UrlBuilder url creation
       | https://www:1234/foo/bar//   |
       | https://www:1234/foo//bar//  |
       | //google.com/logo.png        |
+      | g:h                          |
+      | http://a/b/c/d;p?y           |
+      | http://a/b/c/d;p?q#s         |
+      | http://a/b/c/g?y#s           |
+      | http://a/b/c/g;x?y#s         |
+      | http://a/b/c/g#s/../x        |
+      | http:g                       |
     Then the urls stay the same after a roundtrip conversion
