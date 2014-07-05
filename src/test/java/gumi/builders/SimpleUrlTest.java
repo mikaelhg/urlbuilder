@@ -3,7 +3,6 @@ package gumi.builders;
 import org.testng.annotations.Test;
 
 import java.net.*;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import static org.testng.Assert.*;
@@ -12,14 +11,6 @@ import static org.testng.Assert.*;
  * A few simple, handwritten, non-datadriven tests to get started.
  */
 public class SimpleUrlTest {
-
-    @Test
-    public void encodeAsCharsetStringTest() {
-        final Charset ASCII = Charset.forName("ASCII");
-        final UrlBuilder ub1 = UrlBuilder.empty().encodeAs(ASCII);
-        final UrlBuilder ub2 = UrlBuilder.empty().encodeAs("ASCII");
-        assertEquals(ub1.outputEncoding, ub2.outputEncoding);
-    }
 
     @Test
     public void userInfoTest() throws Exception {
