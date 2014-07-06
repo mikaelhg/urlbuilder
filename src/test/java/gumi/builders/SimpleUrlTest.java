@@ -133,9 +133,9 @@ public class SimpleUrlTest {
     @Test
     public void testNonArrayParameterOrderStability() {
         final String qp1 = "?a=1&b=2&c=3&d=4";
-        assertEquals(qp1, UrlBuilder.fromString(qp1).toString());
+        assertEquals(UrlBuilder.fromString(qp1).toString(), qp1);
         final String qp2 = "?d=1&c=2&b=3&a=4";
-        assertEquals(qp2, UrlBuilder.fromString(qp2).toString());
+        assertEquals(UrlBuilder.fromString(qp2).toString(), qp2);
     }
 
     @Test
@@ -148,94 +148,78 @@ public class SimpleUrlTest {
         assertUrlBuilderEquals(null, "github.com", 443, "", UrlBuilder.fromString("https://github.com:443.com"));
     }
 
-    private static void assertUrlBuilderEquals(String expectedUserInfo, String expectedHostName, Integer expectedPort, String expectedPath, UrlBuilder ub) {
-        assertEquals(expectedUserInfo, ub.userInfo);
-        assertEquals(expectedHostName, ub.hostName);
-        assertEquals(expectedPort, ub.port);
-        assertEquals(expectedPath, ub.path);
+    private static void assertUrlBuilderEquals(String expectedUserInfo, String expectedHostName, Integer expectedPort, String expectedPath, UrlBuilder b) {
+        assertEquals(b.userInfo, expectedUserInfo);
+        assertEquals(b.hostName, expectedHostName);
+        assertEquals(b.port, expectedPort);
+        assertEquals(b.path, expectedPath);
     }
 
     @Test
     public void parsePortAndHostname() {
-        String url = "http://foo:8080/foo";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertEquals(new Integer(8080), builder.port);
-        assertEquals("foo", builder.hostName);
+        UrlBuilder b = UrlBuilder.fromString("http://foo:8080/foo");
+        assertEquals(b.port, new Integer(8080));
+        assertEquals(b.hostName, "foo");
     }
 
     @Test
     public void encodedPathFromURI() throws URISyntaxException {
-        URI uri = new URI("http://foo/a%20b");
-        assertEquals("http://foo/a%20b",UrlBuilder.fromUri(uri).toString());
-        uri = new URI("http://foo/a%7Bb");
-        assertEquals("http://foo/a%7Bb",UrlBuilder.fromUri(uri).toString());
+        assertEquals(UrlBuilder.fromUri(new URI("http://foo/a%20b")).toString(), "http://foo/a%20b");
+        assertEquals(UrlBuilder.fromUri(new URI("http://foo/a%7Bb")).toString(), "http://foo/a%7Bb");
     }
 
     @Test
     public void testRemoveParameter() {
-        String url = "http://somehost.com/page?parameter1=value1";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals("http://somehost.com/page",
-                builder.removeParameter("parameter1", "value1").toString());
+        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals(b.removeParameter("parameter1", "value1").toString(), "http://somehost.com/page");
     }
 
     @Test
     public void testRemoveOneParameterByKey() {
-        String url = "http://somehost.com/page?parameter1=value1";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals("http://somehost.com/page",
-                builder.removeParameters("parameter1").toString());
+        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals(b.removeParameters("parameter1").toString(), "http://somehost.com/page");
     }
 
     @Test
     public void testRemoveTwoParametersByKey() {
-        String url = "http://somehost.com/page?parameter1=value1&parameter1=value2";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals("http://somehost.com/page",
-                builder.removeParameters("parameter1").toString());
+        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1&parameter1=value2");
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals(b.removeParameters("parameter1").toString(), "http://somehost.com/page");
     }
 
     @Test
     public void testRemoveThreeParametersByKey() {
-        String url = "http://somehost.com/page?parameter1=value1&parameter1=value2&parameter1=value3";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertFalse(builder.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals("http://somehost.com/page",
-                builder.removeParameters("parameter1").toString());
+        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1&parameter1=value2&parameter1=value3");
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals(b.removeParameters("parameter1").toString(), "http://somehost.com/page");
     }
 
     @Test
     public void containsParameter() {
-        final UrlBuilder ub1 = UrlBuilder.fromString("/?a=1");
-        assertTrue(ub1.queryParameters.containsKey("a"), "builder contains parameter");
-        assertFalse(ub1.queryParameters.containsKey("b"), "builder doesn't contain parameter");
+        final UrlBuilder b = UrlBuilder.fromString("/?a=1");
+        assertTrue(b.queryParameters.containsKey("a"), "builder contains parameter");
+        assertFalse(b.queryParameters.containsKey("b"), "builder doesn't contain parameter");
     }
     
     @Test
     public void testSetParameterShouldReplaceExistingParameter() {
-        String url = "http://somehost.com/page?parameter1=value1";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertEquals("http://somehost.com/page?parameter1=value2",
-        builder.setParameter("parameter1", "value2").toString());
+        UrlBuilder builder = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
+        assertEquals(builder.setParameter("parameter1", "value2").toString(), "http://somehost.com/page?parameter1=value2");
 }
 
     @Test
     public void testAddParameterShouldAppendOneNewParameter() {
-        String url = "http://somehost.com/page?parameter1=value1";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertEquals("http://somehost.com/page?parameter1=value1&parameter1=value2",
-                builder.addParameter("parameter1", "value2").toString());
+        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
+        assertEquals(b.addParameter("parameter1", "value2").toString(),
+                "http://somehost.com/page?parameter1=value1&parameter1=value2");
     }
 
     @Test
     public void testWithFragmentShouldAppendAnchor() {
-        String url = "http://somehost.com/page";
-        UrlBuilder builder = UrlBuilder.fromString(url);
-        assertEquals("http://somehost.com/page#anchor",
-                builder.withFragment("anchor").toString());
+        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page");
+        assertEquals(b.withFragment("anchor").toString(), "http://somehost.com/page#anchor");
     }
 
 }
