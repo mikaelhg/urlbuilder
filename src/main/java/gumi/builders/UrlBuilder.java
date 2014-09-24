@@ -351,6 +351,36 @@ public final class UrlBuilder {
     }
 
     /**
+     * Appends to the existing path, with the decoded, non-url-encoded additional path, ensuring a single forward slash separating the
+     * old path and new path. If there is no existing path, the additional path is set as the existing path, ensuring a single forward
+     * slash.
+     */
+    public UrlBuilder addPath(final String additionalPath) {
+        final String path = getPathWithAdditional(additionalPath);
+        return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+    }
+
+    /**
+     * Appends to the existing path, by decoding the url-encoded additional path, ensuring a single forward slash separating the old
+     * path and new path. If there is no existing path, the additional path is set as the existing path, ensuring a single forward
+     * slash.
+     */
+    public UrlBuilder addPath(final String additionalPath, final Charset encoding) {
+        final Decoder pathDecoder = new Decoder(encoding);
+        final String path = getPathWithAdditional(pathDecoder.decodePath(additionalPath));
+        return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+    }
+
+    /**
+     * Appends to the existing path, by decoding the url-encoded additional path, ensuring a single forward slash separating the old
+     * path and new path. If there is no existing path, the additional path is set as the existing path, ensuring a single forward
+     * slash.
+     */
+    public UrlBuilder addPath(final String additionalPath, final String encoding) {
+        return addPath(additionalPath, Charset.forName(encoding));
+    }
+
+    /**
      * Sets the query parameters to a deep copy of the input parameter. Use <tt>null</tt> to remove the whole section.
      */
     public UrlBuilder withQuery(final UrlParameterMultimap query) {
@@ -425,4 +455,18 @@ public final class UrlBuilder {
         return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
+    /**
+     * Ensures the combined path is separated by a single forward slash.
+     */
+    private String getPathWithAdditional(String additionalPath) {
+        final String preparedAdditionalPath = (additionalPath.startsWith("/")) ? additionalPath.replace("^\\/", "/")
+                : "/" + additionalPath;
+
+        if (path != null) {
+            final String preparedOldPath = path.replaceAll("\\/+$", "");
+            return preparedOldPath + preparedAdditionalPath;
+        }
+
+        return additionalPath;
+    }
 }
