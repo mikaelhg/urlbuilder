@@ -467,6 +467,6 @@ public final class UrlBuilder {
             return preparedOldPath + preparedAdditionalPath;
         }
 
-        return additionalPath;
+        return preparedAdditionalPath;
     }
 }
