@@ -92,6 +92,19 @@ public class SimpleUrlTest {
         assertEquals(portUrl, UrlBuilder.fromString(portUrl).toString());
     }
 
+	@Test
+	public void percentEndOfLineTest() throws Exception {
+		final UrlBuilder ub1 = UrlBuilder.fromString("http://www.example.com/?q=Science%2");
+		final UrlBuilder ub2 = UrlBuilder.fromString("http://www.example.com/?q=Science%25");
+		final UrlBuilder ub3 = UrlBuilder.fromString("http://www.example.com/?q=Science%");
+		final UrlBuilder ub4 = UrlBuilder.fromString("http://www.example.com/?q=Science%255");
+
+		assertEquals(ub1.toString(), "http://www.example.com/?q=Science%252");
+		assertEquals(ub2.toString(), "http://www.example.com/?q=Science%25");
+		assertEquals(ub3.toString(), "http://www.example.com/?q=Science%25");
+		assertEquals(ub4.toString(), "http://www.example.com/?q=Science%255");
+	}
+
     @Test
     public void urlExceptionTest() throws Exception {
         UrlBuilder.fromString("https://www:1234/").toUriWithException();
