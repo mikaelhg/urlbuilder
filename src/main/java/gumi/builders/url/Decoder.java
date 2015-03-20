@@ -77,7 +77,7 @@ public class Decoder {
         int j = 0;
         for (int i = position; i < len; i++) {
             final char c0 = input.charAt(i);
-            if (c0 != '%' || (len < i + 2)) {
+            if (c0 != '%' || (len < i + 3)) {
                 return Arrays.copyOfRange(data, 0, j);
             } else {
                 data[j++] = (byte) Integer.parseInt(input.substring(i + 1, i + 3), 16);
@@ -116,9 +116,11 @@ public class Decoder {
                 sb.append(' ');
             } else if (c0 != '%') {
                 sb.append(c0);
-            } else if (len < i + 2) {
+            } else if (len < i + 3) {
                 // the string will end before we will be able to read a sequence
-                i += 2;
+	            int endIndex = Math.min(input.length(), i+2);
+	            sb.append(input.substring(i, endIndex));
+                i += 3;
             } else {
                 final byte[] bytes = nextDecodeableSequence(input, i);
                 sb.append(inputEncoding.decode(ByteBuffer.wrap(bytes)));
