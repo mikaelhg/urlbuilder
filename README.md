@@ -2,7 +2,7 @@ Java URL builder
 ================
 
 [![Build Status](https://travis-ci.org/mikaelhg/urlbuilder.png?branch=master)](https://travis-ci.org/mikaelhg/urlbuilder)
-[![Coverage Status](https://coveralls.io/repos/mikaelhg/urlbuilder/badge.svg?branch=master)](https://coveralls.io/r/mikaelhg/urlbuilder?branch=master
+[![Coverage Status](https://coveralls.io/repos/mikaelhg/urlbuilder/badge.svg?branch=master)](https://coveralls.io/r/mikaelhg/urlbuilder?branch=master)
 
 Create and modify URLs and URL parameters easily, with a builder class.
 
