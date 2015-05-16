@@ -50,9 +50,7 @@ public class SimpleUrlTest {
 
     @Test
     public void utf8Test() throws Exception {
-        assertEquals(UrlBuilder
-                .fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
-                .encodeAs("UTF-8").toString(),
+        assertEquals(UrlBuilder.fromString("http://foo/h%F6pl%E4", "ISO-8859-1").encodeAs("UTF-8").toString(),
                 "http://foo/h%C3%B6pl%C3%A4");
     }
 
@@ -89,7 +87,7 @@ public class SimpleUrlTest {
         assertEquals(urlString2, "http://www.example.com/?foo=bar");
 
         final String portUrl = "http://www.example.com:1234/?foo=bar";
-        assertEquals(portUrl, UrlBuilder.fromString(portUrl).toString());
+        assertEquals(UrlBuilder.fromString(portUrl).toString(), portUrl);
     }
 
 	@Test
@@ -140,7 +138,7 @@ public class SimpleUrlTest {
     @Test
     public void testArrayParameterOrderStability() {
         final String qp1 = "?a=1&b=2&a=3&b=4";
-        assertEquals(qp1, UrlBuilder.fromString(qp1).toString());
+        assertEquals(UrlBuilder.fromString(qp1).toString(), qp1);
     }
 
     @Test
