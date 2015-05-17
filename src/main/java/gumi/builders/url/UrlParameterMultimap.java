@@ -18,7 +18,7 @@ package gumi.builders.url;
 import java.util.*;
 
 /**
- * A String to String multimap implementation best suitable for 0-100 entries.
+ * A String to String multimap implementation best suited for 0-100 entries.
  */
 public class UrlParameterMultimap implements Map<String, List<String>> {
 
@@ -72,7 +72,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     @Override
     public boolean containsKey(final Object key) {
-        if (key == null) {
+        if (null == key) {
             throw new IllegalArgumentException("key can't be null");
         }
         for (final Entry<String, String> e : data) {
@@ -85,7 +85,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     @Override
     public boolean containsValue(final Object value) {
-        if (value == null) {
+        if (null == value) {
             throw new IllegalArgumentException("value can't be null");
         }
         for (final Entry<String, String> e : data) {
@@ -138,7 +138,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     @Override
     public List<String> remove(final Object key) {
-        if (key == null) {
+        if (null == key) {
             throw new IllegalArgumentException("can't remove null");
         }
         final List<String> ret = new ArrayList<String>();
@@ -159,7 +159,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
     }
 
     public UrlParameterMultimap remove(final String key, final String value) {
-        if (key == null || value == null) {
+        if (null == key || null == value) {
             throw new IllegalArgumentException("can't remove null");
         }
         final ListIterator<Entry<String, String>> it = data.listIterator();

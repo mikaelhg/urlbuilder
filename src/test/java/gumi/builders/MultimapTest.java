@@ -2,13 +2,10 @@ package gumi.builders;
 
 import gumi.builders.url.UrlParameterMultimap;
 import org.testng.annotations.Test;
+
 import static org.testng.Assert.*;
 
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
-
+import java.util.*;
 
 /**
  * Ideally, these tests should provide 100% coverage for UrlParameterMultimap.
@@ -36,7 +33,7 @@ public class MultimapTest {
         m1.put("b", Arrays.asList("4", "5", "6"));
         m1.put("a", Arrays.asList("2", "3", "7"));
         assertEquals(Arrays.asList(newEntry("a", "2"), newEntry("a", "3"), newEntry("b", "4"),
-                newEntry("b", "5"), newEntry("b", "6"), newEntry("a", "7")),
+                        newEntry("b", "5"), newEntry("b", "6"), newEntry("a", "7")),
                 m1.flatEntryList());
     }
 
@@ -56,7 +53,7 @@ public class MultimapTest {
         final UrlParameterMultimap.Immutable i1 = m1.immutable();
         i1.add("d", "4");
     }
-    
+
     @Test
     public void containsKey() {
         UrlParameterMultimap parameterMap = newMapWithContent();
@@ -133,6 +130,34 @@ public class MultimapTest {
     }
 
     @Test
+    public void putAll() {
+        final Map<String, List<String>> in1 = new HashMap<String, List<String>>();
+        in1.put("a", Collections.singletonList("1"));
+        final Map<String, List<String>> in2 = new HashMap<String, List<String>>();
+        in2.put("a", Collections.singletonList("4"));
+        final UrlParameterMultimap mm = UrlParameterMultimap.newMultimap();
+        mm.putAll(in1);
+        mm.putAll(in2);
+        assertEquals(mm.get("a"), Collections.singletonList("4"));
+    }
+
+    @Test
+    public void keySet() {
+        final Map<String, List<String>> in1 = new HashMap<String, List<String>>();
+        in1.put("a", Collections.singletonList("1"));
+        in1.put("b", Collections.singletonList("2"));
+        in1.put("c", Collections.singletonList("3"));
+        final UrlParameterMultimap mm = UrlParameterMultimap.newMultimap();
+        mm.putAll(in1);
+        assertEquals(mm.keySet(), new HashSet<String>() {{ add("a"); add("b"); add("c"); }});
+    }
+
+    @Test
+    public void equals() {
+        assertEquals(newMapWithContent(), newMapWithContent());
+    }
+
+    @Test
     public void removeAllValues() {
         final UrlParameterMultimap parameterMap = newMapWithContent();
         parameterMap.add("key1", "value2");
@@ -145,5 +170,5 @@ public class MultimapTest {
     private static UrlParameterMultimap newMapWithContent() {
         return UrlParameterMultimap.newMultimap().add("key1", "value1");
     }
-    
+
 }
