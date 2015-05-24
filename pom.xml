@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>mikaelhg</groupId>
+    <groupId>io.mikael</groupId>
     <artifactId>urlbuilder</artifactId>
     <version>2.0.0-SNAPSHOT</version>
 
@@ -17,18 +17,15 @@
         </license>
     </licenses>
 
+    <scm>
+        <url>https://github.com/mikaelhg/urlbuilder</url>
+    </scm>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <coveralls.version>3.1.0</coveralls.version>
         <jacoco.version>0.7.4.201502262128</jacoco.version>
     </properties>
-
-    <distributionManagement>
-        <repository>
-            <id>maven2.gueck.com-s3</id>
-            <url>s3://maven2.gueck.com/releases</url>
-        </repository>
-    </distributionManagement>
 
     <build>
         <plugins>
@@ -103,13 +100,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <extensions>
-            <extension>
-                <groupId>org.springframework.build</groupId>
-                <artifactId>aws-maven</artifactId>
-                <version>5.0.0.RELEASE</version>
-            </extension>
-        </extensions>
     </build>
 
     <dependencies>
