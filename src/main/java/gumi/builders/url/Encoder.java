@@ -105,7 +105,7 @@ public class Encoder {
         for (int i = 0; i < Character.codePointCount(inputChars, 0, inputChars.length); i++) {
             final CharBuffer cb;
             final int codePoint = Character.codePointAt(inputChars, i);
-            if (isBmpCodePoint(codePoint)) {
+            if (Character.isBmpCodePoint(codePoint)) {
                 final char c = Character.toChars(codePoint)[0];
                 if ((isPath && isPChar(c) && c != '+')
                         || isFragment && isFragmentSafe(c)
@@ -120,8 +120,8 @@ public class Encoder {
                 }
             } else {
                 cb = CharBuffer.allocate(2);
-                cb.append(highSurrogate(codePoint));
-                cb.append(lowSurrogate(codePoint));
+                cb.append(Character.highSurrogate(codePoint));
+                cb.append(Character.lowSurrogate(codePoint));
             }
             cb.rewind();
             final ByteBuffer bb = outputEncoding.encode(cb);
@@ -135,19 +135,4 @@ public class Encoder {
         return sb.toString();
     }
 
-    /** Character.highSurrogate is not available in Java 6... **/
-    protected static char highSurrogate(int codePoint) {
-        return (char) ((codePoint >>> 10)
-                + (Character.MIN_HIGH_SURROGATE - (Character.MIN_SUPPLEMENTARY_CODE_POINT >>> 10)));
-    }
-
-    /** Character.lowSurrogate is not available in Java 6... **/
-    protected static char lowSurrogate(int codePoint) {
-        return (char) ((codePoint & 0x3ff) + Character.MIN_LOW_SURROGATE);
-    }
-
-    /** Character.isBmpCodePoint is not available in Java 6... **/
-    protected static boolean isBmpCodePoint(int codePoint) {
-        return codePoint >>> 16 == 0;
-    }
 }

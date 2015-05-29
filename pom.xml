@@ -17,6 +17,14 @@
         </license>
     </licenses>
 
+    <developers>
+        <developer>
+            <name>Mikael Gueck</name>
+            <email>gumi@iki.fi</email>
+            <url>http://mikael.io/</url>
+        </developer>
+    </developers>
+
     <scm>
         <url>https://github.com/mikaelhg/urlbuilder</url>
     </scm>
@@ -34,8 +42,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -55,6 +63,12 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.3</version>
+                <configuration>
+                    <quiet>true</quiet>
+                    <!--
+                    <additionalparam>-Xdoclint:none</additionalparam>
+                    -->
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -131,7 +145,6 @@
     </dependencies>
 
     <profiles>
-        <!-- A profile for code coverage analysis in ci environments -->
         <profile>
             <id>ci</id>
             <activation>
@@ -158,6 +171,62 @@
                         <groupId>org.eluder.coveralls</groupId>
                         <artifactId>coveralls-maven-plugin</artifactId>
                         <version>${coveralls.version}</version>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>pull-request</id>
+            <activation>
+                <property>
+                    <name>env.TRAVIS_PULL_REQUEST</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <configuration>
+                            <effort>Max</effort>
+                            <threshold>Low</threshold>
+                            <xmlOutput>true</xmlOutput>
+                            <excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-pmd-plugin</artifactId>
+                        <version>3.4</version>
+                        <executions>
+                            <execution>
+                                <id>check</id>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                                <configuration>
+                                    <excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>cpd-check</id>
+                                <goals>
+                                    <goal>cpd-check</goal>
+                                </goals>
+                                <configuration>
+                                    <excludeFromFailureFile>exclude-cpd.properties</excludeFromFailureFile>
+                                </configuration>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

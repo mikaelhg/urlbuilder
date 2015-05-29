@@ -26,7 +26,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     public static final class Immutable extends UrlParameterMultimap {
         public Immutable(final List<Entry<String, String>> data) {
-            super(Collections.unmodifiableList(new LinkedList<Entry<String, String>>(data)));
+            super(Collections.unmodifiableList(new LinkedList<>(data)));
         }
     }
 
@@ -45,7 +45,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
     }
 
     private static Entry<String, String> newEntry(final String key, final String value) {
-        return new AbstractMap.SimpleImmutableEntry<String, String>(key, value);
+        return new AbstractMap.SimpleImmutableEntry<>(key, value);
     }
 
     public static UrlParameterMultimap newMultimap() {
@@ -56,7 +56,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
      * Make a mutable copy.
      */
     public UrlParameterMultimap deepCopy() {
-        return new UrlParameterMultimap(new LinkedList<Entry<String, String>>(data));
+        return new UrlParameterMultimap(new LinkedList<>(data));
     }
 
     /**
@@ -199,7 +199,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     @Override
     public Set<Entry<String, List<String>>> entrySet() {
-        final LinkedHashMap<String, List<String>> entries = new LinkedHashMap<String, List<String>>();
+        final LinkedHashMap<String, List<String>> entries = new LinkedHashMap<>();
         for (final Entry<String, String> e : data) {
             if (!entries.containsKey(e.getKey())) {
                 entries.put(e.getKey(), new LinkedList<String>());
@@ -214,7 +214,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     @Override
     public Collection<List<String>> values() {
-        final List<List<String>> ret = new LinkedList<List<String>>();
+        final List<List<String>> ret = new LinkedList<>();
         for (final Entry<String, List<String>> e : this.entrySet()) {
             ret.add(e.getValue());
         }

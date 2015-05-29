@@ -118,8 +118,8 @@ public class Decoder {
                 sb.append(c0);
             } else if (len < i + 3) {
                 // the string will end before we will be able to read a sequence
-	            int endIndex = Math.min(input.length(), i+2);
-	            sb.append(input.substring(i, endIndex));
+                int endIndex = Math.min(input.length(), i + 2);
+                sb.append(input.substring(i, endIndex));
                 i += 3;
             } else {
                 final byte[] bytes = nextDecodeableSequence(input, i);
