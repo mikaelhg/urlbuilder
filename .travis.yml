@@ -4,7 +4,7 @@ jdk:
   - oraclejdk7
   - openjdk7
 install:
-  - mvn clean package test-compile -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn clean install -DskipTests=true -B -V
 script:
   - mvn test jacoco:report
 after_success:
