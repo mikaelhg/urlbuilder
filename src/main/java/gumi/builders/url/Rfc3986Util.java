@@ -17,11 +17,12 @@ package gumi.builders.url;
 
 import java.util.Arrays;
 
-class Rfc3986Util {
+final class Rfc3986Util {
 
     private static final char[] SUB_DELIMITERS = { '!', '$', '&', '\'', '(', ')', '*', '+', ',', ';', '=' };
 
-    private Rfc3986Util() {
+    static {
+        Arrays.sort(SUB_DELIMITERS);
     }
 
     public static boolean isFragmentSafe(final char c) {
