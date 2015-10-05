@@ -20,6 +20,7 @@ import static gumi.builders.url.Rfc3986Util.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -129,7 +130,7 @@ public class Encoder {
                 // Until someone has a real problem with the performance of this bit,
                 // I will leave this less optimal, but much simpler implementation in place
                 sb.append('%');
-                sb.append(String.format("%1$02X", bb.get(j)));
+                sb.append(String.format(Locale.US, "%1$02X", bb.get(j)));
             }
         }
         return sb.toString();

@@ -31,10 +31,14 @@
         <developerConnection>scm:git:git@github.com:mikaelhg/urlbuilder.git</developerConnection>
     </scm>
 
+    <prerequisites>
+        <maven>3.3.3</maven>
+    </prerequisites>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <coveralls.version>3.1.0</coveralls.version>
-        <jacoco.version>0.7.4.201502262128</jacoco.version>
+        <coveralls.version>4.0.0</coveralls.version>
+        <jacoco.version>0.7.5.201505241946</jacoco.version>
     </properties>
 
     <build>
@@ -103,13 +107,13 @@
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-java</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.4</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-testng</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.4</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -121,7 +125,7 @@
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.8.21</version>
+            <version>6.9.6</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -223,7 +227,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>findbugs-maven-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.0.2</version>
                         <configuration>
                             <effort>Max</effort>
                             <threshold>Low</threshold>
@@ -241,7 +245,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
-                        <version>3.4</version>
+                        <version>3.5</version>
                         <executions>
                             <execution>
                                 <id>check</id>
