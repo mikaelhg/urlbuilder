@@ -46,12 +46,14 @@ Todo:
 Use with Maven:
 -----------------------
 
+For 1.3.2 and older:
+
 ```xml
 <repositories>
-  <repository>
-    <id>maven2.gueck.com-releases</id>
-    <url>http://maven2.gueck.com/releases</url>
-  </repository>
+    <repository>
+        <id>maven2.gueck.com-releases</id>
+        <url>http://maven2.gueck.com/releases</url>
+    </repository>
 </repositories>
 
 <dependencies>
@@ -59,6 +61,30 @@ Use with Maven:
         <groupId>mikaelhg</groupId>
         <artifactId>urlbuilder</artifactId>
         <version>1.3.2</version>
+    </dependency>
+</dependencies>
+```
+
+For 2.0.0-SNAPSHOT and newer (after Bintray creates the repo):
+
+
+```xml
+<repositories>
+    <repository>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+        <id>central</id>
+        <name>bintray</name>
+        <url>http://jcenter.bintray.com</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>io.mikael</groupId>
+        <artifactId>urlbuilder</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```

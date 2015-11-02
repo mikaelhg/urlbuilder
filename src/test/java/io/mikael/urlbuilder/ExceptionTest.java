@@ -1,7 +1,7 @@
-package gumi.builders;
+package io.mikael.urlbuilder;
 
-import gumi.builders.url.RuntimeMalformedURLException;
-import gumi.builders.url.RuntimeURISyntaxException;
+import io.mikael.urlbuilder.url.RuntimeMalformedURLException;
+import io.mikael.urlbuilder.url.RuntimeURISyntaxException;
 import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;

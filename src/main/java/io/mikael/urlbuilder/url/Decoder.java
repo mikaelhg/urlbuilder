@@ -13,9 +13,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package gumi.builders.url;
+package io.mikael.urlbuilder.url;
 
-import static gumi.builders.url.UrlParameterMultimap.*;
+import static io.mikael.urlbuilder.url.UrlParameterMultimap.*;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;

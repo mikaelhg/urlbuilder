@@ -1,6 +1,6 @@
-package gumi.builders;
+package io.mikael.urlbuilder;
 
-import gumi.builders.url.UrlParameterMultimap;
+import io.mikael.urlbuilder.url.UrlParameterMultimap;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;

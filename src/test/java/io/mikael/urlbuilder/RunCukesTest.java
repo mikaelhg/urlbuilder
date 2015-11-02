@@ -1,4 +1,4 @@
-package gumi.builders;
+package io.mikael.urlbuilder;
 
 
 import cucumber.api.CucumberOptions;

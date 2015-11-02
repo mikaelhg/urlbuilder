@@ -13,16 +13,16 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package gumi.builders.url;
+package io.mikael.urlbuilder.url;
 
 /**
- * A runtime exception for wrapping java.net.MalformedURLException.
+ * A runtime exception for wrapping java.net.URISyntaxException.
  *
  * @author Mikael Gueck gumi{@literal @}iki.fi
  */
-public class RuntimeMalformedURLException extends RuntimeException {
+public class RuntimeURISyntaxException extends RuntimeException {
 
-    public RuntimeMalformedURLException(final Throwable cause) {
+    public RuntimeURISyntaxException(final Throwable cause) {
         super(cause);
     }
 

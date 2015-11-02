@@ -1,10 +1,11 @@
-package gumi.builders;
+package io.mikael.urlbuilder;
 
 import static org.testng.Assert.*;
 
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
+
 import java.net.*;
 import java.util.List;
 

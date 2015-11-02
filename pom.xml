@@ -96,7 +96,7 @@
                 </executions>
                 <configuration>
                     <instructions>
-                        <Export-Package>gumi.builders.*</Export-Package>
+                        <Export-Package>io.mikael.urlbuilder.*</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
