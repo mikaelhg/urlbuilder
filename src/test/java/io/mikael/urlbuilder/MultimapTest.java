@@ -1,6 +1,6 @@
 package io.mikael.urlbuilder;
 
-import io.mikael.urlbuilder.url.UrlParameterMultimap;
+import io.mikael.urlbuilder.util.UrlParameterMultimap;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;

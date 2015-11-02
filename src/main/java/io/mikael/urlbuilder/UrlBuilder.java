@@ -15,9 +15,9 @@ limitations under the License.
 */
 package io.mikael.urlbuilder;
 
-import io.mikael.urlbuilder.url.*;
+import io.mikael.urlbuilder.util.*;
 
-import static io.mikael.urlbuilder.url.UrlParameterMultimap.*;
+import static io.mikael.urlbuilder.util.UrlParameterMultimap.*;
 
 import java.io.IOException;
 import java.net.*;

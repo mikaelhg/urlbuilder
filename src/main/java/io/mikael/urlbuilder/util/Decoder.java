@@ -13,9 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package io.mikael.urlbuilder.url;
-
-import static io.mikael.urlbuilder.url.UrlParameterMultimap.*;
+package io.mikael.urlbuilder.util;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -53,7 +51,7 @@ public class Decoder {
     }
 
     public UrlParameterMultimap parseQueryString(final String query) {
-        final UrlParameterMultimap ret = newMultimap();
+        final UrlParameterMultimap ret = UrlParameterMultimap.newMultimap();
         if (query == null || query.isEmpty()) {
             return ret;
         }

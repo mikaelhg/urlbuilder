@@ -13,9 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package io.mikael.urlbuilder.url;
-
-import static io.mikael.urlbuilder.url.Rfc3986Util.*;
+package io.mikael.urlbuilder.util;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -108,10 +106,10 @@ public class Encoder {
             final int codePoint = Character.codePointAt(inputChars, i);
             if (Character.isBmpCodePoint(codePoint)) {
                 final char c = Character.toChars(codePoint)[0];
-                if ((isPath && isPChar(c) && c != '+')
-                        || isFragment && isFragmentSafe(c)
+                if ((isPath && Rfc3986Util.isPChar(c) && c != '+')
+                        || isFragment && Rfc3986Util.isFragmentSafe(c)
                         || isUserInfo && c == ':'
-                        || isUnreserved(c))
+                        || Rfc3986Util.isUnreserved(c))
                 {
                     sb.append(c);
                     continue;

@@ -1,7 +1,7 @@
 package io.mikael.urlbuilder;
 
-import io.mikael.urlbuilder.url.RuntimeMalformedURLException;
-import io.mikael.urlbuilder.url.RuntimeURISyntaxException;
+import io.mikael.urlbuilder.util.RuntimeMalformedURLException;
+import io.mikael.urlbuilder.util.RuntimeURISyntaxException;
 import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
