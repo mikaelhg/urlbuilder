@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -29,7 +28,15 @@
         <url>https://github.com/mikaelhg/urlbuilder</url>
         <connection>scm:git:https://github.com/mikaelhg/urlbuilder.git</connection>
         <developerConnection>scm:git:git@github.com:mikaelhg/urlbuilder.git</developerConnection>
+        <tag>HEAD</tag>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/mikaelhg/public/io.mikael.urlbuilder</url>
+        </repository>
+    </distributionManagement>
 
     <prerequisites>
         <maven>3.3.3</maven>
