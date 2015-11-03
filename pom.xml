@@ -4,7 +4,7 @@
 
     <groupId>io.mikael</groupId>
     <artifactId>urlbuilder</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>2.0.2-SNAPSHOT</version>
 
     <licenses>
         <license>
@@ -33,7 +33,7 @@
     <distributionManagement>
         <repository>
             <id>bintray</id>
-            <url>https://api.bintray.com/maven/mikaelhg/public/io.mikael.urlbuilder/;publish=1</url>
+            <url>https://api.bintray.com/maven/mikaelhg/public/urlbuilder/;publish=1</url>
         </repository>
     </distributionManagement>
 
