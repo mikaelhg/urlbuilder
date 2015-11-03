@@ -46,6 +46,29 @@ Todo:
 Use with Maven:
 -----------------------
 
+For 2.0.5 and newer:
+
+
+```xml
+<repositories>
+    <repository>
+        <id>jcenter</id>
+        <url>https://jcenter.bintray.com/</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>io.mikael</groupId>
+        <artifactId>urlbuilder</artifactId>
+        <version>2.0.5</version>
+    </dependency>
+</dependencies>
+```
+
 For 1.3.2 and older:
 
 ```xml
@@ -61,30 +84,6 @@ For 1.3.2 and older:
         <groupId>mikaelhg</groupId>
         <artifactId>urlbuilder</artifactId>
         <version>1.3.2</version>
-    </dependency>
-</dependencies>
-```
-
-For 2.0.0-SNAPSHOT and newer (after Bintray creates the repo):
-
-
-```xml
-<repositories>
-    <repository>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-        <id>central</id>
-        <name>bintray</name>
-        <url>http://jcenter.bintray.com/mikaelhg/public/</url>
-    </repository>
-</repositories>
-
-<dependencies>
-    <dependency>
-        <groupId>io.mikael</groupId>
-        <artifactId>urlbuilder</artifactId>
-        <version>2.0.5</version>
     </dependency>
 </dependencies>
 ```
