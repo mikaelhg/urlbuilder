@@ -76,7 +76,7 @@ For 2.0.0-SNAPSHOT and newer (after Bintray creates the repo):
         </snapshots>
         <id>central</id>
         <name>bintray</name>
-        <url>http://jcenter.bintray.com/mikaelhg/public</url>
+        <url>http://jcenter.bintray.com/mikaelhg/public/</url>
     </repository>
 </repositories>
 
@@ -84,7 +84,7 @@ For 2.0.0-SNAPSHOT and newer (after Bintray creates the repo):
     <dependency>
         <groupId>io.mikael</groupId>
         <artifactId>urlbuilder</artifactId>
-        <version>2.0.1</version>
+        <version>2.0.5</version>
     </dependency>
 </dependencies>
 ```
