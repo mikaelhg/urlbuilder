@@ -4,7 +4,7 @@
 
     <groupId>io.mikael</groupId>
     <artifactId>urlbuilder</artifactId>
-    <version>2.0.5</version>
+    <version>2.0.6-SNAPSHOT</version>
 
     <licenses>
         <license>
@@ -27,7 +27,7 @@
         <url>https://github.com/mikaelhg/urlbuilder</url>
         <connection>scm:git:https://github.com/mikaelhg/urlbuilder.git</connection>
         <developerConnection>scm:git:git@github.com:mikaelhg/urlbuilder.git</developerConnection>
-        <tag>v2.0.5</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
