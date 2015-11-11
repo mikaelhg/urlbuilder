@@ -1,0 +1,9 @@
+^target/
+/target/
+/.idea
+/*.iml
+/nb-configuration.xml
+/.project
+/.classpath
+/.settings/
+/.gradle/
