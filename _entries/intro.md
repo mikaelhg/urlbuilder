@@ -1,12 +1,41 @@
 ---
 sectionid: intro
 sectionclass: h1
-title: Introduction
+title: Show me the code
 number: 1000
 ---
-Welcome to this demo (and documentation) of Docster. A Documentation Theme for jekyll. 
 
-Here we'll show you what the theme looks like and how you will use it. Docster makes setting up an organized Documentation a breeze.
-It has a sidebar, that is a table of contents and consists of links, that will scroll you to the respective section.
+Create and modify URLs and URL parameters easily, with a builder class.
 
-Docster is perfect for really long and complex as well as short and simple Docs.
+
+{% highlight java %}
+UrlBuilder.fromString("http://www.google.com/")
+    .addParameter("q", "charlie brown")
+    .toString() == "http://www.google.com/?q=charlie+brown"
+
+UrlBuilder.fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
+    .encodeAs("UTF-8")
+    .toString() == "http://foo/h%C3%B6pl%C3%A4"
+
+final UrlBuilder ub1 = UrlBuilder.fromEmpty()
+    .withScheme("http")
+    .withHost("www.example.com")
+    .withPath("/")
+    .addParameter("foo", "bar");
+
+final java.net.URI uri1 = ub1.toUri();
+
+try {
+    final java.net.URI uri2 = ub1.toUriWithException();
+} catch (java.net.URISyntaxException ex) {
+    // handle the exception
+}
+
+final java.net.URL url1 = ub1.toUrl();
+
+try {
+    final java.net.URL url2 = ub1.toUrlWithException();
+} catch (java.net.MalformedURLException ex) {
+    // handle the exception
+}
+{% endhighlight %}

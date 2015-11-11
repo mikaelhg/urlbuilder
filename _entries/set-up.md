@@ -1,16 +1,46 @@
 ---
 sectionid: set-up
 sectionclass: h1
-is-parent: yes
-title: Set Up
+title: Use with Maven
 number: 2000
 ---
-Setting Docster up is super simple. Just like with all jekyll-sites you just need a GitHub account to host it. Docster is independent of any plugins so the only requirement is a jekyll installation to check the result before pushing.
+For 2.0.5 and newer:
 
-So download this theme, navigate into the folder, open a terminal and type
+{% highlight xml %}
+<repositories>
+    <repository>
+        <id>jcenter</id>
+        <url>https://jcenter.bintray.com/</url>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
+</repositories>
 
-{% highlight bash %}
-jekyll serve
+<dependencies>
+    <dependency>
+        <groupId>io.mikael</groupId>
+        <artifactId>urlbuilder</artifactId>
+        <version>2.0.5</version>
+    </dependency>
+</dependencies>
 {% endhighlight %}
 
-You will then be able to see the page at **localhost:4000** and make your changes. When you are happy just push them to github in a gh-pages branch and you're site will be compiled by GitHub for you.
+For 1.3.2 and older:
+
+{% highlight xml %}
+<repositories>
+    <repository>
+        <id>maven2.gueck.com-releases</id>
+        <url>http://maven2.gueck.com/releases</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>mikaelhg</groupId>
+        <artifactId>urlbuilder</artifactId>
+        <version>1.3.2</version>
+    </dependency>
+</dependencies>
+{% endhighlight %}

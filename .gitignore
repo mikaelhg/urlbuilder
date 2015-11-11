@@ -7,3 +7,5 @@
 /.classpath
 /.settings/
 /.gradle/
+/site/
+/.sass-cache/

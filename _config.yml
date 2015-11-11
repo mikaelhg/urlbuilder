@@ -1,5 +1,5 @@
 full_rebuild: true
-name: UrlBuilder Documentation
+name: UrlBuilder
 author: Mikael Gueck
 version: 2.0.5
 encoding: utf-8
@@ -20,5 +20,7 @@ exclude: [
 .git,
 .gitignore,
 README.md,
-.sass-cache
+.sass-cache,
+urlbuilder.iml,
+target
 ]
