@@ -6,6 +6,10 @@
     <artifactId>urlbuilder</artifactId>
     <version>2.0.6-SNAPSHOT</version>
 
+    <name>urlbuilder</name>
+    <description>Create and modify URLs and URL parameters easily, with a builder class.</description>
+    <url>https://mikael.io/urlbuilder/</url>
+
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
