@@ -25,13 +25,13 @@ final class Rfc3986Util {
         Arrays.sort(SUB_DELIMITERS);
     }
 
-    public static boolean isFragmentSafe(final char c) {
+    static boolean isFragmentSafe(final char c) {
         return isPChar(c)
                 || c == '/'
                 || c == '?';
     }
 
-    public static boolean isPChar(final char c) {
+    static boolean isPChar(final char c) {
         // Excludes % used in %XX chars
         return isUnreserved(c)
                 || isSubDelimeter(c)
@@ -39,14 +39,14 @@ final class Rfc3986Util {
                 || c == '@';
     }
 
-    public static boolean isUnreserved(final char c) {
+    static boolean isUnreserved(final char c) {
         return ('a' <= c && c <= 'z') ||
                 ('A' <= c && c <= 'Z') ||
                 ('0' <= c && c <= '9') ||
                 (c == '-' || c == '.' || c == '_' || c == '~');
     }
 
-    public static boolean isSubDelimeter(final char c) {
+    private static boolean isSubDelimeter(final char c) {
         return Arrays.binarySearch(SUB_DELIMITERS, c) >= 0;
     }
 
