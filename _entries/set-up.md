@@ -4,24 +4,14 @@ sectionclass: h1
 title: Use with Maven
 number: 2000
 ---
-For 2.0.5 and newer:
+For 2.0.7 and newer:
 
 {% highlight xml %}
-<repositories>
-    <repository>
-        <id>jcenter</id>
-        <url>https://jcenter.bintray.com/</url>
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-    </repository>
-</repositories>
-
 <dependencies>
     <dependency>
         <groupId>io.mikael</groupId>
         <artifactId>urlbuilder</artifactId>
-        <version>2.0.5</version>
+        <version>2.0.7</version>
     </dependency>
 </dependencies>
 {% endhighlight %}
