@@ -285,7 +285,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>findbugs-maven-plugin</artifactId>
-                        <version>3.0.2</version>
+                        <version>3.0.3</version>
                         <configuration>
                             <effort>Max</effort>
                             <threshold>Low</threshold>
@@ -311,6 +311,8 @@
                                     <goal>check</goal>
                                 </goals>
                                 <configuration>
+                                    <printFailingErrors>true</printFailingErrors>
+                                    <verbose>true</verbose>
                                     <excludeFromFailureFile>exclude-pmd.properties</excludeFromFailureFile>
                                 </configuration>
                             </execution>
