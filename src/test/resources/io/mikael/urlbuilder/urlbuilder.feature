@@ -75,3 +75,8 @@ Feature: UrlBuilder url creation
       | http://a/b/c/g#s/../x        |
       | http:g                       |
     Then the urls stay the same after a roundtrip conversion
+
+
+  Scenario: Non-default port string
+    Given I create a builder from the URL http://www.example.com:8080/
+    Then the port should be 8080

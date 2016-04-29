@@ -2,6 +2,7 @@ package io.mikael.urlbuilder;
 
 import static org.testng.Assert.*;
 
+import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
@@ -119,5 +120,10 @@ public class UrlBuilderStepDefinitions {
     @Then("^the unicode path should be a playing card ace of spades$")
     public void the_unicode_path_should_be_a_playing_card_ace_of_spades() {
         assertEquals(builder.path, "/\uD83C\uDCA1");
+    }
+
+    @Then("^the port should be (\\d+)$")
+    public void thePortShouldBe(Integer port) throws Throwable {
+        assertEquals(builder.port, port, "Port doesn't match");
     }
 }
