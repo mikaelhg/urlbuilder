@@ -1,14 +1,17 @@
 package io.mikael.urlbuilder;
 
-import static org.testng.Assert.*;
-
-import cucumber.api.PendingException;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 public class UrlBuilderStepDefinitions {
 
@@ -126,4 +129,5 @@ public class UrlBuilderStepDefinitions {
     public void thePortShouldBe(Integer port) throws Throwable {
         assertEquals(builder.port, port, "Port doesn't match");
     }
+
 }

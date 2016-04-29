@@ -80,3 +80,10 @@ Feature: UrlBuilder url creation
   Scenario: Non-default port string
     Given I create a builder from the URL http://www.example.com:8080/
     Then the port should be 8080
+
+  Scenario: Path must start with a slash
+   Given I create an empty builder
+    When I set the schema to https
+     And I set the host to www.google.com
+     And I set the path to foo/bar
+    Then as a string it should be https://www.google.com/foo/bar

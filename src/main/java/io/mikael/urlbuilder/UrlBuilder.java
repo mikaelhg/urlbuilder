@@ -228,6 +228,11 @@ public final class UrlBuilder {
             out.append(Integer.toString(this.port));
         }
         if (null != this.path) {
+            if (null != this.hostName && this.path.length() > 0 && this.path.charAt(0) != '/') {
+                /* RFC 3986 section 3.3: If a URI contains an authority component, then the path component
+                   must either be empty or begin with a slash ("/") character. */
+                out.append('/');
+            }
             out.append(encoder.encodePath(this.path));
         }
         if (null != this.queryParametersMultimap && !this.queryParametersMultimap.isEmpty()) {
