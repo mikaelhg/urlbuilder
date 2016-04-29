@@ -9,7 +9,7 @@ Create and modify URLs and URL parameters easily, with a builder class.
 ```java
 UrlBuilder.fromString("http://www.google.com/")
     .addParameter("q", "charlie brown")
-    .toString() == "http://www.google.com/?q=charlie+brown"
+    .toString() === "http://www.google.com/?q=charlie+brown"
 
 UrlBuilder.fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
     .encodeAs("UTF-8")
@@ -38,10 +38,12 @@ try {
 }
 ```
 
+Builder instances are immutable, thread-safe and reusable. Every change creates a new instance.
+
 Todo:
 -----
 
-* More unit tests for corner cases (your help is needed!)
+* More unit tests for corner cases. Please send in pull requests, your help is needed.
 
 Use with Maven:
 -----------------------
