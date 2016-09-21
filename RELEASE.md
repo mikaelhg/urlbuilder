@@ -1,6 +1,6 @@
 How to release:
 
-Create a GPG key and push it out into the world.
+If you haven't done this before, create a GPG key and push it out into the world.
 
 ```
 j7 mvn -Prelease release:prepare
