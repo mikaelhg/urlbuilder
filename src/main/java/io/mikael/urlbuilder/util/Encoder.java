@@ -106,7 +106,7 @@ public class Encoder {
             final int codePoint = Character.codePointAt(inputChars, i);
             if (Character.isBmpCodePoint(codePoint)) {
                 final char c = Character.toChars(codePoint)[0];
-                if ((isPath && Rfc3986Util.isPChar(c) && c != '+')
+                if ((isPath && Rfc3986Util.isPChar(c))
                         || isFragment && Rfc3986Util.isFragmentSafe(c)
                         || isUserInfo && c == ':'
                         || Rfc3986Util.isUnreserved(c))

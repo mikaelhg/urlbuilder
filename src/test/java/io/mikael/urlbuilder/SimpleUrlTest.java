@@ -233,4 +233,11 @@ public class SimpleUrlTest {
         assertEquals(b.withFragment("anchor").toString(), "http://somehost.com/page#anchor");
     }
 
+    @Test
+    public void testWithAllowedPlusSignInPath() {
+        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page/++++");
+        assertEquals(b.toString(), "http://somehost.com/page/++++");
+    }
+
 }
+

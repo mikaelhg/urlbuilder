@@ -13,10 +13,10 @@ Feature: UrlBuilder url creation
     Given I create a builder from the URL http://www.example.com/a%20b/
     Then as a string it should be http://www.example.com/a%20b/
 
-  Scenario: Percent Encode a plus in the path
+  Scenario: Do not percent Encode a plus in the path
     Given I create a builder from the URL http://www.example.com/a+b%2b/
     Then the path should be /a+b+/
-      And as a string it should be http://www.example.com/a%2Bb%2B/
+      And as a string it should be http://www.example.com/a+b+/
 
   Scenario: From URL with allowed special characters in the path
     Given I create a builder from the URL http://example.com/a=&b/
