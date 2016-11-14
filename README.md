@@ -48,7 +48,7 @@ Todo:
 Use with Maven:
 -----------------------
 
-For 2.0.7 and newer:
+For 2.0.8 and newer:
 
 
 ```xml
@@ -56,7 +56,7 @@ For 2.0.7 and newer:
     <dependency>
         <groupId>io.mikael</groupId>
         <artifactId>urlbuilder</artifactId>
-        <version>2.0.7</version>
+        <version>2.0.8</version>
     </dependency>
 </dependencies>
 ```
