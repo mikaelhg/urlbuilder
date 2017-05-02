@@ -85,7 +85,7 @@ public class Encoder {
         return sb.toString();
     }
 
-    protected String encodeQueryElement(final String input) {
+    public String encodeQueryElement(final String input) {
         return urlEncode(input, IS_NOT_PATH, IS_NOT_FRAGMENT, IS_NOT_USERINFO);
     }
 
