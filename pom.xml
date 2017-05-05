@@ -4,7 +4,7 @@
 
     <groupId>io.mikael</groupId>
     <artifactId>urlbuilder</artifactId>
-    <version>2.0.9</version>
+    <version>2.0.10-SNAPSHOT</version>
 
     <name>urlbuilder</name>
     <description>Create and modify URLs and URL parameters easily, with a builder class.</description>
@@ -31,7 +31,7 @@
         <url>https://github.com/mikaelhg/urlbuilder</url>
         <connection>scm:git:https://github.com/mikaelhg/urlbuilder.git</connection>
         <developerConnection>scm:git:git@github.com:mikaelhg/urlbuilder.git</developerConnection>
-        <tag>2.0.9</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
