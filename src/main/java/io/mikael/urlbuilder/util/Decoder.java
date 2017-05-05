@@ -69,7 +69,7 @@ public class Decoder {
         return ret;
     }
 
-    protected byte[] nextDecodeableSequence(final String input, final int position) {
+    public byte[] nextDecodeableSequence(final String input, final int position) {
         final int len = input.length();
         final byte[] data = new byte[len];
         int j = 0;
@@ -105,7 +105,7 @@ public class Decoder {
         return sb.toString();
     }
 
-    protected String urlDecode(final String input, final boolean decodePlusAsSpace) {
+    public String urlDecode(final String input, final boolean decodePlusAsSpace) {
         final StringBuilder sb = new StringBuilder();
         final int len = input.length();
         for (int i = 0; i < len; i++) {

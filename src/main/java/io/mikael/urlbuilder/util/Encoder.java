@@ -96,7 +96,7 @@ public class Encoder {
         return urlEncode(input, IS_NOT_PATH, IS_FRAGMENT, IS_NOT_USERINFO);
     }
 
-    protected String urlEncode(final String input, final boolean isPath,
+    public String urlEncode(final String input, final boolean isPath,
             final boolean isFragment, final boolean isUserInfo)
     {
         final StringBuilder sb = new StringBuilder();
