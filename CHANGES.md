@@ -1,6 +1,12 @@
 Changelog
 
-## 2.0.0 (UNRELEASED)
+## 2.0.9
+
+* #41 and #42, make Encoder and Decoder methods public
+
+* Upgrade build dependencies
+
+## 2.0.0
 
 * Fix #1 - add W3C tests to the test set.
 
