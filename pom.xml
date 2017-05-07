@@ -112,6 +112,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version> <!-- Java 1.7 compatible -->
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>info.cukes</groupId>
             <artifactId>cucumber-java</artifactId>
             <version>1.2.5</version>
