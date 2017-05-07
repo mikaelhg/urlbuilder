@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-@CucumberOptions(format = "json:target/cucumber-report.json", strict = false)
+@CucumberOptions(format = "json:target/cucumber-report.json")
 public class RunCukesTest implements IHookable {
 
     @Test(groups = "cucumber", description = "Runs Cucumber Features", skipFailedInvocations = true)
