@@ -87,3 +87,8 @@ Feature: UrlBuilder url creation
      And I set the host to www.google.com
      And I set the path to foo/bar
     Then as a string it should be https://www.google.com/foo/bar
+
+  Scenario: Issue #43: Faulty fragment matching
+    Given I create a builder from the string http://localhost:5555/#/aresource?bparameter=cvalue
+    When I add the parameter "d" with the value "parameter"
+    Then as a string it should be http://localhost:5555/#/aresource?bparameter=cvalue&d=parameter

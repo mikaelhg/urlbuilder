@@ -68,6 +68,11 @@ public class UrlBuilderStepDefinitions {
         builder = builder.withPath(value);
     }
 
+    @When("^I add the parameter \"([^\"]*)\" with the value \"([^\"]*)\"$")
+    public void i_add_the_parameter_with_the_value(final String key, final String value) {
+        builder.addParameter(key, value);
+    }
+
     @Then("^the urls stay the same after a roundtrip conversion$")
     public void the_urls_stay_the_same_after_a_roundtrip_conversion() {
         for (final String url : urls) {
