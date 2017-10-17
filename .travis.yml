@@ -1,7 +1,8 @@
 language: java
 jdk:
-  - oraclejdk8
-  - oraclejdk7
+  - oraclejdk9
+  - openjdk8
+  - openjdk7
 install:
   - mvn clean install -DskipTests=true -B -V
 script:
