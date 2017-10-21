@@ -76,6 +76,15 @@ Feature: UrlBuilder url creation
       | http:g                       |
     Then the urls stay the same after a roundtrip conversion
 
+  Scenario: Default Google Translate link, a mix of escaped and unescaped characters
+    Given I create a builder from the string http://translate.google.com/translate?hl=auto&langpair=auto|zh-TW&u=http%3A%2F%2Fus6.campaign-archive1.com%2F%3Fu%3Dcbc96c3d7a%26id%3D17fdad33a4%26e%3D
+    Then as a string it should be http://translate.google.com/translate?hl=auto&langpair=auto%7Czh-TW&u=http%3A%2F%2Fus6.campaign-archive1.com%2F%3Fu%3Dcbc96c3d7a%26id%3D17fdad33a4%26e%3D
+    Then as a URI it should be http://translate.google.com/translate?hl=auto&langpair=auto%7Czh-TW&u=http%3A%2F%2Fus6.campaign-archive1.com%2F%3Fu%3Dcbc96c3d7a%26id%3D17fdad33a4%26e%3D
+
+  Scenario: Escaped Google Translate link
+    Given I create a builder from the string http://translate.google.com/translate?hl=auto&langpair=auto%7Czh-TW&u=http%3A%2F%2Fus6.campaign-archive1.com%2F%3Fu%3Dcbc96c3d7a%26id%3D17fdad33a4%26e%3D
+    Then as a string it should be http://translate.google.com/translate?hl=auto&langpair=auto%7Czh-TW&u=http%3A%2F%2Fus6.campaign-archive1.com%2F%3Fu%3Dcbc96c3d7a%26id%3D17fdad33a4%26e%3D
+    Then as a URI it should be http://translate.google.com/translate?hl=auto&langpair=auto%7Czh-TW&u=http%3A%2F%2Fus6.campaign-archive1.com%2F%3Fu%3Dcbc96c3d7a%26id%3D17fdad33a4%26e%3D
 
   Scenario: Non-default port string
     Given I create a builder from the URL http://www.example.com:8080/

@@ -80,6 +80,11 @@ public class UrlBuilderStepDefinitions {
         assertEquals(builder.toString(), result);
     }
 
+    @Then("^as a URI it should be (.*)$")
+    public void as_a_uri_string_it_should_be_x(final String result) {
+        assertEquals(builder.toUri().toString(), result);
+    }
+
     @Then("^as a (.*) encoded string it should be (.*)$")
     public void as_a_y_encoded_string_it_should_be_x(final String encoding, final String result) {
         assertEquals(builder.encodeAs(encoding).toString(), result);
