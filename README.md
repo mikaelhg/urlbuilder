@@ -7,10 +7,12 @@ Java URL builder
 
 Create and modify URLs and URL parameters easily, with a builder class.
 
+Builder instances are immutable, thread-safe and reusable. Every change creates a new instance.
+
 ```java
 UrlBuilder.fromString("http://www.google.com/")
     .addParameter("q", "charlie brown")
-    .toString() === "http://www.google.com/?q=charlie+brown"
+    .toString() == "http://www.google.com/?q=charlie+brown"
 
 UrlBuilder.fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
     .encodeAs("UTF-8")
@@ -39,8 +41,6 @@ try {
 }
 ```
 
-Builder instances are immutable, thread-safe and reusable. Every change creates a new instance.
-
 Todo:
 -----
 
@@ -55,25 +55,6 @@ Use with Maven:
         <groupId>io.mikael</groupId>
         <artifactId>urlbuilder</artifactId>
         <version>2.0.9</version>
-    </dependency>
-</dependencies>
-```
-
-For 1.3.2 and older:
-
-```xml
-<repositories>
-    <repository>
-        <id>maven2.gueck.com-releases</id>
-        <url>http://maven2.gueck.com/releases</url>
-    </repository>
-</repositories>
-
-<dependencies>
-    <dependency>
-        <groupId>mikaelhg</groupId>
-        <artifactId>urlbuilder</artifactId>
-        <version>1.3.2</version>
     </dependency>
 </dependencies>
 ```

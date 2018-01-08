@@ -169,7 +169,7 @@ public class SimpleUrlTest {
     @Test
     public void parsePortAndHostname() {
         UrlBuilder b = UrlBuilder.fromString("http://foo:8080/foo");
-        assertEquals(b.port, new Integer(8080));
+        assertEquals(b.port, Integer.valueOf(8080));
         assertEquals(b.hostName, "foo");
     }
 
