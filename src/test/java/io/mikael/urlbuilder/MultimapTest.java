@@ -13,7 +13,7 @@ import java.util.*;
 public class MultimapTest {
 
     private static Map.Entry<String, String> newEntry(final String key, final String value) {
-        return new AbstractMap.SimpleImmutableEntry<String, String>(key, value);
+        return new AbstractMap.SimpleImmutableEntry<>(key, value);
     }
 
     @Test
