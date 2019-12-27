@@ -430,4 +430,25 @@ public final class UrlBuilder {
         return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
+    /**
+     * Add URI path segments.
+     */
+    public UrlBuilder addPathSegments(final String ... pathSegments) {
+        final StringBuilder sb = new StringBuilder(this.path);
+        for (final String p : pathSegments) {
+            final char lastChar = sb.charAt(sb.length() - 1);
+            final char firstChar = p.charAt(0);
+            if ('/' == lastChar && '/' == firstChar) {
+                sb.append(p.substring(1));
+            } else if ('/' == lastChar || '/' == firstChar) {
+                sb.append(p);
+            } else {
+                sb.append('/');
+                sb.append(p);
+            }
+        }
+        final String path = sb.toString();
+        return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+    }
+
 }

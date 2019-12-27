@@ -239,5 +239,29 @@ public class SimpleUrlTest {
         assertEquals(b.toString(), "http://somehost.com/page/++++");
     }
 
+    @Test
+    public void testSimpleSegments() {
+        UrlBuilder b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a", "b", "c");
+        assertEquals(b.toString(), "http://somehost.com/page/a/b/c");
+    }
+
+    @Test
+    public void testSimpleDoubleSegments() {
+        UrlBuilder b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a/1", "b/2", "c/3");
+        assertEquals(b.toString(), "http://somehost.com/page/a/1/b/2/c/3");
+    }
+
+    @Test
+    public void testSegmentSlashes() {
+        UrlBuilder b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a/1/", "/b/2", "/c/3");
+        assertEquals(b.toString(), "http://somehost.com/page/a/1/b/2/c/3");
+    }
+
 }
 
