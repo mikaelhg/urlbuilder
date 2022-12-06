@@ -1,11 +1,11 @@
 package io.mikael.urlbuilder;
 
 import io.mikael.urlbuilder.util.UrlParameterMultimap;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Ideally, these tests should provide 100% coverage for UrlParameterMultimap.
@@ -46,12 +46,14 @@ public class MultimapTest {
         assertEquals(m1.flatEntryList().get(2), newEntry("c", "3"));
     }
 
-    @Test(expectedExceptions = UnsupportedOperationException.class)
+    @Test
     public void mutateImmutableParameterMap() {
-        final UrlParameterMultimap m1 = UrlParameterMultimap.newMultimap();
-        m1.add("a", "1").add("b", "2").add("c", "3");
-        final UrlParameterMultimap.Immutable i1 = m1.immutable();
-        i1.add("d", "4");
+        assertThrows(UnsupportedOperationException.class, () -> {
+            final UrlParameterMultimap m1 = UrlParameterMultimap.newMultimap();
+            m1.add("a", "1").add("b", "2").add("c", "3");
+            final UrlParameterMultimap.Immutable i1 = m1.immutable();
+            i1.add("d", "4");
+        });
     }
 
     @Test
@@ -76,29 +78,34 @@ public class MultimapTest {
         assertTrue(parameterMap.containsValue("value2"));
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void nullContainsKey() {
-        newMapWithContent().containsKey(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> newMapWithContent().containsKey(null));
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void nullContainsValue() {
-        newMapWithContent().containsValue(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> newMapWithContent().containsValue(null));
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void nullRemove() {
-        newMapWithContent().remove(null);
+        assertThrows(IllegalArgumentException.class,
+                () -> newMapWithContent().remove(null));
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void nullRemove2() {
-        newMapWithContent().remove("", null);
+        assertThrows(IllegalArgumentException.class,
+                () -> newMapWithContent().remove("", null));
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test
     public void nullRemove3() {
-        newMapWithContent().remove(null, "");
+        assertThrows(IllegalArgumentException.class,
+                () -> newMapWithContent().remove(null, ""));
     }
 
     @Test
