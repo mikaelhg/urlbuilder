@@ -1,9 +1,14 @@
 package io.mikael.urlbuilder;
 
+import io.cucumber.junit.platform.engine.Cucumber;
+import org.junit.platform.suite.api.ConfigurationParameter;
+import org.junit.platform.suite.api.SelectClasspathResource;
+import org.junit.platform.suite.api.Suite;
 
-import cucumber.api.CucumberOptions;
-import cucumber.api.testng.AbstractTestNGCucumberTests;
+import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
 
-@CucumberOptions(plugin = "json:target/cucumber-report.json")
-public class RunCukesTest extends AbstractTestNGCucumberTests {
+@Suite
+@SelectClasspathResource("io/mikael")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "io.mikael")
+public class RunCukesTest {
 }

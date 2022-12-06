@@ -2,31 +2,37 @@ package io.mikael.urlbuilder;
 
 import io.mikael.urlbuilder.util.RuntimeMalformedURLException;
 import io.mikael.urlbuilder.util.RuntimeURISyntaxException;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class ExceptionTest {
 
-    @Test(expectedExceptions = RuntimeURISyntaxException.class)
+    @Test
     public void runtimeUriSyntaxExceptionTest() {
-        UrlBuilder.empty().withHost("%2").toUri();
+        assertThrows(RuntimeURISyntaxException.class,
+                () -> UrlBuilder.empty().withHost("%2").toUri());
     }
 
-    @Test(expectedExceptions = URISyntaxException.class)
-    public void uriSyntaxExceptionTest() throws URISyntaxException {
-        UrlBuilder.empty().withHost("%2").toUriWithException();
+    @Test
+    public void uriSyntaxExceptionTest() {
+        assertThrows(URISyntaxException.class,
+                () -> UrlBuilder.empty().withHost("%2").toUriWithException());
     }
 
-    @Test(expectedExceptions = RuntimeMalformedURLException.class)
+    @Test
     public void runtimeMalformedURLExceptionTest() {
-        UrlBuilder.empty().toUrl();
+        assertThrows(RuntimeMalformedURLException.class,
+                () -> UrlBuilder.empty().toUrl());
     }
 
-    @Test(expectedExceptions = MalformedURLException.class)
-    public void malformedURLExceptionTest() throws MalformedURLException {
-        UrlBuilder.empty().toUrlWithException();
+    @Test
+    public void malformedURLExceptionTest() {
+        assertThrows(MalformedURLException.class,
+                () -> UrlBuilder.empty().toUrlWithException());
     }
 
 }

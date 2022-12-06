@@ -1,5 +1,7 @@
 ^target/
 /target/
+^build/
+/build/
 /.idea
 /*.iml
 /nb-configuration.xml

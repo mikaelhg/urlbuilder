@@ -1,11 +1,12 @@
 package io.mikael.urlbuilder;
 
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.*;
 import java.util.Arrays;
 
-import static org.testng.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * A few simple, handwritten, non-datadriven tests to get started.
@@ -43,9 +44,10 @@ public class SimpleUrlTest {
         assertEquals(ub3.hostName, "");
     }
 
-    @Test(expectedExceptions = NumberFormatException.class)
+    @Test
     public void brokenUrlEncodingTest() throws Exception {
-        UrlBuilder.fromString("http://localhost/%ax");
+        assertThrows(NumberFormatException.class,
+                () -> UrlBuilder.fromString("http://localhost/%ax"));
     }
 
     @Test
