@@ -9,13 +9,13 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.cucumber:cucumber-java:7.9.0")
-    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.9.0") {
+    testImplementation("io.cucumber:cucumber-java:7.12.0")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.12.0") {
         exclude("org.junit.vintage:vintage-engine")
     }
-    testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    testImplementation("org.junit.platform:junit-platform-suite-engine:1.9.3")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
 }
 
 group = "io.mikael"
