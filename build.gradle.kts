@@ -41,7 +41,7 @@ tasks.spotbugsMain {
     reports.create("html") {
         required.set(true)
         outputLocation.set(file("$buildDir/reports/spotbugs.html"))
-        setStylesheet("fancy-hist.xsl")
+        setStylesheet("plain.xsl")
     }
 }
 
@@ -51,14 +51,14 @@ publishing {
     }
 }
 
-tasks.withType<JavaCompile>() {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-tasks.withType<Javadoc>() {
+tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
 }
 
-tasks.named<Test>("test") {
+tasks.test {
     useJUnitPlatform()
 }
