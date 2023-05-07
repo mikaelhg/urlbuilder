@@ -38,11 +38,16 @@ tasks.jacocoTestReport {
 }
 
 tasks.spotbugsMain {
+    excludeFilter.set(file("spotbugs-exclude.xml"))
     reports.create("html") {
         required.set(true)
         outputLocation.set(file("$buildDir/reports/spotbugs.html"))
         setStylesheet("plain.xsl")
     }
+}
+
+tasks.spotbugsTest {
+    enabled = false
 }
 
 publishing {
