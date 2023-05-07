@@ -1,10 +1,12 @@
 plugins {
+    java
     `java-library`
     `maven-publish`
+    jacoco
+    id("com.github.spotbugs") version "5.0.14"
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
 }
 
@@ -22,6 +24,26 @@ group = "io.mikael"
 version = "2.0.10-SNAPSHOT"
 description = "urlbuilder"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(8))
+    }
+}
+
+tasks.jacocoTestReport {
+    reports {
+        csv.required.set(true)
+    }
+}
+
+tasks.spotbugsMain {
+    reports.create("html") {
+        required.set(true)
+        outputLocation.set(file("$buildDir/reports/spotbugs.html"))
+        setStylesheet("fancy-hist.xsl")
+    }
+}
 
 publishing {
     publications.create<MavenPublication>("maven") {
