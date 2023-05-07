@@ -1,6 +1,5 @@
 package io.mikael.urlbuilder;
 
-import io.cucumber.junit.platform.engine.Cucumber;
 import org.junit.platform.suite.api.ConfigurationParameter;
 import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
