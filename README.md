@@ -46,6 +46,17 @@ Todo:
 
 * More unit tests for corner cases. Please send in pull requests, your help is needed.
 
+Use with Gradle:
+-----------------------
+
+```kotlin
+implementation("io.mikael:urlbuilder:2.0.9")
+```
+
+```groovy
+implementation "io.mikael:urlbuilder:2.0.9"
+```
+
 Use with Maven:
 -----------------------
 
