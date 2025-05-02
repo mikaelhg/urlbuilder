@@ -22,6 +22,7 @@ import static io.mikael.urlbuilder.util.UrlParameterMultimap.*;
 import java.io.IOException;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -37,7 +38,7 @@ import java.util.regex.Pattern;
  */
 public final class UrlBuilder {
 
-    private static final Charset DEFAULT_ENCODING = Charset.forName("UTF-8");
+    private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
 
     private static final Pattern URI_PATTERN =
             Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
