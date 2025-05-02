@@ -75,11 +75,17 @@ public final class UrlBuilder {
         this(null, null, null, null, null, null, null, null, null);
     }
 
-    private UrlBuilder(final Decoder decoder, final Encoder encoder,
-            final String scheme, final String userInfo,
-            final String hostName, final Integer port, final String path,
-            final UrlParameterMultimap queryParametersMultimap, final String fragment)
-    {
+    private UrlBuilder(
+        final Decoder decoder,
+        final Encoder encoder,
+        final String scheme,
+        final String userInfo,
+        final String hostName,
+        final Integer port,
+        final String path,
+        final UrlParameterMultimap queryParametersMultimap,
+        final String fragment
+    ) {
         if (null == decoder) {
             this.decoder = new Decoder(DEFAULT_ENCODING);
         } else {
@@ -111,11 +117,17 @@ public final class UrlBuilder {
         return new UrlBuilder();
     }
 
-    protected static UrlBuilder of(final Decoder decoder, final Encoder encoder,
-            final String scheme, final String userInfo,
-            final String hostName, final Integer port, final String path,
-            final UrlParameterMultimap queryParameters, final String fragment)
-    {
+    private static UrlBuilder of(
+        final Decoder decoder,
+        final Encoder encoder,
+        final String scheme,
+        final String userInfo,
+        final String hostName,
+        final Integer port,
+        final String path,
+        final UrlParameterMultimap queryParameters,
+        final String fragment
+    ) {
         return new UrlBuilder(decoder, encoder, scheme, userInfo, hostName, port, path, queryParameters, fragment);
     }
 
@@ -254,7 +266,7 @@ public final class UrlBuilder {
             out.append(Integer.toString(this.port));
         }
         if (null != this.path) {
-            if (null != this.hostName && this.path.length() > 0 && this.path.charAt(0) != '/') {
+            if (null != this.hostName && !this.path.isEmpty() && this.path.charAt(0) != '/') {
                 /* RFC 3986 section 3.3: If a URI contains an authority component, then the path component
                    must either be empty or begin with a slash ("/") character. */
                 out.append('/');
