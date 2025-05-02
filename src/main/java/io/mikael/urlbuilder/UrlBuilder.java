@@ -29,12 +29,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Build and manipulate URLs easily. Instances of this class are immutable
- * after their constructor returns.
+ * A utility class for building and manipulating URLs.
  *
- * URL: http://www.ietf.org/rfc/rfc1738.txt
- * URI: http://tools.ietf.org/html/rfc3986
- * @author Mikael Gueck gumi{@literal @}iki.fi
+ * <p>Instances of this class are immutable after construction.</p>
+ *
+ * <p>References:
+ * <ul>
+ *   <li>URL specification: <a href="http://www.ietf.org/rfc/rfc1738.txt">RFC 1738</a></li>
+ *   <li>URI specification: <a href="http://tools.ietf.org/html/rfc3986">RFC 3986</a></li>
+ * </ul>
+ * </p>
+ *
+ * @author Mikael Gueck {@literal <gumi@iki.fi>}
  */
 public final class UrlBuilder {
 
@@ -122,33 +128,47 @@ public final class UrlBuilder {
     }
 
     /**
-     * Construct a UrlBuilder from a full or partial URL string. When percent-decoding the query parameters, assume that
-     * they were encoded with <b>inputEncoding</b>.
+     * Constructs a UrlBuilder from a full or partial URL string.
      *
-     * @throws NumberFormatException
-     *             if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
+     * <p>When percent-decoding the query parameters, assumes that they were encoded with
+     * <b>inputEncoding</b>.</p>
+     *
+     * @throws NumberFormatException if the input contains:
+     *         <ul>
+     *           <li>An invalid percent-encoding sequence (%ax)</li>
+     *           <li>A non-numeric port number</li>
+     *         </ul>
      */
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
         return fromString(url, Charset.forName(inputEncoding));
     }
 
     /**
-     * Construct a UrlBuilder from a full or partial URL string. When percent-decoding the query parameters, assume that
-     * they were encoded with <b>inputEncoding</b>.
+     * Constructs a {@code UrlBuilder} from a full or partial URL string.
      *
-     * @throws NumberFormatException
-     *             if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
+     * <p>When percent-decoding query parameters, assumes they were encoded using
+     * the specified {@code inputEncoding}.</p>
+     *
+     * @throws NumberFormatException if the input contains:
+     *         <ul>
+     *           <li>An invalid percent-encoding sequence (e.g., {@code %ax})</li>
+     *           <li>A non-numeric port number</li>
+     *         </ul>
      */
     public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
         return fromString(url, new Decoder(inputEncoding));
     }
 
     /**
-     * Construct a UrlBuilder from a full or partial URL string. When percent-decoding the query parameters, use the
-     * supplied decoder.
+     * Constructs a {@code UrlBuilder} from a full or partial URL string.
      *
-     * @throws NumberFormatException
-     *             if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
+     * <p>Uses the provided decoder for percent-decoding query parameters.</p>
+     *
+     * @throws NumberFormatException if the input contains:
+     *         <ul>
+     *           <li>An invalid percent-encoding sequence (e.g., {@code %ax})</li>
+     *           <li>A non-numeric port number</li>
+     *         </ul>
      */
     public static UrlBuilder fromString(final String url, final Decoder decoder) {
         if (url == null || url.isEmpty()) {
@@ -185,7 +205,7 @@ public final class UrlBuilder {
     }
 
     /**
-     * Construct a UrlBuilder from a {@link java.net.URI}.
+     * Constructs a {@link UrlBuilder} from a {@link java.net.URI}.
      */
     public static UrlBuilder fromUri(final URI uri) {
         final Decoder decoder = new Decoder(DEFAULT_ENCODING);
@@ -198,8 +218,13 @@ public final class UrlBuilder {
     }
 
     /**
-     * Construct a UrlBuilder from a {@link java.net.URL}.
-     * @throws NumberFormatException if the input contains a invalid percent-encoding sequence (%ax) or a non-numeric port
+     * Constructs a {@link UrlBuilder} from a {@link java.net.URL}.
+     *
+     * @throws NumberFormatException if the URL contains:
+     *         <ul>
+     *           <li>An invalid percent-encoding sequence (e.g., {@code %ax})</li>
+     *           <li>A non-numeric port number</li>
+     *         </ul>
      */
     public static UrlBuilder fromUrl(final URL url) {
         final Decoder decoder = new Decoder(DEFAULT_ENCODING);
@@ -328,7 +353,9 @@ public final class UrlBuilder {
     }
 
     /**
-     * Set the port. Use <tt>null</tt> to denote the protocol's default port.
+     * Sets the port number.
+     *
+     * <p>Use {@code null} to indicate the protocol's default port.</p>
      */
     public UrlBuilder withPort(final Integer port) {
         return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
@@ -357,7 +384,11 @@ public final class UrlBuilder {
     }
 
     /**
-     * Sets the query parameters to a deep copy of the input parameter. Use <tt>null</tt> to remove the whole section.
+     * Sets the query parameters to a deep copy of the specified parameters.
+     *
+     * <p>Passing {@code null} will remove the entire query section.</p>
+     *
+     * @param parameters the query parameters to copy (may be {@code null})
      */
     public UrlBuilder withQuery(final UrlParameterMultimap query) {
         final UrlParameterMultimap q;

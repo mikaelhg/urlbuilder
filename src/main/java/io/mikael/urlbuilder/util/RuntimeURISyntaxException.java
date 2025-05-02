@@ -15,24 +15,41 @@ limitations under the License.
 */
 package io.mikael.urlbuilder.util;
 
+import java.util.Objects;
+
 /**
- * A runtime exception for wrapping java.net.URISyntaxException.
+ * Unchecked exception wrapper for {@link java.net.URISyntaxException}.
+ * <p>
+ * This exception converts checked {@code URISyntaxException}s into unchecked exceptions
+ * for cleaner error handling in cases where URI syntax validation failures
+ * should be treated as unrecoverable errors.
+ * </p>
  *
- * @author Mikael Gueck gumi{@literal @}iki.fi
+ * @author Mikael Gueck <a href="mailto:gumi@iki.fi">gumi@iki.fi</a>
  */
 public class RuntimeURISyntaxException extends RuntimeException {
 
+    /**
+     * Constructs a new runtime URI syntax exception with the specified cause.
+     *
+     * @param cause the underlying {@code URISyntaxException} (must not be {@code null})
+     * @throws NullPointerException if the cause is {@code null}
+     */
     public RuntimeURISyntaxException(final Throwable cause) {
-        super(cause);
+        super(Objects.requireNonNull(cause, "Cause must not be null"));
     }
 
     /**
-     * We're not interested in the wrapper's stack trace.
-     * @return null
+     * Suppresses stack trace generation for performance optimization.
+     * <p>
+     * Since this is a wrapper exception, the original exception's stack trace
+     * provides sufficient debugging information.
+     * </p>
+     *
+     * @return always {@code null}
      */
     @Override
     public Throwable fillInStackTrace() {
         return null;
     }
-
 }

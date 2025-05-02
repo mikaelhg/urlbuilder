@@ -16,9 +16,13 @@ limitations under the License.
 package io.mikael.urlbuilder.util;
 
 /**
- * A runtime exception for wrapping java.net.MalformedURLException.
+ * Runtime exception wrapper for {@link java.net.MalformedURLException}.
+ * <p>
+ * This exception is used to convert checked {@code MalformedURLException}s
+ * into unchecked exceptions.
+ * </p>
  *
- * @author Mikael Gueck gumi{@literal @}iki.fi
+ * @author Mikael Gueck <a href="mailto:gumi@iki.fi">gumi@iki.fi</a>
  */
 public class RuntimeMalformedURLException extends RuntimeException {
 
@@ -27,8 +31,13 @@ public class RuntimeMalformedURLException extends RuntimeException {
     }
 
     /**
-     * We're not interested in the wrapper's stack trace.
-     * @return null
+     * Returns {@code null} to suppress the stack trace.
+     * <p>
+     * This implementation is optimized for performance by avoiding the
+     * expensive stack trace collection process.
+     * </p>
+     *
+     * @return always {@code null}
      */
     @Override
     public Throwable fillInStackTrace() {
