@@ -1,8 +1,7 @@
 Java URL builder
 ================
 
-[![Build Status](https://travis-ci.org/mikaelhg/urlbuilder.png?branch=master)](https://travis-ci.org/mikaelhg/urlbuilder)
-[![Coverage Status](https://coveralls.io/repos/mikaelhg/urlbuilder/badge.svg?branch=master)](https://coveralls.io/r/mikaelhg/urlbuilder?branch=master)
+[![Build Status](https://github.com/mikaelhg/urlbuilder/actions/workflows/pr_and_master.yaml/badge.svg)](https://travis-ci.org/mikaelhg/urlbuilder)
 [![Maven Central](https://img.shields.io/maven-central/v/io.mikael/urlbuilder.svg)](https://repo1.maven.org/maven2/io/mikael/urlbuilder/)
 
 Create and modify URLs and URL parameters easily, with a builder class.
