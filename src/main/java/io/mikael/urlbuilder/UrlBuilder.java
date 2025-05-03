@@ -35,8 +35,8 @@ import java.util.regex.Pattern;
  *
  * <p>References:
  * <ul>
- *   <li>URL specification: <a href="http://www.ietf.org/rfc/rfc1738.txt">RFC 1738</a></li>
- *   <li>URI specification: <a href="http://tools.ietf.org/html/rfc3986">RFC 3986</a></li>
+ *   <li>URL specification: <a href="https://tools.ietf.org/html/rfc1738">RFC 1738</a></li>
+ *   <li>URI specification: <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a></li>
  * </ul>
  * </p>
  *

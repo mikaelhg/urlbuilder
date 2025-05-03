@@ -22,7 +22,7 @@ package io.mikael.urlbuilder.util;
  * into unchecked exceptions.
  * </p>
  *
- * @author Mikael Gueck <a href="mailto:gumi@iki.fi">gumi@iki.fi</a>
+ * @author Mikael Gueck {@literal <gumi@iki.fi>}
  */
 public class RuntimeMalformedURLException extends RuntimeException {
 

@@ -25,7 +25,7 @@ import java.util.Objects;
  * should be treated as unrecoverable errors.
  * </p>
  *
- * @author Mikael Gueck <a href="mailto:gumi@iki.fi">gumi@iki.fi</a>
+ * @author Mikael Gueck {@literal <gumi@iki.fi>}
  */
 public class RuntimeURISyntaxException extends RuntimeException {
 
