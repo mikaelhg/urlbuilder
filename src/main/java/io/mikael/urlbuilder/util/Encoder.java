@@ -18,7 +18,6 @@ package io.mikael.urlbuilder.util;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -99,39 +98,44 @@ public class Encoder {
     public String urlEncode(final String input, final boolean isPath,
             final boolean isFragment, final boolean isUserInfo)
     {
-        final StringBuilder sb = new StringBuilder();
-        final char[] inputChars = input.toCharArray();
-        for (int i = 0; i < Character.codePointCount(inputChars, 0, inputChars.length); i++) {
-            final CharBuffer cb;
-            final int codePoint = Character.codePointAt(inputChars, i);
-            if (Character.isBmpCodePoint(codePoint)) {
-                final char c = Character.toChars(codePoint)[0];
-                if ((isPath && Rfc3986Util.isPChar(c))
-                        || isFragment && Rfc3986Util.isFragmentSafe(c)
-                        || isUserInfo && c == ':'
-                        || Rfc3986Util.isUnreserved(c))
-                {
-                    sb.append(c);
-                    continue;
-                } else {
-                    cb = CharBuffer.allocate(1);
-                    cb.append(c);
-                }
-            } else {
-                cb = CharBuffer.allocate(2);
-                cb.append(Character.highSurrogate(codePoint));
-                cb.append(Character.lowSurrogate(codePoint));
-            }
-            cb.rewind();
-            final ByteBuffer bb = outputEncoding.encode(cb);
-            for (int j = 0; j < bb.limit(); j++) {
-                // Until someone has a real problem with the performance of this bit,
-                // I will leave this less optimal, but much simpler implementation in place
-                sb.append('%');
-                sb.append(String.format(Locale.US, "%1$02X", bb.get(j)));
-            }
-        }
-        return sb.toString();
+        return input.codePoints()
+                .sequential()
+                .mapToObj(Character::toChars)
+                .collect(StringBuffer::new,
+                        (sb, chars) -> {
+                            boolean needsEncoding = true;
+                            if (chars.length == 1) {
+                                char c = chars[0];
+                                if ((isPath && Rfc3986Util.isPChar(c))
+                                        || (isFragment && Rfc3986Util.isFragmentSafe(c))
+                                        || (isUserInfo && c == ':')
+                                        || Rfc3986Util.isUnreserved(c)) {
+                                    sb.append(c);
+                                    needsEncoding = false;
+                                }
+                            }
+                            if (needsEncoding) {
+                                final CharBuffer cb = CharBuffer.wrap(chars);
+                                final ByteBuffer bb = outputEncoding.encode(cb);
+                                for (int j = 0; j < bb.limit(); j++) {
+                                    sb.append(appendPercentEncodedByte(bb.get(j)));
+                                }
+                            }
+                        },
+                        StringBuffer::append
+                )
+                .toString();
+    }
+
+    static char[] appendPercentEncodedByte(final byte b) {
+        int unsignedByte = b & 0xFF;
+        int highNibble = (unsignedByte >> 4) & 0xF;
+        int lowNibble = unsignedByte & 0xF;
+        return new char[] {'%', getHexChar(highNibble), getHexChar(lowNibble) };
+    }
+
+    static char getHexChar(final int nibble) {
+        return (nibble < 10) ? (char) ('0' + nibble) : (char) ('A' - 10 + nibble);
     }
 
 }
