@@ -57,7 +57,7 @@ Feature: UrlBuilder url creation
 
   Scenario: Round trip conversion
     Given I have these URLs:
-      | https://                     |
+      | https:                       |
       | https://www                  |
       | https://www:1234             |
       | https://www:1234/            |
