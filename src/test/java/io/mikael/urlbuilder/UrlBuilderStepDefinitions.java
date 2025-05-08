@@ -35,8 +35,9 @@ public class UrlBuilderStepDefinitions {
 
     @Given("^I create a builder from a URI (.*) with a null path and query$")
     public void i_create_a_builder_from_a_uri_with_a_null_path_and_query(final String uriString)
-            throws URISyntaxException {
-        URI uri = new URI(uriString);
+            throws URISyntaxException
+    {
+        final URI uri = new URI(uriString);
         assertNull(uri.getPath());
         assertNull(uri.getQuery());
         builder = UrlBuilder.fromUri(uri);
@@ -76,22 +77,22 @@ public class UrlBuilderStepDefinitions {
 
     @Then("^as a string it should be (.*)$")
     public void as_a_string_it_should_be_x(final String result) {
-        assertEquals(builder.toString(), result);
+        assertEquals(result, builder.toString());
     }
 
     @Then("^as a URI it should be (.*)$")
     public void as_a_uri_string_it_should_be_x(final String result) {
-        assertEquals(builder.toUri().toString(), result);
+        assertEquals(result, builder.toUri().toString());
     }
 
     @Then("^as a (.*) encoded string it should be (.*)$")
     public void as_a_y_encoded_string_it_should_be_x(final String encoding, final String result) {
-        assertEquals(builder.encodeAs(encoding).toString(), result);
+        assertEquals(result, builder.encodeAs(encoding).toString());
     }
 
     @Then("^the user info should be (.*)$")
     public void the_user_info_should_be_u(final String userInfo) {
-        assertEquals(builder.userInfo, userInfo);
+        assertEquals(userInfo, builder.userInfo);
     }
 
     @Then("^the host name should be (.*)$")
@@ -101,37 +102,37 @@ public class UrlBuilderStepDefinitions {
 
     @Then("^the path should be (.*)$")
     public void the_path_should_be_f(final String path) {
-        assertEquals(builder.path, path);
+        assertEquals(path, builder.path);
     }
 
     @Then("^the parameter (.*) should be (.*)$")
     public void the_parameter_key_should_be_value(final String key, final String value) {
-        assertEquals(builder.queryParameters.get(key).get(0), value);
+        assertEquals(value, builder.queryParameters.get(key).get(0));
     }
 
     @Then("^the fragment should be (.*)$")
     public void the_fragment_should_be_f(final String fragment) {
-        assertEquals(builder.fragment, fragment);
+        assertEquals(fragment, builder.fragment);
     }
 
     @Then("^it should be an empty string$")
     public void it_should_be_an_empty_string() {
-        assertEquals(builder.toString(), "");
+        assertEquals("", builder.toString());
     }
 
     @Then("^the unicode path should be a smiley$")
     public void the_unicode_path_should_be_a_smiley() {
-        assertEquals(builder.path, "/\u263A");
+        assertEquals("/\u263A", builder.path);
     }
 
     @Then("^the unicode path should be a playing card ace of spades$")
     public void the_unicode_path_should_be_a_playing_card_ace_of_spades() {
-        assertEquals(builder.path, "/\uD83C\uDCA1");
+        assertEquals("/\uD83C\uDCA1", builder.path);
     }
 
     @Then("^the port should be (\\d+)$")
     public void thePortShouldBe(Integer port) throws Throwable {
-        assertEquals(builder.port, port, "Port doesn't match");
+        assertEquals(port, builder.port, "Port doesn't match");
     }
 
 }

@@ -18,30 +18,31 @@ public class SimpleUrlTest {
         final String userInfo = "username:password";
         final String model = "http://" + userInfo + "@server/path?a=b#fragment";
         final UrlBuilder ub1 = UrlBuilder.fromString(model);
-        assertEquals(ub1.userInfo, userInfo);
-        assertEquals(ub1.toString(), model);
+        assertEquals(userInfo, ub1.userInfo);
+        assertEquals(model, ub1.toString());
         final URL url1 = ub1.toUrl();
-        assertEquals(url1.getUserInfo(), userInfo);
-        assertEquals(url1.toString(), model);
+        assertEquals(userInfo, url1.getUserInfo());
+        assertEquals(model, url1.toString());
         final UrlBuilder ub2 = UrlBuilder.fromUrl(new URL(model));
-        assertEquals(ub2.userInfo, userInfo);
+        assertEquals(userInfo, ub2.userInfo);
     }
 
     @Test
     public void incompleteUserInfoTest() throws Exception {
         final String userInfo = "username:password";
         final UrlBuilder ub1 = UrlBuilder.empty().withScheme("http").withUserInfo(userInfo);
-        assertEquals(ub1.userInfo, userInfo);
-        assertEquals(ub1.toString(), "http:");
+        assertEquals(userInfo, ub1.userInfo);
+        assertEquals("http:", ub1.toString());
         final URL url1 = ub1.toUrl();
-        assertEquals(url1.toString(), "http:");
+        assertEquals("http:", url1.toString());
         assertNull(url1.getUserInfo());
         final UrlBuilder ub2 = UrlBuilder.fromString("http://username:password@");
-        assertEquals(ub2.userInfo, userInfo);
-        assertEquals(ub2.hostName, "");
+        System.err.println(ub2);
+        assertEquals(userInfo, ub2.userInfo);
+        assertEquals("", ub2.hostName);
         final UrlBuilder ub3 = UrlBuilder.fromString("http://username:password@/");
-        assertEquals(ub3.userInfo, userInfo);
-        assertEquals(ub3.hostName, "");
+        assertEquals(userInfo, ub3.userInfo);
+        assertEquals("", ub3.hostName);
     }
 
     @Test
@@ -67,10 +68,10 @@ public class SimpleUrlTest {
     @Test
     public void brokenparameterTest() {
         final UrlBuilder ub1 = UrlBuilder.fromString("?=b");
-        assertEquals(ub1.queryParameters.get("").get(0), "b");
+        assertEquals("b", ub1.queryParameters.get("").get(0));
         final UrlBuilder ub2 = UrlBuilder.fromString("?==b");
-        assertEquals(ub2.queryParameters.get("").get(0), "=b");
-        assertEquals(ub2.toString(), "?=%3Db");
+        assertEquals("=b", ub2.queryParameters.get("").get(0));
+        assertEquals("?=%3Db", ub2.toString());
     }
 
     @Test
@@ -85,11 +86,11 @@ public class SimpleUrlTest {
         final UrlBuilder ub2 = UrlBuilder.fromString("http://www.example.com/?foo=bar");
         final String urlString2 = ub2.toString();
 
-        assertEquals(urlString1, "http://www.example.com/?foo=bar");
-        assertEquals(urlString2, "http://www.example.com/?foo=bar");
+        assertEquals("http://www.example.com/?foo=bar", urlString1);
+        assertEquals("http://www.example.com/?foo=bar", urlString2);
 
         final String portUrl = "http://www.example.com:1234/?foo=bar";
-        assertEquals(UrlBuilder.fromString(portUrl).toString(), portUrl);
+        assertEquals(portUrl, UrlBuilder.fromString(portUrl).toString());
     }
 
 	@Test
@@ -99,10 +100,10 @@ public class SimpleUrlTest {
 		final UrlBuilder ub3 = UrlBuilder.fromString("http://www.example.com/?q=Science%");
 		final UrlBuilder ub4 = UrlBuilder.fromString("http://www.example.com/?q=Science%255");
 
-		assertEquals(ub1.toString(), "http://www.example.com/?q=Science%252");
-		assertEquals(ub2.toString(), "http://www.example.com/?q=Science%25");
-		assertEquals(ub3.toString(), "http://www.example.com/?q=Science%25");
-		assertEquals(ub4.toString(), "http://www.example.com/?q=Science%255");
+		assertEquals("http://www.example.com/?q=Science%252", ub1.toString());
+		assertEquals("http://www.example.com/?q=Science%25", ub2.toString());
+		assertEquals("http://www.example.com/?q=Science%25", ub3.toString());
+		assertEquals("http://www.example.com/?q=Science%255", ub4.toString());
 	}
 
     @Test
@@ -114,22 +115,22 @@ public class SimpleUrlTest {
         final String bar = URLDecoder.decode(foo, charset);
         final String url1 = "https://www:1234/foo?foo=" + foo;
 
-        assertEquals(UrlBuilder.empty().encodeAs("ISO-8859-1")
-                .withHost("test").withPath("/foo")
-                .addParameter("foo", "öäöäöä")
-                .toString(),
-                "//test/foo?foo=%F6%E4%F6%E4%F6%E4");
+        assertEquals("//test/foo?foo=%F6%E4%F6%E4%F6%E4",
+                UrlBuilder.empty().encodeAs("ISO-8859-1")
+                        .withHost("test").withPath("/foo")
+                        .addParameter("foo", "öäöäöä")
+                        .toString());
 
-        assertEquals(UrlBuilder.fromString(url1, charset).encodeAs(charset).toString(), url1);
+        assertEquals(url1, UrlBuilder.fromString(url1, charset).encodeAs(charset).toString());
 
-        assertEquals(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").toString(),
-                "?foo=%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6");
+        assertEquals("?foo=%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6%C3%A4%C3%B6",
+                UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").toString());
 
-        assertEquals(UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").encodeAs("ISO-8859-1").toString(),
-                "?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6");
+        assertEquals("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6",
+                UrlBuilder.fromString("?foo=%E4%F6%E4%F6%E4%F6%E4%F6%E4%F6", "ISO-8859-1").encodeAs("ISO-8859-1").toString());
 
-        assertEquals(UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString(),
-                "http://foo/h%C3%A4pl%C3%B6");
+        assertEquals("http://foo/h%C3%A4pl%C3%B6",
+                UrlBuilder.fromString("http://foo/h%E4pl%F6", "ISO-8859-1").encodeAs("UTF-8").toString());
     }
 
     @Test
@@ -140,13 +141,13 @@ public class SimpleUrlTest {
     @Test
     public void testArrayParameterOrderStability() {
         final String qp1 = "?a=1&b=2&a=3&b=4";
-        assertEquals(UrlBuilder.fromString(qp1).toString(), qp1);
+        assertEquals(qp1, UrlBuilder.fromString(qp1).toString());
     }
 
     @Test
     public void testNonArrayParameterOrderStability() {
         final String qp1 = "?a=1&b=2&c=3&d=4";
-        assertEquals(UrlBuilder.fromString(qp1).toString(), qp1);
+        assertEquals(qp1, UrlBuilder.fromString(qp1).toString());
         final String qp2 = "?d=1&c=2&b=3&a=4";
         assertEquals(UrlBuilder.fromString(qp2).toString(), qp2);
     }
@@ -162,51 +163,51 @@ public class SimpleUrlTest {
     }
 
     private static void assertUrlBuilderEquals(String expectedUserInfo, String expectedHostName, Integer expectedPort, String expectedPath, UrlBuilder b) {
-        assertEquals(b.userInfo, expectedUserInfo);
-        assertEquals(b.hostName, expectedHostName);
-        assertEquals(b.port, expectedPort);
-        assertEquals(b.path, expectedPath);
+        assertEquals(expectedUserInfo, b.userInfo);
+        assertEquals(expectedHostName, b.hostName);
+        assertEquals(expectedPort, b.port);
+        assertEquals(expectedPath, b.path);
     }
 
     @Test
     public void parsePortAndHostname() {
-        UrlBuilder b = UrlBuilder.fromString("http://foo:8080/foo");
-        assertEquals(b.port, Integer.valueOf(8080));
-        assertEquals(b.hostName, "foo");
+        final UrlBuilder b = UrlBuilder.fromString("http://foo:8080/foo");
+        assertEquals(8080, b.port);
+        assertEquals("foo", b.hostName);
     }
 
     @Test
     public void encodedPathFromURI() throws URISyntaxException {
-        assertEquals(UrlBuilder.fromUri(new URI("http://foo/a%20b")).toString(), "http://foo/a%20b");
-        assertEquals(UrlBuilder.fromUri(new URI("http://foo/a%7Bb")).toString(), "http://foo/a%7Bb");
+        assertEquals("http://foo/a%20b", UrlBuilder.fromUri(new URI("http://foo/a%20b")).toString());
+        assertEquals("http://foo/a%7Bb", UrlBuilder.fromUri(new URI("http://foo/a%7Bb")).toString());
     }
 
     @Test
     public void testRemoveParameter() {
         UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
         assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals(b.removeParameter("parameter1", "value1").toString(), "http://somehost.com/page");
+        assertEquals("http://somehost.com/page", b.removeParameter("parameter1", "value1").toString());
     }
 
     @Test
     public void testRemoveOneParameterByKey() {
         UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
         assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals(b.removeParameters("parameter1").toString(), "http://somehost.com/page");
+        assertEquals("http://somehost.com/page", b.removeParameters("parameter1").toString());
     }
 
     @Test
     public void testRemoveTwoParametersByKey() {
         UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1&parameter1=value2");
         assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals(b.removeParameters("parameter1").toString(), "http://somehost.com/page");
+        assertEquals("http://somehost.com/page", b.removeParameters("parameter1").toString());
     }
 
     @Test
     public void testRemoveThreeParametersByKey() {
         UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1&parameter1=value2&parameter1=value3");
         assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
-        assertEquals(b.removeParameters("parameter1").toString(), "http://somehost.com/page");
+        assertEquals("http://somehost.com/page", b.removeParameters("parameter1").toString());
     }
 
     @Test
@@ -219,50 +220,50 @@ public class SimpleUrlTest {
     @Test
     public void testSetParameterShouldReplaceExistingParameter() {
         UrlBuilder builder = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
-        assertEquals(builder.setParameter("parameter1", "value2").toString(), "http://somehost.com/page?parameter1=value2");
+        assertEquals("http://somehost.com/page?parameter1=value2", builder.setParameter("parameter1", "value2").toString());
 }
 
     @Test
     public void testAddParameterShouldAppendOneNewParameter() {
         UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
-        assertEquals(b.addParameter("parameter1", "value2").toString(),
-                "http://somehost.com/page?parameter1=value1&parameter1=value2");
+        assertEquals("http://somehost.com/page?parameter1=value1&parameter1=value2",
+                b.addParameter("parameter1", "value2").toString());
     }
 
     @Test
     public void testWithFragmentShouldAppendAnchor() {
-        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page");
-        assertEquals(b.withFragment("anchor").toString(), "http://somehost.com/page#anchor");
+        final UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page");
+        assertEquals("http://somehost.com/page#anchor", b.withFragment("anchor").toString());
     }
 
     @Test
     public void testWithAllowedPlusSignInPath() {
-        UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page/++++");
-        assertEquals(b.toString(), "http://somehost.com/page/++++");
+        final UrlBuilder b = UrlBuilder.fromString("http://somehost.com/page/++++");
+        assertEquals("http://somehost.com/page/++++", b.toString());
     }
 
     @Test
     public void testSimpleSegments() {
-        UrlBuilder b = UrlBuilder
+        final UrlBuilder b = UrlBuilder
                 .fromString("http://somehost.com/page")
                 .addPathSegments("a", "b", "c");
-        assertEquals(b.toString(), "http://somehost.com/page/a/b/c");
+        assertEquals("http://somehost.com/page/a/b/c", b.toString());
     }
 
     @Test
     public void testSimpleDoubleSegments() {
-        UrlBuilder b = UrlBuilder
+        final UrlBuilder b = UrlBuilder
                 .fromString("http://somehost.com/page")
                 .addPathSegments("a/1", "b/2", "c/3");
-        assertEquals(b.toString(), "http://somehost.com/page/a/1/b/2/c/3");
+        assertEquals("http://somehost.com/page/a/1/b/2/c/3", b.toString());
     }
 
     @Test
     public void testSegmentSlashes() {
-        UrlBuilder b = UrlBuilder
+        final UrlBuilder b = UrlBuilder
                 .fromString("http://somehost.com/page")
                 .addPathSegments("a/1/", "/b/2", "/c/3");
-        assertEquals(b.toString(), "http://somehost.com/page/a/1/b/2/c/3");
+        assertEquals("http://somehost.com/page/a/1/b/2/c/3", b.toString());
     }
 
 }
