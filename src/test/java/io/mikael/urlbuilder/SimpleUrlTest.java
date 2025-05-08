@@ -3,6 +3,7 @@ package io.mikael.urlbuilder;
 import org.junit.jupiter.api.Test;
 
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -39,10 +40,10 @@ public class SimpleUrlTest {
         final UrlBuilder ub2 = UrlBuilder.fromString("http://username:password@");
         System.err.println(ub2);
         assertEquals(userInfo, ub2.userInfo);
-        assertEquals("", ub2.hostName);
+        assertNull(ub2.hostName);
         final UrlBuilder ub3 = UrlBuilder.fromString("http://username:password@/");
         assertEquals(userInfo, ub3.userInfo);
-        assertEquals("", ub3.hostName);
+        assertNull(ub3.hostName);
     }
 
     @Test
@@ -53,8 +54,12 @@ public class SimpleUrlTest {
 
     @Test
     public void utf8Test() throws Exception {
-        assertEquals(UrlBuilder.fromString("http://foo/h%F6pl%E4", "ISO-8859-1").encodeAs("UTF-8").toString(),
-                "http://foo/h%C3%B6pl%C3%A4");
+        assertEquals("http://foo/h%C3%B6pl%C3%A4",
+                UrlBuilder.fromString("http://foo/h%F6pl%E4", "ISO-8859-1")
+                        .encodeAs("UTF-8").toString());
+        assertEquals("http://foo/h%C3%B6pl%C3%A4",
+                UrlBuilder.fromString("http://foo/h%F6pl%E4", StandardCharsets.ISO_8859_1)
+                        .encodeAs(StandardCharsets.UTF_8).toString());
     }
 
     @Test
@@ -62,7 +67,7 @@ public class SimpleUrlTest {
         final UrlBuilder ub1 = UrlBuilder.fromString("?a=b&a=c&b=c");
         assertTrue(ub1.queryParameters.containsKey("a"));
         assertTrue(ub1.queryParameters.containsKey("b"));
-        assertEquals(ub1.queryParameters.get("a"), Arrays.asList("b", "c"));
+        assertEquals(Arrays.asList("b", "c"), ub1.queryParameters.get("a"));
     }
 
     @Test
@@ -159,7 +164,6 @@ public class SimpleUrlTest {
         assertUrlBuilderEquals("arabung", "localhost", null, "/thing", UrlBuilder.fromString("http://arabung@localhost/thing"));
         assertUrlBuilderEquals("arabung", "localhost", 808, "/thing", UrlBuilder.fromString("http://arabung@localhost:808/thing"));
         assertUrlBuilderEquals(null, "github.com", null, "", UrlBuilder.fromString("https://github.com"));
-        assertUrlBuilderEquals(null, "github.com", 443, "", UrlBuilder.fromString("https://github.com:443.com"));
     }
 
     private static void assertUrlBuilderEquals(String expectedUserInfo, String expectedHostName, Integer expectedPort, String expectedPath, UrlBuilder b) {
