@@ -25,8 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * A utility class for building and manipulating URLs.
@@ -45,11 +43,6 @@ import java.util.regex.Pattern;
 public final class UrlBuilder {
 
     private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
-
-    private static final Pattern URI_PATTERN =
-            Pattern.compile("^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
-
-    private static final Pattern AUTHORITY_PATTERN = Pattern.compile("((.*)@)?([^:]*)(:(\\d+))?");
 
     private final Decoder decoder;
 
@@ -182,38 +175,106 @@ public final class UrlBuilder {
      *           <li>A non-numeric port number</li>
      *         </ul>
      */
-    public static UrlBuilder fromString(final String url, final Decoder decoder) {
-        if (url == null || url.isEmpty()) {
-            return new UrlBuilder();
-        }
-        final Matcher m = URI_PATTERN.matcher(url);
-        String scheme = null, userInfo = null, hostName = null, path = null, fragment = null;
-        Integer port = null;
-        final UrlParameterMultimap queryParametersMultimap;
-        if (m.find()) {
-            scheme = m.group(2);
-            if (m.group(4) != null) {
-                final Matcher n = AUTHORITY_PATTERN.matcher(m.group(4));
-                if (n.find()) {
-                    if (n.group(2) != null) {
-                        userInfo = decoder.decodeUserInfo(n.group(2));
-                    }
-                    if (n.group(3) != null) {
-                        hostName = IDN.toUnicode(n.group(3));
-                    }
-                    if (n.group(5) != null) {
-                        port = Integer.parseInt(n.group(5));
-                    }
-                }
+    public static UrlBuilder fromString(String inputUri, final Decoder decoder) {
+        final int firstPound = inputUri.indexOf('#');
+        final String fragment;
+        if (firstPound != -1) {
+            if (inputUri.length() > firstPound + 1) {
+                fragment = inputUri.substring(firstPound + 1);
+            } else {
+                fragment = null;
             }
-            path = decoder.decodePath(m.group(5));
-            queryParametersMultimap = decoder.parseQueryString(m.group(7));
-            fragment = decoder.decodeFragment(m.group(9));
+            inputUri = inputUri.substring(0, firstPound);
         } else {
-            queryParametersMultimap = newMultimap();
+            fragment = null;
         }
+
+        final int firstQuestionMark = inputUri.indexOf('?');
+        final String query;
+        if (firstQuestionMark != -1) {
+            if (inputUri.length() > firstQuestionMark + 1) {
+                query = inputUri.substring(firstQuestionMark + 1);
+            } else {
+                query = null;
+            }
+            inputUri = inputUri.substring(0, firstQuestionMark);
+        } else {
+            query = null;
+        }
+
+        final int firstColon = inputUri.indexOf(':'); // either for schema, password or port
+        final int firstSlash = inputUri.indexOf('/');
+        final String schema;
+        if ((firstColon != -1 && firstColon < firstSlash) || (firstColon != -1 && firstSlash == -1)) {
+            schema = inputUri.substring(0, firstColon);
+            inputUri = inputUri.substring(firstColon + 1);
+        } else {
+            schema = null;
+        }
+
+        final int firstDoubleSlash = inputUri.indexOf("//");
+        String authority;
+        if (firstDoubleSlash == 0) {
+            final int nextSlash = inputUri.indexOf('/', 2);
+            if (nextSlash != -1) {
+                authority = inputUri.substring(2, nextSlash);
+                inputUri = inputUri.substring(nextSlash);
+            } else {
+                authority = inputUri.substring(2);
+                inputUri = "";
+            }
+        } else {
+            authority = null;
+        }
+
+        final int firstAtSign = authority != null ? authority.indexOf('@') : -1;
+        String userInfo;
+        // username (':' password)? '@'
+        if (firstAtSign > -1) {
+            userInfo = decoder.decodeUserInfo(authority.substring(0, firstAtSign));
+            authority = authority.substring(firstAtSign + 1);
+        } else {
+            userInfo = null;
+        }
+
+        final int firstSquareBracketOpen = authority != null ? authority.indexOf('[') : -1;
+        // [IPv6] | IPv4 | hostname
+        String hostName = null;
+        if (firstSquareBracketOpen > -1) {
+            final int firstSquareBracketClosed = authority.indexOf(']');
+            hostName = authority.substring(firstSquareBracketOpen, firstSquareBracketClosed + 1);
+            authority = authority.substring(firstSquareBracketClosed + 1);
+        }
+
+        final int firstAuthorityColon = authority != null ? authority.indexOf(':') : -1;
+        if (firstAuthorityColon > -1 && hostName == null) {
+            hostName = authority.substring(0, firstAuthorityColon);
+            authority = authority.substring(firstAuthorityColon);
+        } else if (firstAuthorityColon == -1 && hostName == null) {
+            hostName = authority;
+            authority = null;
+        }
+
+        final String portString;
+        // ':' port
+        if (authority == null || authority.isEmpty()) {
+            portString = null;
+        } else {
+            portString = authority.substring(1);
+        }
+
+        final Integer port;
+        if (portString != null && !portString.isEmpty()) {
+            port = Integer.parseUnsignedInt(portString);
+        } else {
+            port = null;
+        }
+
+        final String path = decoder.decodePath(inputUri);
+
         final Encoder encoder = new Encoder(DEFAULT_ENCODING);
-        return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
+        return of(decoder, encoder, schema, userInfo, hostName, port, path,
+                decoder.parseQueryString(query), fragment);
     }
 
     /**
@@ -400,7 +461,7 @@ public final class UrlBuilder {
      *
      * <p>Passing {@code null} will remove the entire query section.</p>
      *
-     * @param parameters the query parameters to copy (may be {@code null})
+     * @param query the query parameters to copy (may be {@code null})
      */
     public UrlBuilder withQuery(final UrlParameterMultimap query) {
         final UrlParameterMultimap q;

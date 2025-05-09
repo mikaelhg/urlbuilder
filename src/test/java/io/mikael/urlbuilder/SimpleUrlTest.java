@@ -40,10 +40,10 @@ public class SimpleUrlTest {
         final UrlBuilder ub2 = UrlBuilder.fromString("http://username:password@");
         System.err.println(ub2);
         assertEquals(userInfo, ub2.userInfo);
-        assertNull(ub2.hostName);
+        assertEquals("", ub2.hostName);
         final UrlBuilder ub3 = UrlBuilder.fromString("http://username:password@/");
         assertEquals(userInfo, ub3.userInfo);
-        assertNull(ub3.hostName);
+        assertEquals("", ub3.hostName);
     }
 
     @Test
