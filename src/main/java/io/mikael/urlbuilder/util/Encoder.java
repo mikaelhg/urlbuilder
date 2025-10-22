@@ -128,9 +128,9 @@ public class Encoder {
     }
 
     static char[] appendPercentEncodedByte(final byte b) {
-        int unsignedByte = b & 0xFF;
-        int highNibble = (unsignedByte >> 4) & 0xF;
-        int lowNibble = unsignedByte & 0xF;
+        final int unsignedByte = b & 0xFF;
+        final int highNibble = (unsignedByte >> 4) & 0xF;
+        final int lowNibble = unsignedByte & 0xF;
         return new char[] {'%', getHexChar(highNibble), getHexChar(lowNibble) };
     }
 
