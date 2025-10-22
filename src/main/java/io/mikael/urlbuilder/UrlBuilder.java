@@ -25,21 +25,18 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-/**
- * A utility class for building and manipulating URLs.
- *
- * <p>Instances of this class are immutable after construction.</p>
- *
- * <p>References:
- * <ul>
- *   <li>URL specification: <a href="https://tools.ietf.org/html/rfc1738">RFC 1738</a></li>
- *   <li>URI specification: <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a></li>
- * </ul>
- * </p>
- *
- * @author Mikael Gueck {@literal <gumi@iki.fi>}
- */
+/// A utility class for building and manipulating URLs.
+///
+/// Instances of this class are immutable after construction.
+///
+/// References:
+///
+///     - URL specification: <a href="https://tools.ietf.org/html/rfc1738">RFC 1738</a>
+///     - URI specification: <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a>
+///
+/// @author Mikael Gueck {@literal <gumi@iki.fi>}
 public final class UrlBuilder {
 
     private static final Charset DEFAULT_ENCODING = StandardCharsets.UTF_8;
@@ -79,26 +76,15 @@ public final class UrlBuilder {
         final UrlParameterMultimap queryParametersMultimap,
         final String fragment
     ) {
-        if (null == decoder) {
-            this.decoder = new Decoder(DEFAULT_ENCODING);
-        } else {
-            this.decoder = decoder;
-        }
-        if (null == encoder) {
-            this.encoder = new Encoder(DEFAULT_ENCODING);
-        } else {
-            this.encoder = encoder;
-        }
+        this.decoder = Objects.requireNonNullElseGet(decoder, () -> new Decoder(DEFAULT_ENCODING));
+        this.encoder = Objects.requireNonNullElseGet(encoder, () -> new Encoder(DEFAULT_ENCODING));
         this.scheme = scheme;
         this.userInfo = userInfo;
         this.hostName = hostName;
         this.port = port;
         this.path = path;
-        if (queryParametersMultimap == null) {
-            this.queryParametersMultimap = newMultimap().immutable();
-        } else {
-            this.queryParametersMultimap = queryParametersMultimap.immutable();
-        }
+        this.queryParametersMultimap = Objects.requireNonNullElseGet(
+                queryParametersMultimap, UrlParameterMultimap::newMultimap).immutable();
         this.queryParameters = this.queryParametersMultimap;
         this.fragment = fragment;
     }
@@ -132,49 +118,43 @@ public final class UrlBuilder {
         return fromString(url, DEFAULT_ENCODING);
     }
 
-    /**
-     * Constructs a UrlBuilder from a full or partial URL string.
-     *
-     * <p>When percent-decoding the query parameters, assumes that they were encoded with
-     * <b>inputEncoding</b>.</p>
-     *
-     * @throws NumberFormatException if the input contains:
-     *         <ul>
-     *           <li>An invalid percent-encoding sequence (%ax)</li>
-     *           <li>A non-numeric port number</li>
-     *         </ul>
-     */
+    /// Constructs a UrlBuilder from a full or partial URL string.
+    ///
+    /// When percent-decoding the query parameters, assumes that they were encoded with
+    /// **inputEncoding**.
+    ///
+    /// @throws NumberFormatException if the input contains:
+    ///
+    ///         - An invalid percent-encoding sequence (%ax)
+    ///         - A non-numeric port number
+    ///
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
         return fromString(url, Charset.forName(inputEncoding));
     }
 
-    /**
-     * Constructs a {@code UrlBuilder} from a full or partial URL string.
-     *
-     * <p>When percent-decoding query parameters, assumes they were encoded using
-     * the specified {@code inputEncoding}.</p>
-     *
-     * @throws NumberFormatException if the input contains:
-     *         <ul>
-     *           <li>An invalid percent-encoding sequence (e.g., {@code %ax})</li>
-     *           <li>A non-numeric port number</li>
-     *         </ul>
-     */
+    /// Constructs a `UrlBuilder` from a full or partial URL string.
+    ///
+    /// When percent-decoding query parameters, assumes they were encoded using
+    /// the specified `inputEncoding`.
+    ///
+    /// @throws NumberFormatException if the input contains:
+    ///
+    ///         - An invalid percent-encoding sequence (e.g., `%ax`)
+    ///         - A non-numeric port number
+    ///
     public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
         return fromString(url, new Decoder(inputEncoding));
     }
 
-    /**
-     * Constructs a {@code UrlBuilder} from a full or partial URL string.
-     *
-     * <p>Uses the provided decoder for percent-decoding query parameters.</p>
-     *
-     * @throws NumberFormatException if the input contains:
-     *         <ul>
-     *           <li>An invalid percent-encoding sequence (e.g., {@code %ax})</li>
-     *           <li>A non-numeric port number</li>
-     *         </ul>
-     */
+    /// Constructs a `UrlBuilder` from a full or partial URL string.
+    ///
+    /// Uses the provided decoder for percent-decoding query parameters.
+    ///
+    /// @throws NumberFormatException if the input contains:
+    ///
+    ///         - An invalid percent-encoding sequence (e.g., `%ax`)
+    ///         - A non-numeric port number
+    ///
     public static UrlBuilder fromString(String inputUri, final Decoder decoder) {
         final int firstPound = inputUri.indexOf('#');
         final String fragment;
@@ -290,15 +270,13 @@ public final class UrlBuilder {
                 decoder.decodeFragment(uri.getFragment()));
     }
 
-    /**
-     * Constructs a {@link UrlBuilder} from a {@link java.net.URL}.
-     *
-     * @throws NumberFormatException if the URL contains:
-     *         <ul>
-     *           <li>An invalid percent-encoding sequence (e.g., {@code %ax})</li>
-     *           <li>A non-numeric port number</li>
-     *         </ul>
-     */
+    /// Constructs a [UrlBuilder] from a [java.net.URL].
+    ///
+    /// @throws NumberFormatException if the URL contains:
+    ///
+    ///         - An invalid percent-encoding sequence (e.g., `%ax`)
+    ///         - A non-numeric port number
+    ///
     public static UrlBuilder fromUrl(final URL url) {
         final Decoder decoder = new Decoder(DEFAULT_ENCODING);
         return of(decoder, new Encoder(DEFAULT_ENCODING),
@@ -368,6 +346,8 @@ public final class UrlBuilder {
     }
 
     public URL toUrlWithException() throws MalformedURLException {
+        // Keep the deprecated URL constructor until there's a real solution
+        // to the incompatibilities between URL and URI.
         return new URL(this.toString());
     }
 
@@ -425,11 +405,9 @@ public final class UrlBuilder {
         return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
 
-    /**
-     * Sets the port number.
-     *
-     * <p>Use {@code null} to indicate the protocol's default port.</p>
-     */
+    /// Sets the port number.
+    ///
+    /// Use `null` to indicate the protocol's default port.
     public UrlBuilder withPort(final Integer port) {
         return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);
     }
@@ -456,13 +434,11 @@ public final class UrlBuilder {
         return withPath(path, Charset.forName(encoding));
     }
 
-    /**
-     * Sets the query parameters to a deep copy of the specified parameters.
-     *
-     * <p>Passing {@code null} will remove the entire query section.</p>
-     *
-     * @param query the query parameters to copy (may be {@code null})
-     */
+    /// Sets the query parameters to a deep copy of the specified parameters.
+    ///
+    /// Passing `null` will remove the entire query section.
+    ///
+    /// @param query the query parameters to copy (may be `null`)
     public UrlBuilder withQuery(final UrlParameterMultimap query) {
         final UrlParameterMultimap q;
         if (query == null) {
