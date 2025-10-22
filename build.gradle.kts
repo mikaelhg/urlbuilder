@@ -5,7 +5,7 @@ plugins {
     `java-library`
     `maven-publish`
     jacoco
-    id("com.github.spotbugs") version "6.1.10"
+    id("com.github.spotbugs") version "6.4.4"
 }
 
 repositories {
@@ -13,13 +13,11 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.cucumber:cucumber-java:7.22.1")
-    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.22.1") {
-        exclude("org.junit.vintage:vintage-engine")
-    }
-    testImplementation("org.junit.platform:junit-platform-suite-engine:1.12.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.12.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.12.2")
+    testImplementation("io.cucumber:cucumber-java:7.29.0")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.29.0")
+    testImplementation("org.junit.platform:junit-platform-suite-engine:6.0.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.0")
 }
 
 group = "io.mikael"
@@ -28,7 +26,7 @@ description = "urlbuilder"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(8))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
