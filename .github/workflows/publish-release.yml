@@ -1,0 +1,47 @@
+name: Publish Release to GitHub Packages
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          cache-read-only: false
+
+      - name: Extract version from release tag
+        id: get_version
+        run: |
+          # The release tag is available in the github context.
+          # Example: If tag is 'v1.2.3', this will output '1.2.3'.
+          # If tag is '1.2.3', it will also output '1.2.3'.
+          VERSION=${{ github.event.release.tag_name }}
+          echo "Release tag: $VERSION"
+          
+          # Use shell parameter expansion to remove a leading 'v' if it exists.
+          VERSION_WITHOUT_V="${VERSION#v}"
+          echo "version=${VERSION_WITHOUT_V}" >> "$GITHUB_OUTPUT"
+
+      - name: Build and Publish with Gradle
+        run: ./gradlew clean build publishMavenPublicationToGithubPackages -Pversion=${{ steps.get_version.outputs.version }}
+        env:
+          GPR_USER: ${{ github.actor }}
+          GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
