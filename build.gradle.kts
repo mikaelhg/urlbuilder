@@ -5,7 +5,7 @@ plugins {
     `java-library`
     `maven-publish`
     jacoco
-    id("com.github.spotbugs") version "6.4.4"
+    id("com.github.spotbugs") version "6.5.1"
 }
 
 repositories {
@@ -13,11 +13,12 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.cucumber:cucumber-java:7.29.0")
-    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.29.0")
-    testImplementation("org.junit.platform:junit-platform-suite-engine:6.0.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.0")
+    testImplementation("io.cucumber:cucumber-java:7.34.3")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.34.3")
+    testImplementation(platform("org.junit:junit-bom:6.0.3"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.platform:junit-platform-suite-api")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 group = "io.mikael"
@@ -34,6 +35,7 @@ tasks.jacocoTestReport {
     reports {
         csv.required = true
         html.required = true
+        xml.required = true
     }
 }
 
@@ -99,4 +101,5 @@ tasks.withType<Javadoc> {
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
+    outputs.upToDateWhen { false }
 }
