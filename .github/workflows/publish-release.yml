@@ -30,19 +30,17 @@ jobs:
 
       - name: Extract version from release tag
         id: get_version
+        env:
+          TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
-          # The release tag is available in the github context.
-          # Example: If tag is 'v1.2.3', this will output '1.2.3'.
-          # If tag is '1.2.3', it will also output '1.2.3'.
-          VERSION=${{ github.event.release.tag_name }}
-          echo "Release tag: $VERSION"
-          
+          echo "Release tag: $TAG_NAME"
           # Use shell parameter expansion to remove a leading 'v' if it exists.
-          VERSION_WITHOUT_V="${VERSION#v}"
+          VERSION_WITHOUT_V="${TAG_NAME#v}"
           echo "version=${VERSION_WITHOUT_V}" >> "$GITHUB_OUTPUT"
 
       - name: Build and Publish with Gradle
-        run: ./gradlew clean build publishMavenPublicationToGithubPackages -Pversion=${{ steps.get_version.outputs.version }}
+        run: ./gradlew clean build publishMavenPublicationToGithubPackages -Pversion="$VERSION"
         env:
+          VERSION: ${{ steps.get_version.outputs.version }}
           GPR_USER: ${{ github.actor }}
           GPR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
