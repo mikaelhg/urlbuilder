@@ -5,7 +5,7 @@ plugins {
     `java-library`
     `maven-publish`
     jacoco
-    id("com.github.spotbugs") version "6.5.11"
+    id("com.github.spotbugs") version "6.5.12"
 }
 
 repositories {
@@ -13,8 +13,8 @@ repositories {
 }
 
 dependencies {
-    testImplementation("io.cucumber:cucumber-java:7.34.7")
-    testImplementation("io.cucumber:cucumber-junit-platform-engine:7.34.7")
+    testImplementation("io.cucumber:cucumber-java:8.0.2")
+    testImplementation("io.cucumber:cucumber-junit-platform-engine:8.0.2")
     testImplementation(platform("org.junit:junit-bom:6.1.3"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.platform:junit-platform-suite-api")
