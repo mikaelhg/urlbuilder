@@ -162,13 +162,7 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
         if (null == key || null == value) {
             throw new IllegalArgumentException("can't remove null");
         }
-        final ListIterator<Entry<String, String>> it = data.listIterator();
-        while (it.hasNext()) {
-            final Entry<String, String> e = it.next();
-            if (key.equals(e.getKey()) && value.equals(e.getValue())) {
-                it.remove();
-            }
-        }
+        data.removeIf(e -> key.equals(e.getKey()) && value.equals(e.getValue()));
         return this;
     }
 
@@ -223,11 +217,11 @@ public class UrlParameterMultimap implements Map<String, List<String>> {
 
     @Override
     public boolean equals(final Object other) {
-        if (!(other instanceof UrlParameterMultimap)) {
+        if (other instanceof UrlParameterMultimap otherMultimap) {
+            return data.equals(otherMultimap.data);
+        } else {
             return false;
         }
-        final UrlParameterMultimap otherMultimap = (UrlParameterMultimap) other;
-        return data.equals(otherMultimap.data);
     }
 
     @Override

@@ -15,7 +15,6 @@ limitations under the License.
  */
 package io.mikael.urlbuilder.util;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.StringTokenizer;
@@ -71,18 +70,30 @@ public class Decoder {
 
     public byte[] nextDecodeableSequence(final String input, final int position) {
         final int len = input.length();
-        final byte[] data = new byte[len];
+        final byte[] data = new byte[Math.max(0, (len - position) / 3)];
         int j = 0;
-        for (int i = position; i < len; i++) {
-            final char c0 = input.charAt(i);
-            if (c0 != '%' || (len < i + 3)) {
-                return Arrays.copyOfRange(data, 0, j);
-            } else {
-                data[j++] = (byte) Integer.parseInt(input.substring(i + 1, i + 3), 16);
-                i += 2;
+        int i = position;
+        while (i + 2 < len && input.charAt(i) == '%') {
+            final int hi = hexValue(input.charAt(i + 1));
+            final int lo = hexValue(input.charAt(i + 2));
+            if (hi < 0 || lo < 0) {
+                break;
             }
+            data[j++] = (byte) (hi << 4 | lo);
+            i += 3;
         }
-        return Arrays.copyOfRange(data, 0, j);
+        return j == data.length ? data : Arrays.copyOfRange(data, 0, j);
+    }
+
+    private static int hexValue(final char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        } else if (c >= 'a' && c <= 'f') {
+            return c - 'a' + 10;
+        } else if (c >= 'A' && c <= 'F') {
+            return c - 'A' + 10;
+        }
+        return -1;
     }
 
     public String decodePath(final String input) {
@@ -106,23 +117,38 @@ public class Decoder {
     }
 
     public String urlDecode(final String input, final boolean decodePlusAsSpace) {
-        final StringBuilder sb = new StringBuilder();
         final int len = input.length();
-        for (int i = 0; i < len; i++) {
-            final char c0 = input.charAt(i);
-            if (c0 == '+' && decodePlusAsSpace) {
+        int first = 0;
+        while (first < len) {
+            final char c = input.charAt(first);
+            if (c == '%' || (c == '+' && decodePlusAsSpace)) {
+                break;
+            }
+            first++;
+        }
+        if (first == len) {
+            return input;
+        }
+
+        final StringBuilder sb = new StringBuilder(len).append(input, 0, first);
+        int i = first;
+        while (i < len) {
+            final char c = input.charAt(i);
+            if (c == '+' && decodePlusAsSpace) {
                 sb.append(' ');
-            } else if (c0 != '%') {
-                sb.append(c0);
-            } else if (len < i + 3) {
-                // the string will end before we will be able to read a sequence
-                int endIndex = Math.min(input.length(), i + 2);
-                sb.append(input, i, endIndex);
-                i += 3;
+                i++;
+            } else if (c != '%') {
+                sb.append(c);
+                i++;
             } else {
                 final byte[] bytes = nextDecodeableSequence(input, i);
-                sb.append(inputEncoding.decode(ByteBuffer.wrap(bytes)));
-                i += bytes.length * 3 - 1;
+                if (bytes.length == 0) {
+                    sb.append('%');
+                    i++;
+                } else {
+                    sb.append(new String(bytes, inputEncoding));
+                    i += bytes.length * 3;
+                }
             }
         }
         return sb.toString();

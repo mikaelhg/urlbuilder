@@ -1,5 +1,11 @@
 Changelog
 
+## Unreleased
+
+* Decoder.urlDecode no longer throws NumberFormatException on malformed percent-escapes (e.g. ``%zz``, ``%+1``); they are kept as literal text.
+
+* Decoder.urlDecode is linear-time and returns the input unchanged when there is nothing to decode.
+
 ## 2.0.9
 
 * #41 and #42, make Encoder and Decoder methods public
