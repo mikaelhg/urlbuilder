@@ -6,6 +6,12 @@ Changelog
 
 * Decoder.urlDecode is linear-time and returns the input unchanged when there is nothing to decode.
 
+* Migrated Cucumber tests to JUnit 5
+
+* UrlBuilder.fromString is now a hand-written single-pass scanner. Fixes: percent-escapes in the fragment are decoded (previously they were double-encoded on output); the user info ends at the last ``@``; ports must be 0-65535 ASCII digits (previously ``:4294967295`` became ``-1``); a scheme must match RFC 3986 syntax; ``null`` input throws a descriptive NullPointerException.
+
+* UrlBuilder.fromString now throws IllegalArgumentException (previously NumberFormatException, or a misleading one) for an unterminated IPv6 literal, trailing characters after it, or an invalid or out-of-range port.
+
 ## 2.0.9
 
 * #41 and #42, make Encoder and Decoder methods public

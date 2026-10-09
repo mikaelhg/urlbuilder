@@ -110,151 +110,183 @@ public final class UrlBuilder {
         return new UrlBuilder(decoder, encoder, scheme, userInfo, hostName, port, path, queryParameters, fragment);
     }
 
-    /**
-     * Construct a UrlBuilder from a full or partial URL string.
-     * Assume that the query paremeters were percent-encoded, as the standard suggests, as UTF-8.
-     */
+    /// Constructs a `UrlBuilder` from a full or partial URL string.
+    ///
+    /// Assumes that the URL was percent-encoded as UTF-8, as the standard suggests.
+    ///
+    /// @throws NullPointerException if `url` is null
+    /// @throws IllegalArgumentException if the authority is malformed; see
+    ///         {@link #fromString(String, Decoder)}
     public static UrlBuilder fromString(final String url) {
         return fromString(url, DEFAULT_ENCODING);
     }
 
-    /// Constructs a UrlBuilder from a full or partial URL string.
+    /// Constructs a `UrlBuilder` from a full or partial URL string.
     ///
-    /// When percent-decoding the query parameters, assumes that they were encoded with
-    /// **inputEncoding**.
+    /// Assumes that the URL was percent-encoded with `inputEncoding`.
     ///
-    /// @throws NumberFormatException if the input contains:
-    ///
-    ///         - An invalid percent-encoding sequence (%ax)
-    ///         - A non-numeric port number
-    ///
+    /// @throws NullPointerException if `url` is null
+    /// @throws IllegalArgumentException if the authority is malformed; see
+    ///         {@link #fromString(String, Decoder)}
     public static UrlBuilder fromString(final String url, final String inputEncoding) {
         return fromString(url, Charset.forName(inputEncoding));
     }
 
     /// Constructs a `UrlBuilder` from a full or partial URL string.
     ///
-    /// When percent-decoding query parameters, assumes they were encoded using
-    /// the specified `inputEncoding`.
+    /// Assumes that the URL was percent-encoded with `inputEncoding`.
     ///
-    /// @throws NumberFormatException if the input contains:
-    ///
-    ///         - An invalid percent-encoding sequence (e.g., `%ax`)
-    ///         - A non-numeric port number
-    ///
+    /// @throws NullPointerException if `url` is null
+    /// @throws IllegalArgumentException if the authority is malformed; see
+    ///         {@link #fromString(String, Decoder)}
     public static UrlBuilder fromString(final String url, final Charset inputEncoding) {
         return fromString(url, new Decoder(inputEncoding));
     }
 
     /// Constructs a `UrlBuilder` from a full or partial URL string.
     ///
-    /// Uses the provided decoder for percent-decoding query parameters.
+    /// Uses the provided decoder for percent-decoding the user info, path, query and fragment.
+    /// Malformed percent-escapes are kept as literal text.
     ///
-    /// @throws NumberFormatException if the input contains:
+    /// The string is scanned left to right, without backtracking:
     ///
-    ///         - An invalid percent-encoding sequence (e.g., `%ax`)
-    ///         - A non-numeric port number
+    ///     - The fragment starts at the first `#`, the query at the first `?` before that.
+    ///     - A scheme is a letter followed by letters, digits, `+`, `-` or `.`, terminated by `:`.
+    ///       Note that `host:8080/x` therefore parses with the scheme `host`.
+    ///     - If `//` follows, the authority extends to the next `/` or the end of the input.
+    ///     - The user info ends at the last `@` in the authority.
+    ///     - The port is 0-65535, in ASCII digits.
     ///
-    public static UrlBuilder fromString(String inputUri, final Decoder decoder) {
-        final int firstPound = inputUri.indexOf('#');
+    /// @throws NullPointerException if `inputUri` or `decoder` is null
+    /// @throws IllegalArgumentException if the authority contains an unterminated or
+    ///         trailing-garbage IPv6 literal, or a port that is not a number from 0 to 65535
+    public static UrlBuilder fromString(final String inputUri, final Decoder decoder) {
+        Objects.requireNonNull(inputUri, "inputUri");
+        Objects.requireNonNull(decoder, "decoder");
+
+        int end = inputUri.length();
+
         final String fragment;
-        if (firstPound != -1) {
-            if (inputUri.length() > firstPound + 1) {
-                fragment = inputUri.substring(firstPound + 1);
-            } else {
-                fragment = null;
-            }
-            inputUri = inputUri.substring(0, firstPound);
+        final int hash = inputUri.indexOf('#');
+        if (hash != -1) {
+            fragment = hash + 1 < end ? decoder.decodeFragment(inputUri.substring(hash + 1)) : null;
+            end = hash;
         } else {
             fragment = null;
         }
 
-        final int firstQuestionMark = inputUri.indexOf('?');
         final String query;
-        if (firstQuestionMark != -1) {
-            if (inputUri.length() > firstQuestionMark + 1) {
-                query = inputUri.substring(firstQuestionMark + 1);
-            } else {
-                query = null;
-            }
-            inputUri = inputUri.substring(0, firstQuestionMark);
+        final int questionMark = inputUri.indexOf('?');
+        if (questionMark != -1 && questionMark < end) {
+            query = questionMark + 1 < end ? inputUri.substring(questionMark + 1, end) : null;
+            end = questionMark;
         } else {
             query = null;
         }
 
-        final int firstColon = inputUri.indexOf(':'); // either for schema, password or port
-        final int firstSlash = inputUri.indexOf('/');
-        final String schema;
-        if ((firstColon != -1 && firstColon < firstSlash) || (firstColon != -1 && firstSlash == -1)) {
-            schema = inputUri.substring(0, firstColon);
-            inputUri = inputUri.substring(firstColon + 1);
+        int pos = 0;
+        final String scheme;
+        final int schemeEnd = schemeLength(inputUri, end);
+        if (schemeEnd > 0) {
+            scheme = inputUri.substring(0, schemeEnd);
+            pos = schemeEnd + 1;
         } else {
-            schema = null;
+            scheme = null;
         }
 
-        final int firstDoubleSlash = inputUri.indexOf("//");
-        String authority;
-        if (firstDoubleSlash == 0) {
-            final int nextSlash = inputUri.indexOf('/', 2);
-            if (nextSlash != -1) {
-                authority = inputUri.substring(2, nextSlash);
-                inputUri = inputUri.substring(nextSlash);
-            } else {
-                authority = inputUri.substring(2);
-                inputUri = "";
-            }
-        } else {
-            authority = null;
-        }
-
-        final int firstAtSign = authority != null ? authority.indexOf('@') : -1;
-        String userInfo;
-        // username (':' password)? '@'
-        if (firstAtSign > -1) {
-            userInfo = decoder.decodeUserInfo(authority.substring(0, firstAtSign));
-            authority = authority.substring(firstAtSign + 1);
-        } else {
-            userInfo = null;
-        }
-
-        final int firstSquareBracketOpen = authority != null ? authority.indexOf('[') : -1;
-        // [IPv6] | IPv4 | hostname
+        String userInfo = null;
         String hostName = null;
-        if (firstSquareBracketOpen > -1) {
-            final int firstSquareBracketClosed = authority.indexOf(']');
-            hostName = authority.substring(firstSquareBracketOpen, firstSquareBracketClosed + 1);
-            authority = authority.substring(firstSquareBracketClosed + 1);
+        Integer port = null;
+        if (inputUri.startsWith("//", pos)) {
+            final int authorityStart = pos + 2;
+            int authorityEnd = inputUri.indexOf('/', authorityStart);
+            if (authorityEnd == -1 || authorityEnd > end) {
+                authorityEnd = end;
+            }
+            pos = authorityEnd;
+
+            int hostStart = authorityStart;
+            final int at = inputUri.lastIndexOf('@', authorityEnd - 1);
+            if (at >= authorityStart) {
+                userInfo = decoder.decodeUserInfo(inputUri.substring(authorityStart, at));
+                hostStart = at + 1;
+            }
+
+            final int hostEnd;
+            int portStart = -1;
+            if (hostStart < authorityEnd && inputUri.charAt(hostStart) == '[') {
+                final int close = inputUri.indexOf(']', hostStart);
+                if (close == -1 || close >= authorityEnd) {
+                    throw new IllegalArgumentException("Unterminated IPv6 literal in authority");
+                }
+                hostEnd = close + 1;
+                if (hostEnd < authorityEnd) {
+                    if (inputUri.charAt(hostEnd) != ':') {
+                        throw new IllegalArgumentException("Unexpected characters after IPv6 literal");
+                    }
+                    portStart = hostEnd + 1;
+                }
+            } else {
+                int colon = inputUri.indexOf(':', hostStart);
+                if (colon == -1 || colon >= authorityEnd) {
+                    hostEnd = authorityEnd;
+                } else {
+                    hostEnd = colon;
+                    portStart = colon + 1;
+                }
+            }
+            hostName = inputUri.substring(hostStart, hostEnd);
+            if (portStart != -1) {
+                port = parsePort(inputUri, portStart, authorityEnd);
+            }
         }
 
-        final int firstAuthorityColon = authority != null ? authority.indexOf(':') : -1;
-        if (firstAuthorityColon > -1 && hostName == null) {
-            hostName = authority.substring(0, firstAuthorityColon);
-            authority = authority.substring(firstAuthorityColon);
-        } else if (firstAuthorityColon == -1 && hostName == null) {
-            hostName = authority;
-            authority = null;
-        }
+        final String path = decoder.decodePath(inputUri.substring(pos, end));
 
-        final String portString;
-        // ':' port
-        if (authority == null || authority.isEmpty()) {
-            portString = null;
-        } else {
-            portString = authority.substring(1);
-        }
-
-        final Integer port;
-        if (portString != null && !portString.isEmpty()) {
-            port = Integer.parseUnsignedInt(portString);
-        } else {
-            port = null;
-        }
-
-        final String path = decoder.decodePath(inputUri);
-
-        final Encoder encoder = new Encoder(DEFAULT_ENCODING);
-        return of(decoder, encoder, schema, userInfo, hostName, port, path,
+        return of(decoder, new Encoder(DEFAULT_ENCODING), scheme, userInfo, hostName, port, path,
                 decoder.parseQueryString(query), fragment);
+    }
+
+    /// Returns the length of the scheme at the start of `s[0, end)`, or 0 if there is none.
+    private static int schemeLength(final String s, final int end) {
+        if (end == 0 || !isAsciiLetter(s.charAt(0))) {
+            return 0;
+        }
+        for (int i = 1; i < end; i++) {
+            final char c = s.charAt(i);
+            if (c == ':') {
+                return i;
+            } else if (!isAsciiLetter(c) && !(c >= '0' && c <= '9') && c != '+' && c != '-' && c != '.') {
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    private static boolean isAsciiLetter(final char c) {
+        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    /// Parses `s[start, end)` as a port number; an empty range means no port.
+    private static Integer parsePort(final String s, final int start, final int end) {
+        if (start == end) {
+            return null;
+        }
+        if (end - start > 5) {
+            throw new IllegalArgumentException("Invalid port in authority");
+        }
+        int port = 0;
+        for (int i = start; i < end; i++) {
+            final char c = s.charAt(i);
+            if (c < '0' || c > '9') {
+                throw new IllegalArgumentException("Invalid port in authority");
+            }
+            port = port * 10 + (c - '0');
+        }
+        if (port > 65535) {
+            throw new IllegalArgumentException("Port out of range: " + port);
+        }
+        return port;
     }
 
     /**
@@ -274,7 +306,6 @@ public final class UrlBuilder {
     ///
     /// @throws NumberFormatException if the URL contains:
     ///
-    ///         - An invalid percent-encoding sequence (e.g., `%ax`)
     ///         - A non-numeric port number
     ///
     public static UrlBuilder fromUrl(final URL url) {
