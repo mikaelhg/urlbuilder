@@ -178,4 +178,62 @@ public class MultimapTest {
         return UrlParameterMultimap.newMultimap().add("key1", "value1");
     }
 
+
+    private static UrlParameterMultimap interleaved() {
+        return UrlParameterMultimap.newMultimap().add("a", "1").add("b", "2").add("a", "3");
+    }
+
+    @Test
+    public void entrySetGroupsValuesByKeyInFirstSeenOrder() {
+        final var entries = new ArrayList<>(interleaved().entrySet());
+        assertEquals(2, entries.size());
+        assertEquals("a", entries.get(0).getKey());
+        assertEquals(Arrays.asList("1", "3"), entries.get(0).getValue());
+        assertEquals("b", entries.get(1).getKey());
+        assertEquals(List.of("2"), entries.get(1).getValue());
+    }
+
+    @Test
+    public void entrySetIsUnmodifiable() {
+        final var entrySet = interleaved().entrySet();
+        assertThrows(UnsupportedOperationException.class, entrySet::clear);
+        assertThrows(UnsupportedOperationException.class,
+                () -> entrySet.iterator().next().getValue().add("x"));
+    }
+
+    @Test
+    public void entrySetOfEmptyMultimap() {
+        assertTrue(UrlParameterMultimap.newMultimap().entrySet().isEmpty());
+    }
+
+    @Test
+    public void valuesGroupsByKey() {
+        final var values = interleaved().values();
+        assertEquals(List.of(Arrays.asList("1", "3"), List.of("2")), new ArrayList<>(values));
+        assertThrows(UnsupportedOperationException.class, () -> values.add(List.of("x")));
+    }
+
+    @Test
+    public void equalsAndHashCode() {
+        final var m1 = interleaved();
+        final var m2 = interleaved();
+        assertEquals(m1, m1);
+        assertEquals(m1, m2);
+        assertEquals(m1.hashCode(), m2.hashCode());
+        assertEquals(m1, m1.immutable());
+        assertNotEquals(m1, m2.add("c", "4"));
+    }
+
+    @Test
+    public void equalsIsOrderSensitiveOnFlatEntries() {
+        final var other = UrlParameterMultimap.newMultimap().add("b", "2").add("a", "1").add("a", "3");
+        assertNotEquals(interleaved(), other);
+    }
+
+    @Test
+    public void notEqualToOtherTypes() {
+        assertNotEquals(interleaved(), "a=1&b=2&a=3");
+        assertNotEquals(interleaved(), null);
+        assertNotEquals(interleaved(), new HashMap<String, List<String>>());
+    }
 }

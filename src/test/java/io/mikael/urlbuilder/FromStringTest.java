@@ -113,4 +113,52 @@ public class FromStringTest {
         final String url = "http://h/" + "a/".repeat(500_000) + "?" + "k=v&".repeat(100_000) + "#" + "f".repeat(100_000);
         assertEquals("h", UrlBuilder.fromString(url).hostName);
     }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"foo", "foo/bar", "http", "a1+-.b", "x"})
+    public void schemeWithoutColonIsAPath(final String url) {
+        final var ub = UrlBuilder.fromString(url);
+        assertNull(ub.scheme);
+        assertEquals(url, ub.path);
+    }
+
+    @Test
+    public void portFollowedByQueryOrFragment() {
+        assertEquals(80, UrlBuilder.fromString("http://h:80?x=1").port);
+        assertEquals(80, UrlBuilder.fromString("http://h:80#f").port);
+        assertEquals(80, UrlBuilder.fromString("http://[::1]:80?x=1").port);
+    }
+
+    @Test
+    public void schemeOnly() {
+        final var ub = UrlBuilder.fromString("http:");
+        assertEquals("http", ub.scheme);
+        assertNull(ub.hostName);
+        assertEquals("", ub.path);
+    }
+
+    @Test
+    public void networkPathReference() {
+        final var ub = UrlBuilder.fromString("//host:81/p");
+        assertNull(ub.scheme);
+        assertEquals("host", ub.hostName);
+        assertEquals(81, ub.port);
+        assertEquals("/p", ub.path);
+    }
+
+    @Test
+    public void emptyInput() {
+        final var ub = UrlBuilder.fromString("");
+        assertNull(ub.scheme);
+        assertNull(ub.hostName);
+        assertEquals("", ub.path);
+        assertEquals("", ub.toString());
+    }
+
+    @Test
+    public void authorityWithOnlyUserInfo() {
+        final var ub = UrlBuilder.fromString("http://u:p@");
+        assertEquals("u:p", ub.userInfo);
+        assertEquals("", ub.hostName);
+    }
 }
