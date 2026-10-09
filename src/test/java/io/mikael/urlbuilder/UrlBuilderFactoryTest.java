@@ -5,12 +5,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class UrlBuilderCreationTest {
+/// Creating builders from URLs, URIs and strings: `empty`, `fromString`, `fromUrl` and `fromUri`.
+public class UrlBuilderFactoryTest {
 
     private static final String TRANSLATE_ESCAPED = "http://translate.google.com/translate?hl=auto"
             + "&langpair=auto%7Czh-TW"
@@ -142,5 +144,11 @@ public class UrlBuilderCreationTest {
     public void pathMustStartWithSlash() {
         assertEquals("https://www.google.com/foo/bar",
                 UrlBuilder.empty().withScheme("https").withHost("www.google.com").withPath("foo/bar").toString());
+    }
+
+    @Test
+    public void fromUriKeepsEncodedPath() throws URISyntaxException {
+        assertEquals("http://foo/a%20b", UrlBuilder.fromUri(new URI("http://foo/a%20b")).toString());
+        assertEquals("http://foo/a%7Bb", UrlBuilder.fromUri(new URI("http://foo/a%7Bb")).toString());
     }
 }

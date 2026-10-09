@@ -4,14 +4,15 @@ import io.mikael.urlbuilder.util.Decoder;
 import io.mikael.urlbuilder.util.Encoder;
 import io.mikael.urlbuilder.util.UrlParameterMultimap;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class FluentApiTest {
+/// The immutable `with*`, `add*`, `set*` and `remove*` methods.
+public class UrlBuilderMutationTest {
 
     private static UrlBuilder base() {
         return UrlBuilder.fromString("http://example.com/p?a=1#f");
@@ -133,5 +134,73 @@ public class FluentApiTest {
     public void addPathSegmentsJoinsWithSingleSlash() {
         assertEquals("http://example.com/p/a/b/c/?a=1#f", base().addPathSegments("a", "/b", "c/").toString());
         assertEquals("http://example.com/p/a/b?a=1#f", base().addPathSegments("/a/", "/b").toString());
+    }
+
+    @Test
+    public void testRemoveParameter() {
+        final var b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals("http://somehost.com/page", b.removeParameter("parameter1", "value1").toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "http://somehost.com/page?parameter1=value1",
+            "http://somehost.com/page?parameter1=value1&parameter1=value2",
+            "http://somehost.com/page?parameter1=value1&parameter1=value2&parameter1=value3"
+    })
+    public void removeParametersByKey(final String url) {
+        final var b = UrlBuilder.fromString(url);
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals("http://somehost.com/page", b.removeParameters("parameter1").toString());
+    }
+
+    @Test
+    public void withFragment() {
+        final var b = UrlBuilder.fromString("http://somehost.com/page");
+        assertEquals("http://somehost.com/page#anchor", b.withFragment("anchor").toString());
+    }
+
+    @Test
+    public void addPathSegments() {
+        final var b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a", "b", "c");
+        assertEquals("http://somehost.com/page/a/b/c", b.toString());
+    }
+
+    @Test
+    public void addMultiPartPathSegments() {
+        final var b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a/1", "b/2", "c/3");
+        assertEquals("http://somehost.com/page/a/1/b/2/c/3", b.toString());
+    }
+
+    @Test
+    public void addPathSegmentsNormalisesSlashes() {
+        final var b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a/1/", "/b/2", "/c/3");
+        assertEquals("http://somehost.com/page/a/1/b/2/c/3", b.toString());
+    }
+
+    @Test
+    public void builderAndParserProduceTheSameUrl() {
+        final var ub1 = UrlBuilder.empty()
+                .withScheme("http")
+                .withHost("www.example.com")
+                .withPath("/")
+                .addParameter("foo", "bar");
+        final String urlString1 = ub1.toString();
+
+        final var ub2 = UrlBuilder.fromString("http://www.example.com/?foo=bar");
+        final String urlString2 = ub2.toString();
+
+        assertEquals("http://www.example.com/?foo=bar", urlString1);
+        assertEquals("http://www.example.com/?foo=bar", urlString2);
+
+        final String portUrl = "http://www.example.com:1234/?foo=bar";
+        assertEquals(portUrl, UrlBuilder.fromString(portUrl).toString());
     }
 }
