@@ -1,2 +1,6 @@
 [tools]
 java = "zulu-21"
+# search tool used by AI coding agents (see AGENTS.md and .claude/settings.json)
+ripgrep = "latest"
+# GitHub CLI for pull requests, Actions runs and Dependabot updates
+gh = "latest"
