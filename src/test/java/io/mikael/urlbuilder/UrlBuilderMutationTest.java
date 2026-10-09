@@ -1,0 +1,206 @@
+package io.mikael.urlbuilder;
+
+import io.mikael.urlbuilder.util.Decoder;
+import io.mikael.urlbuilder.util.Encoder;
+import io.mikael.urlbuilder.util.UrlParameterMultimap;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.nio.charset.StandardCharsets;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+/// The immutable `with*`, `add*`, `set*` and `remove*` methods.
+public class UrlBuilderMutationTest {
+
+    private static UrlBuilder base() {
+        return UrlBuilder.fromString("http://example.com/p?a=1#f");
+    }
+
+    @Test
+    public void withersDoNotModifyTheOriginal() {
+        final var original = base();
+        original.withScheme("https").withHost("other").withPort(1).withPath("/x").withFragment("g");
+        assertEquals("http://example.com/p?a=1#f", original.toString());
+    }
+
+    @Test
+    public void withUserInfo() {
+        assertEquals("http://bob:pw@example.com/p?a=1#f", base().withUserInfo("bob:pw").toString());
+    }
+
+    @Test
+    public void withHostDecodesInternationalizedNames() {
+        assertEquals("bücher.example", base().withHost("xn--bcher-kva.example").hostName);
+    }
+
+    @Test
+    public void withPort() {
+        assertEquals("http://example.com:8080/p?a=1#f", base().withPort(8080).toString());
+        assertNull(base().withPort(8080).withPort(null).port);
+    }
+
+    @Test
+    public void withPathIsNotDecoded() {
+        assertEquals("/a%25b", UrlBuilder.empty().withPath("/a%b").toUri().getRawPath());
+        assertEquals("/a%b", base().withPath("/a%b").path);
+    }
+
+    @Test
+    public void withPathDecodesUsingCharset() {
+        assertEquals("/hö", base().withPath("/h%F6", StandardCharsets.ISO_8859_1).path);
+        assertEquals("/hö", base().withPath("/h%F6", "ISO-8859-1").path);
+        assertEquals("/hö", base().withPath("/h%C3%B6", "UTF-8").path);
+    }
+
+    @Test
+    public void withQueryString() {
+        final var ub = base().withQuery("x=1&y=2&x=3");
+        assertEquals("http://example.com/p?x=1&y=2&x=3#f", ub.toString());
+        assertEquals(2, ub.queryParameters.get("x").size());
+    }
+
+    @Test
+    public void withQueryStringNullOrEmptyRemovesQuery() {
+        assertEquals("http://example.com/p#f", base().withQuery((String) null).toString());
+        assertEquals("http://example.com/p#f", base().withQuery("").toString());
+    }
+
+    @Test
+    public void withQueryStringDecodesUsingCharset() {
+        final var ub = base().withQuery("k=%F6", StandardCharsets.ISO_8859_1);
+        assertEquals("ö", ub.queryParameters.get("k").get(0));
+        assertEquals("http://example.com/p?k=%C3%B6#f", ub.toString());
+    }
+
+    @Test
+    public void withQueryMultimapMakesADeepCopy() {
+        final var m = UrlParameterMultimap.newMultimap().add("k", "v");
+        final var ub = base().withQuery(m);
+        m.add("k", "later");
+        assertEquals("http://example.com/p?k=v#f", ub.toString());
+    }
+
+    @Test
+    public void withQueryMultimapNullRemovesQuery() {
+        assertEquals("http://example.com/p#f", base().withQuery((UrlParameterMultimap) null).toString());
+    }
+
+    @Test
+    public void withParameters() {
+        final var m = UrlParameterMultimap.newMultimap().add("k", "v").add("k", "w");
+        assertEquals("http://example.com/p?k=v&k=w#f", base().withParameters(m).toString());
+    }
+
+    @Test
+    public void withParametersIsolatedFromLaterMutation() {
+        final var m = UrlParameterMultimap.newMultimap().add("k", "v");
+        final var ub = base().withParameters(m);
+        m.add("k", "later");
+        assertEquals("http://example.com/p?k=v#f", ub.toString());
+    }
+
+    @Test
+    public void withDecoderIsUsedByLaterDecoding() {
+        final var ub = base().withDecoder(new Decoder(StandardCharsets.ISO_8859_1)).withQuery("k=%F6");
+        assertEquals("ö", ub.queryParameters.get("k").get(0));
+    }
+
+    @Test
+    public void withEncoderIsUsedForOutput() {
+        final var ub = base().withPath("/ö").withEncoder(new Encoder(StandardCharsets.ISO_8859_1));
+        assertEquals("http://example.com/%F6?a=1#f", ub.toString());
+    }
+
+    @Test
+    public void encodeAs() {
+        final var ub = base().withPath("/ö");
+        assertEquals("http://example.com/%F6?a=1#f", ub.encodeAs(StandardCharsets.ISO_8859_1).toString());
+        assertEquals("http://example.com/%C3%B6?a=1#f", ub.encodeAs("UTF-8").toString());
+    }
+
+    @Test
+    public void addSetAndRemoveParameters() {
+        final var ub = base().addParameter("a", "2").addParameter("b", "3");
+        assertEquals("http://example.com/p?a=1&a=2&b=3#f", ub.toString());
+        assertEquals("http://example.com/p?b=3&a=9#f", ub.setParameter("a", "9").toString());
+        assertEquals("http://example.com/p?a=1&b=3#f", ub.removeParameter("a", "2").toString());
+        assertEquals("http://example.com/p?b=3#f", ub.removeParameters("a").toString());
+        assertTrue(ub.removeParameters("a").removeParameters("b").queryParameters.isEmpty());
+    }
+
+    @Test
+    public void addPathSegmentsJoinsWithSingleSlash() {
+        assertEquals("http://example.com/p/a/b/c/?a=1#f", base().addPathSegments("a", "/b", "c/").toString());
+        assertEquals("http://example.com/p/a/b?a=1#f", base().addPathSegments("/a/", "/b").toString());
+    }
+
+    @Test
+    public void testRemoveParameter() {
+        final var b = UrlBuilder.fromString("http://somehost.com/page?parameter1=value1");
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals("http://somehost.com/page", b.removeParameter("parameter1", "value1").toString());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "http://somehost.com/page?parameter1=value1",
+            "http://somehost.com/page?parameter1=value1&parameter1=value2",
+            "http://somehost.com/page?parameter1=value1&parameter1=value2&parameter1=value3"
+    })
+    public void removeParametersByKey(final String url) {
+        final var b = UrlBuilder.fromString(url);
+        assertFalse(b.removeParameters("parameter1").queryParameters.containsKey("parameter1"));
+        assertEquals("http://somehost.com/page", b.removeParameters("parameter1").toString());
+    }
+
+    @Test
+    public void withFragment() {
+        final var b = UrlBuilder.fromString("http://somehost.com/page");
+        assertEquals("http://somehost.com/page#anchor", b.withFragment("anchor").toString());
+    }
+
+    @Test
+    public void addPathSegments() {
+        final var b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a", "b", "c");
+        assertEquals("http://somehost.com/page/a/b/c", b.toString());
+    }
+
+    @Test
+    public void addMultiPartPathSegments() {
+        final var b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a/1", "b/2", "c/3");
+        assertEquals("http://somehost.com/page/a/1/b/2/c/3", b.toString());
+    }
+
+    @Test
+    public void addPathSegmentsNormalisesSlashes() {
+        final var b = UrlBuilder
+                .fromString("http://somehost.com/page")
+                .addPathSegments("a/1/", "/b/2", "/c/3");
+        assertEquals("http://somehost.com/page/a/1/b/2/c/3", b.toString());
+    }
+
+    @Test
+    public void builderAndParserProduceTheSameUrl() {
+        final var ub1 = UrlBuilder.empty()
+                .withScheme("http")
+                .withHost("www.example.com")
+                .withPath("/")
+                .addParameter("foo", "bar");
+        final String urlString1 = ub1.toString();
+
+        final var ub2 = UrlBuilder.fromString("http://www.example.com/?foo=bar");
+        final String urlString2 = ub2.toString();
+
+        assertEquals("http://www.example.com/?foo=bar", urlString1);
+        assertEquals("http://www.example.com/?foo=bar", urlString2);
+
+        final String portUrl = "http://www.example.com:1234/?foo=bar";
+        assertEquals(portUrl, UrlBuilder.fromString(portUrl).toString());
+    }
+}
