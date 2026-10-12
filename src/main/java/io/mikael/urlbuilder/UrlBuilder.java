@@ -445,6 +445,9 @@ public final class UrlBuilder {
 
     /**
      * Set the decoded, non-url-encoded path.
+     *
+     * <p>{@code %2F} and {@code %25} are the exception: they stand for an encoded slash and an
+     * encoded percent sign, and are output as-is. Any other {@code %} is encoded as {@code %25}.
      */
     public UrlBuilder withPath(final String path) {
         return of(decoder, encoder, scheme, userInfo, hostName, port, path, queryParametersMultimap, fragment);

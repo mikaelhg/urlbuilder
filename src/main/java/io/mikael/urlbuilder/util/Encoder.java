@@ -19,7 +19,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * Percent-encoding according to the URI and URL standards.
@@ -51,21 +50,52 @@ public class Encoder {
         return urlEncode(input, IS_NOT_PATH, IS_NOT_FRAGMENT, IS_USERINFO);
     }
 
+    /**
+     * Percent-encodes a decoded path, keeping {@code /} as the segment separator.
+     *
+     * <p>{@code %2F} and {@code %25} (either case) are emitted as-is, as the encoded slash and
+     * percent sign that {@link Decoder#decodePath} keeps encoded. Any other {@code %} is encoded.
+     */
     public String encodePath(final String input) {
         if (input == null || input.isEmpty()) {
             return "";
         }
-        final StringBuilder sb = new StringBuilder();
-        final StringTokenizer st = new StringTokenizer(input, "/", true);
-        while (st.hasMoreElements()) {
-            final String element = st.nextToken();
-            if ("/".equals(element)) {
-                sb.append(element);
-            } else if (!element.isEmpty()) {
-                sb.append(urlEncode(element, IS_PATH, IS_NOT_FRAGMENT, IS_NOT_USERINFO));
+        final int len = input.length();
+        final StringBuilder sb = new StringBuilder(len);
+        int segmentStart = 0;
+        int i = 0;
+        while (i < len) {
+            final char c = input.charAt(i);
+            if (c == '/') {
+                appendPathSegment(sb, input, segmentStart, i);
+                sb.append('/');
+                i++;
+                segmentStart = i;
+            } else if (c == '%' && isPathDelimiterEscape(input, i)) {
+                appendPathSegment(sb, input, segmentStart, i);
+                sb.append('%').append('2').append(Character.toUpperCase(input.charAt(i + 2)));
+                i += 3;
+                segmentStart = i;
+            } else {
+                i++;
             }
         }
+        appendPathSegment(sb, input, segmentStart, len);
         return sb.toString();
+    }
+
+    private void appendPathSegment(final StringBuilder sb, final String input, final int start, final int end) {
+        if (start < end) {
+            sb.append(urlEncode(input.substring(start, end), IS_PATH, IS_NOT_FRAGMENT, IS_NOT_USERINFO));
+        }
+    }
+
+    private static boolean isPathDelimiterEscape(final String input, final int i) {
+        if (i + 2 >= input.length() || input.charAt(i + 1) != '2') {
+            return false;
+        }
+        final char c = input.charAt(i + 2);
+        return c == 'F' || c == 'f' || c == '5';
     }
 
     public String encodeQueryParameters(final UrlParameterMultimap queryParametersMultimap) {
@@ -95,6 +125,12 @@ public class Encoder {
         return urlEncode(input, IS_NOT_PATH, IS_FRAGMENT, IS_NOT_USERINFO);
     }
 
+    /**
+     * Percent-encodes every character that is not safe in the given component.
+     *
+     * <p>Characters the output encoding cannot represent, and unpaired surrogates, are
+     * replaced with the charset's replacement bytes, usually {@code %3F} ({@code ?}).
+     */
     public String urlEncode(final String input, final boolean isPath,
             final boolean isFragment, final boolean isUserInfo)
     {
