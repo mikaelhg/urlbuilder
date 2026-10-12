@@ -12,6 +12,39 @@ import static org.junit.jupiter.api.Assertions.*;
 /// Parsing of URL strings by `UrlBuilder.fromString`.
 public class UrlBuilderParsingTest {
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "http://h/a%2Fb/c",
+            "http://h/a%252Fb",
+            "http://h/a%25b",
+            "http://h/%2F%2F/x"})
+    public void roundTripsExactly(final String url) {
+        assertEquals(url, UrlBuilder.fromString(url).toString());
+    }
+
+    @Test
+    public void encodedSlashInPathIsNotASeparator() {
+        final var ub = UrlBuilder.fromString("http://h/a%2fb/c");
+        assertEquals("/a%2Fb/c", ub.path);
+        assertEquals("http://h/a%2Fb/c", ub.toString());
+    }
+
+    @Test
+    public void plusInUserInfoIsLiteral() {
+        final var ub = UrlBuilder.fromString("http://u+p:s+w@h/");
+        assertEquals("u+p:s+w", ub.userInfo);
+        assertEquals("http://u%2Bp:s%2Bw@h/", ub.toString());
+    }
+
+    @Test
+    public void invalidUtf8IsKeptAsLiteralText() {
+        final var ub = UrlBuilder.fromString("http://h/%FF?x=%C3#%C0%AF");
+        assertEquals("/%FF", ub.path);
+        assertEquals("%C3", ub.queryParameters.get("x").get(0));
+        assertEquals("%C0%AF", ub.fragment);
+        assertEquals("http://h/%25FF?x=%25C3#%25C0%25AF", ub.toString());
+    }
+
     @Test
     public void fragmentIsPercentDecoded() {
         final var ub = UrlBuilder.fromString("http://h/p#a%20b%23");

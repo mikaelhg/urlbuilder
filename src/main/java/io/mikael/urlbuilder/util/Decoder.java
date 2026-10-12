@@ -15,9 +15,11 @@ limitations under the License.
  */
 package io.mikael.urlbuilder.util;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.nio.charset.CharsetDecoder;
+import java.nio.charset.CoderResult;
 
 /**
  * Percent-decoding according to the URI and URL standards.
@@ -38,7 +40,7 @@ public class Decoder {
         if (null == userInfo || userInfo.isEmpty()) {
             return userInfo;
         } else {
-            return urlDecode(userInfo, DECODE_PLUS_AS_SPACE);
+            return urlDecode(userInfo, DO_NOT_DECODE_PLUS_AS_SPACE);
         }
     }
 
@@ -69,20 +71,46 @@ public class Decoder {
     }
 
     public byte[] nextDecodeableSequence(final String input, final int position) {
-        final int len = input.length();
-        final byte[] data = new byte[Math.max(0, (len - position) / 3)];
-        int j = 0;
+        return escapedBytes(input, position, escapeRunEnd(input, position, false));
+    }
+
+    /**
+     * Returns the end of the run of valid {@code %XX} escapes starting at {@code position}.
+     * With {@code keepPathDelimiters}, the run stops before {@code %2F} and {@code %25}.
+     */
+    private static int escapeRunEnd(final String input, final int position, final boolean keepPathDelimiters) {
         int i = position;
-        while (i + 2 < len && input.charAt(i) == '%') {
-            final int hi = hexValue(input.charAt(i + 1));
-            final int lo = hexValue(input.charAt(i + 2));
-            if (hi < 0 || lo < 0) {
+        while (isEscape(input, i)) {
+            if (keepPathDelimiters && isPathDelimiterEscape(input, i)) {
                 break;
             }
-            data[j++] = (byte) (hi << 4 | lo);
             i += 3;
         }
-        return j == data.length ? data : Arrays.copyOfRange(data, 0, j);
+        return i;
+    }
+
+    private static boolean isEscape(final String input, final int i) {
+        return i + 2 < input.length()
+                && input.charAt(i) == '%'
+                && hexValue(input.charAt(i + 1)) >= 0
+                && hexValue(input.charAt(i + 2)) >= 0;
+    }
+
+    private static boolean isPathDelimiterEscape(final String input, final int i) {
+        final int b = escapedByte(input, i);
+        return b == '/' || b == '%';
+    }
+
+    private static byte escapedByte(final String input, final int i) {
+        return (byte) (hexValue(input.charAt(i + 1)) << 4 | hexValue(input.charAt(i + 2)));
+    }
+
+    private static byte[] escapedBytes(final String input, final int start, final int end) {
+        final byte[] data = new byte[(end - start) / 3];
+        for (int j = 0; j < data.length; j++) {
+            data[j] = escapedByte(input, start + j * 3);
+        }
+        return data;
     }
 
     private static int hexValue(final char c) {
@@ -96,27 +124,31 @@ public class Decoder {
         return -1;
     }
 
+    /**
+     * Decodes a percent-encoded path.
+     *
+     * <p>{@code %2F} and {@code %25} are kept encoded (normalised to upper case), so that an encoded
+     * slash stays distinguishable from a segment separator and {@link Encoder#encodePath} restores
+     * the original path.
+     */
     public String decodePath(final String input) {
         if (input == null || input.isEmpty()) {
             return "";
         }
-
-        final StringBuilder sb = new StringBuilder();
-        final boolean RETURN_DELIMETERS = true;
-        final StringTokenizer st = new StringTokenizer(input, "/", RETURN_DELIMETERS);
-
-        while (st.hasMoreElements()) {
-            final String element = st.nextToken();
-            if ("/".equals(element)) {
-                sb.append(element);
-            } else if (!element.isEmpty()) {
-                sb.append(urlDecode(element, DO_NOT_DECODE_PLUS_AS_SPACE));
-            }
-        }
-        return sb.toString();
+        return decode(input, DO_NOT_DECODE_PLUS_AS_SPACE, true);
     }
 
+    /**
+     * Decodes {@code %XX} escapes, and optionally {@code +} as a space.
+     *
+     * <p>Malformed escapes, and escaped bytes that are not valid in the input encoding,
+     * are kept as their original text.
+     */
     public String urlDecode(final String input, final boolean decodePlusAsSpace) {
+        return decode(input, decodePlusAsSpace, false);
+    }
+
+    private String decode(final String input, final boolean decodePlusAsSpace, final boolean keepPathDelimiters) {
         final int len = input.length();
         int first = 0;
         while (first < len) {
@@ -131,6 +163,7 @@ public class Decoder {
         }
 
         final StringBuilder sb = new StringBuilder(len).append(input, 0, first);
+        CharsetDecoder charsetDecoder = null;
         int i = first;
         while (i < len) {
             final char c = input.charAt(i);
@@ -141,17 +174,60 @@ public class Decoder {
                 sb.append(c);
                 i++;
             } else {
-                final byte[] bytes = nextDecodeableSequence(input, i);
-                if (bytes.length == 0) {
+                final int end = escapeRunEnd(input, i, keepPathDelimiters);
+                if (end > i) {
+                    if (charsetDecoder == null) {
+                        charsetDecoder = inputEncoding.newDecoder();
+                    }
+                    decodeEscapes(input, i, end, charsetDecoder, sb);
+                    i = end;
+                } else if (keepPathDelimiters && isEscape(input, i)) {
+                    sb.append('%')
+                            .append(Character.toUpperCase(input.charAt(i + 1)))
+                            .append(Character.toUpperCase(input.charAt(i + 2)));
+                    i += 3;
+                } else {
                     sb.append('%');
                     i++;
-                } else {
-                    sb.append(new String(bytes, inputEncoding));
-                    i += bytes.length * 3;
                 }
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * Appends the decoded escapes in {@code input[start, end)} to {@code sb}. Byte sequences that
+     * the charset rejects are appended as their original escape text.
+     */
+    private static void decodeEscapes(final String input, final int start, final int end,
+            final CharsetDecoder charsetDecoder, final StringBuilder sb)
+    {
+        final ByteBuffer in = ByteBuffer.wrap(escapedBytes(input, start, end));
+        final CharBuffer out = CharBuffer.allocate((int) (in.capacity() * charsetDecoder.maxCharsPerByte()) + 1);
+        charsetDecoder.reset();
+        while (true) {
+            final CoderResult result = charsetDecoder.decode(in, out, true);
+            if (result.isError()) {
+                drain(out, sb);
+                final int bad = in.position();
+                sb.append(input, start + bad * 3, start + (bad + result.length()) * 3);
+                in.position(bad + result.length());
+            } else if (result.isOverflow()) {
+                drain(out, sb);
+            } else {
+                break;
+            }
+        }
+        while (charsetDecoder.flush(out).isOverflow()) {
+            drain(out, sb);
+        }
+        drain(out, sb);
+    }
+
+    private static void drain(final CharBuffer out, final StringBuilder sb) {
+        out.flip();
+        sb.append(out);
+        out.clear();
     }
 
 }
