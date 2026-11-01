@@ -5,7 +5,7 @@ plugins {
     `java-library`
     `maven-publish`
     jacoco
-    id("com.github.spotbugs") version "6.5.12"
+    id("com.github.spotbugs") version "6.5.13"
 }
 
 repositories {
